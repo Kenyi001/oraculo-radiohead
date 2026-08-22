@@ -83,11 +83,13 @@ npm run dev:web
 
 Open http://localhost:5173
 
-**Live demo:** _(deploy URL — fill after Vercel)_
+**Live demo:** deploy with `npx vercel --prod` (requires `vercel login`) — then paste URL here.  
+Repo: https://github.com/Kenyi001/oraculo-radiohead
 
 ```bash
 # Deploy from repo root (Vercel CLI or dashboard)
 # vercel.json points output to packages/demo-web/dist
+npx vercel --prod
 ```
 
 ## Monorepo
