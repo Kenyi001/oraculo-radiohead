@@ -1,7 +1,7 @@
 # Casandra — Task board (human panel)
 
 > Spec: [specs/001-casandra-investment-oracle/spec.md](specs/001-casandra-investment-oracle/spec.md) · Constitution: [specs/constitution.md](specs/constitution.md)  
-> Requirements: [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) · Track: [docs/TRACK.md](docs/TRACK.md)  
+> Requirements: [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) · Track: [docs/TRACK.md](docs/TRACK.md) · **Board:** [docs/BOARD.md](docs/BOARD.md)  
 > Issues: https://github.com/Kenyi001/oraculo-radiohead/issues  
 > Deadline: **Sun 23 Aug ~11:00 BO**
 
@@ -43,7 +43,7 @@
 | ID | Task | Owner | Status |
 |---|---|---|---|
 | T12 | WDK USDT hook | Dax | open (#8) |
-| T13 | UI polish | Partner | todo |
+| T13 | UI polish | Partner | open (#11) |
 
 ## Definition of done (Sunday)
 
