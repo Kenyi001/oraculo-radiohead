@@ -1,0 +1,134 @@
+{
+  "contracts/deployments/baseSepolia.json": {
+    "mtime": 1787417825.4560654,
+    "seen": 1787436993.368242,
+    "ast_hash": "1ed29bc9a87cfda6f2faadffea66a9c9",
+    "semantic_hash": "1ed29bc9a87cfda6f2faadffea66a9c9"
+  },
+  "contracts/scripts/deploy.js": {
+    "mtime": 1787417825.4566033,
+    "seen": 1787436993.368242,
+    "ast_hash": "67e468f7d8adabb08f01555034c8171e",
+    "semantic_hash": "67e468f7d8adabb08f01555034c8171e"
+  },
+  "docs/mcp-casandra-wdk.example.json": {
+    "mtime": 1787428655.0389624,
+    "seen": 1787436993.368242,
+    "ast_hash": "d78cf1e64f2fff271d3067a4bb4a73b2",
+    "semantic_hash": "d78cf1e64f2fff271d3067a4bb4a73b2"
+  },
+  "hardhat.config.js": {
+    "mtime": 1787417825.4653301,
+    "seen": 1787436993.368242,
+    "ast_hash": "aa545ec311bf40bfaf0b8906ef4104b8",
+    "semantic_hash": "aa545ec311bf40bfaf0b8906ef4104b8"
+  },
+  "package.json": {
+    "mtime": 1787428954.9839482,
+    "seen": 1787436993.368242,
+    "ast_hash": "fb88af1797e3a621147edf28fd477507",
+    "semantic_hash": "fb88af1797e3a621147edf28fd477507"
+  },
+  "packages/demo-web/package.json": {
+    "mtime": 1787417825.4718986,
+    "seen": 1787436993.368242,
+    "ast_hash": "208fb4d6cae57a7439c77ab3301d2635",
+    "semantic_hash": "208fb4d6cae57a7439c77ab3301d2635"
+  },
+  "packages/demo-web/src/App.tsx": {
+    "mtime": 1787428614.702674,
+    "seen": 1787436993.368242,
+    "ast_hash": "ade9ffd8d9ef3ddea4219c211bdd6247",
+    "semantic_hash": "ade9ffd8d9ef3ddea4219c211bdd6247"
+  },
+  "packages/demo-web/src/main.tsx": {
+    "mtime": 1787417825.4743526,
+    "seen": 1787436993.368242,
+    "ast_hash": "aeeb6399bf256e26c82c1ce41c1ba027",
+    "semantic_hash": "aeeb6399bf256e26c82c1ce41c1ba027"
+  },
+  "packages/demo-web/src/vite-env.d.ts": {
+    "mtime": 1787417825.4753733,
+    "seen": 1787436993.368242,
+    "ast_hash": "50fd3b4a67ffb00fa0f8955343806296",
+    "semantic_hash": "50fd3b4a67ffb00fa0f8955343806296"
+  },
+  "packages/demo-web/tsconfig.json": {
+    "mtime": 1787417825.4753733,
+    "seen": 1787436993.368242,
+    "ast_hash": "c7c21c311fc6c352027ddf0dd5262d6f",
+    "semantic_hash": "c7c21c311fc6c352027ddf0dd5262d6f"
+  },
+  "packages/demo-web/vite.config.ts": {
+    "mtime": 1787417825.4763856,
+    "seen": 1787436993.368242,
+    "ast_hash": "145972878cfbebc63028d47879e0349d",
+    "semantic_hash": "145972878cfbebc63028d47879e0349d"
+  },
+  "packages/market-core/package.json": {
+    "mtime": 1787417825.4775374,
+    "seen": 1787436993.368242,
+    "ast_hash": "0ee558d1675e62ad31da37d19fc8e2a7",
+    "semantic_hash": "0ee558d1675e62ad31da37d19fc8e2a7"
+  },
+  "packages/market-core/src/index.ts": {
+    "mtime": 1787436707.651141,
+    "seen": 1787436993.368242,
+    "ast_hash": "0e38c0d4023a897fa4bad9089f8996d4",
+    "semantic_hash": "0e38c0d4023a897fa4bad9089f8996d4"
+  },
+  "packages/market-core/tsconfig.json": {
+    "mtime": 1787417825.4810774,
+    "seen": 1787436993.368242,
+    "ast_hash": "6e37c028173697304b7ca113945811a0",
+    "semantic_hash": "6e37c028173697304b7ca113945811a0"
+  },
+  "packages/mcp-server/package.json": {
+    "mtime": 1787417825.4820828,
+    "seen": 1787436993.368242,
+    "ast_hash": "bc92897e74bee8f3dfe359fc7440a84d",
+    "semantic_hash": "bc92897e74bee8f3dfe359fc7440a84d"
+  },
+  "packages/mcp-server/src/index.ts": {
+    "mtime": 1787436723.8353052,
+    "seen": 1787436993.368242,
+    "ast_hash": "d53d76bd301dad22e7c7a5dd33e14fb0",
+    "semantic_hash": "d53d76bd301dad22e7c7a5dd33e14fb0"
+  },
+  "packages/mcp-server/tsconfig.json": {
+    "mtime": 1787417825.483068,
+    "seen": 1787436993.368242,
+    "ast_hash": "6e37c028173697304b7ca113945811a0",
+    "semantic_hash": "6e37c028173697304b7ca113945811a0"
+  },
+  "packages/wdk-bridge/package.json": {
+    "mtime": 1787428943.7268002,
+    "seen": 1787436993.368242,
+    "ast_hash": "b4500862d46349a7dd6919e9bc25de44",
+    "semantic_hash": "b4500862d46349a7dd6919e9bc25de44"
+  },
+  "packages/wdk-bridge/src/index.ts": {
+    "mtime": 1787432160.6235137,
+    "seen": 1787436993.368242,
+    "ast_hash": "6d565fea3d123bff4cf28ba543f8ddb4",
+    "semantic_hash": "6d565fea3d123bff4cf28ba543f8ddb4"
+  },
+  "packages/wdk-bridge/tsconfig.json": {
+    "mtime": 1787428943.7268002,
+    "seen": 1787436993.368242,
+    "ast_hash": "087cec8cc8cdb4a8f17d90c5d244e32b",
+    "semantic_hash": "087cec8cc8cdb4a8f17d90c5d244e32b"
+  },
+  "tsconfig.base.json": {
+    "mtime": 1787417825.487131,
+    "seen": 1787436993.368242,
+    "ast_hash": "cc63c89e4660b08698bfc6e1d190432e",
+    "semantic_hash": "cc63c89e4660b08698bfc6e1d190432e"
+  },
+  "vercel.json": {
+    "mtime": 1787417825.4881377,
+    "seen": 1787436993.368242,
+    "ast_hash": "d2ae7694e28719da0c532afbe3a70ace",
+    "semantic_hash": "d2ae7694e28719da0c532afbe3a70ace"
+  }
+}

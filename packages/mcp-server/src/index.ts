@@ -6,6 +6,7 @@ import {
   checkWdkGuardrail,
   getHealth,
   getMarketContext,
+  getMarketPulse,
   getMarketSummary,
   getPortfolioState,
   getPrice,
@@ -105,6 +106,39 @@ server.tool(
     const ctx = await getMarketContext(symbol);
     return {
       content: [{ type: "text" as const, text: JSON.stringify(ctx, null, 2) }],
+    };
+  }
+);
+
+server.tool(
+  "get_market_pulse",
+  "Consume-only investment pulse for AI agents: market_favor, verdict, risk_pct, Fear&Greed, news headlines, and why{} reasons. Do not reinvent casandra-pulse-v1 — read JSON fields only.",
+  {
+    symbol: z.string().describe("Ticker, e.g. btc, eth, sol"),
+    side: z
+      .enum(["buy", "sell"])
+      .optional()
+      .describe("Optional trade side to align market_favor"),
+    lookback_hours: z
+      .number()
+      .optional()
+      .describe("News/context window hours (default 24)"),
+    include_news: z
+      .boolean()
+      .optional()
+      .describe("Include headlines + news_score (default true)"),
+  },
+  async ({ symbol, side, lookback_hours, include_news }) => {
+    const pulse = await getMarketPulse({
+      symbol,
+      side,
+      lookback_hours,
+      include_news,
+    });
+    return {
+      content: [
+        { type: "text" as const, text: JSON.stringify(pulse, null, 2) },
+      ],
     };
   }
 );

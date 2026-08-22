@@ -40,15 +40,13 @@ Que un **agente IA** consulte Casandra (precios, portafolio, riesgo con `action`
 
 **Done cuando:** explorer muestra el contrato y el footer del demo lo lee.
 
-### David (`@arnez69`) — Market Pulse
-**Issue:** [#17](https://github.com/Kenyi001/oraculo-radiohead/issues/17)
+### David (`@arnez69`) — Market Pulse (producto / API para agentes)
+**Issue:** [#17](https://github.com/Kenyi001/oraculo-radiohead/issues/17)  
+**Contrato:** [david/REQUISITOS_PULSE.md](david/REQUISITOS_PULSE.md)
 
-1. Partir de `master` (ya tiene `action` / verdict)
-2. Implementar `get_market_pulse` (Fear&Greed + market_favor + reasons) según el body del issue
-3. Exponer tool MCP + ejemplo JSON en el issue
-4. **No** rehacer investigaciones: aplicar O1–O8 del #17
+**Exigencia:** noticias + algoritmo `casandra-pulse-v1` + **por qué** (`why`/`reasons`) + JSON consume-only para MCP.
 
-**Done cuando:** MCP tool responde JSON con `market_favor` + `verdict` medible.
+Base ya en master (`get_market_pulse`). David valida DoD, mejora calidad news/reasons, pega JSON real en #17.
 
 ### Augusto (`@RonaldGaymer2002`) — Pitch, video y demo público
 **Issues:** [#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6) (P0 pitch/video) · [#5](https://github.com/Kenyi001/oraculo-radiohead/issues/5) (Vercel)

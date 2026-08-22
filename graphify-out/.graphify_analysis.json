@@ -1,0 +1,417 @@
+{
+  "communities": {
+    "0": [
+      "packages_market_core_src_index",
+      "packages_market_core_src_index_actionfromband",
+      "packages_market_core_src_index_bandfromscore",
+      "packages_market_core_src_index_biasfromchange",
+      "packages_market_core_src_index_checkwdkguardrail",
+      "packages_market_core_src_index_clamp",
+      "packages_market_core_src_index_computebias",
+      "packages_market_core_src_index_default_demo_positions",
+      "packages_market_core_src_index_feargreedsnapshot",
+      "packages_market_core_src_index_fetchheadlines",
+      "packages_market_core_src_index_getextendedquote",
+      "packages_market_core_src_index_getfeargreed",
+      "packages_market_core_src_index_gethealth",
+      "packages_market_core_src_index_getmarketcontext",
+      "packages_market_core_src_index_getmarketpulse",
+      "packages_market_core_src_index_getmarketsummary",
+      "packages_market_core_src_index_getportfoliostate",
+      "packages_market_core_src_index_getprice",
+      "packages_market_core_src_index_getrisklevel",
+      "packages_market_core_src_index_healthstatus",
+      "packages_market_core_src_index_isstable",
+      "packages_market_core_src_index_marketbias",
+      "packages_market_core_src_index_marketcontext",
+      "packages_market_core_src_index_marketfavor",
+      "packages_market_core_src_index_marketfavorfrombias",
+      "packages_market_core_src_index_marketmeters",
+      "packages_market_core_src_index_marketpulse",
+      "packages_market_core_src_index_marketpulsewhy",
+      "packages_market_core_src_index_marketsummary",
+      "packages_market_core_src_index_mock_prices",
+      "packages_market_core_src_index_mockheadlines",
+      "packages_market_core_src_index_mockquote",
+      "packages_market_core_src_index_news_neg",
+      "packages_market_core_src_index_news_pos",
+      "packages_market_core_src_index_newsbias",
+      "packages_market_core_src_index_newsbiasfromscore",
+      "packages_market_core_src_index_normalizesymbol",
+      "packages_market_core_src_index_portfoliostate",
+      "packages_market_core_src_index_positioninput",
+      "packages_market_core_src_index_positionstate",
+      "packages_market_core_src_index_pricequote",
+      "packages_market_core_src_index_pulseheadline",
+      "packages_market_core_src_index_resolvecoinid",
+      "packages_market_core_src_index_riskassessment",
+      "packages_market_core_src_index_riskband",
+      "packages_market_core_src_index_riskfactor",
+      "packages_market_core_src_index_riskfromchangeandusdtshare",
+      "packages_market_core_src_index_scoreheadlinetitle",
+      "packages_market_core_src_index_stable_symbols",
+      "packages_market_core_src_index_symbol_to_id",
+      "packages_market_core_src_index_trendstrength",
+      "packages_market_core_src_index_trendstrengthfromchange",
+      "packages_market_core_src_index_wdkaction",
+      "packages_market_core_src_index_wdkguardrailresult",
+      "packages_market_core_src_index_worsenverdict"
+    ],
+    "1": [
+      "package",
+      "package_author",
+      "package_dependencies",
+      "package_dependencies_tetherto_wdk",
+      "package_dependencies_tetherto_wdk_cli",
+      "package_description",
+      "package_engines",
+      "package_engines_node",
+      "package_json_tetherto_wdk",
+      "package_json_tetherto_wdk_cli",
+      "package_license",
+      "package_name",
+      "package_private",
+      "package_scripts",
+      "package_scripts_build",
+      "package_scripts_build_core",
+      "package_scripts_contracts_compile",
+      "package_scripts_contracts_deploy_base",
+      "package_scripts_contracts_deploy_local",
+      "package_scripts_dev_mcp",
+      "package_scripts_dev_web",
+      "package_scripts_start_mcp",
+      "package_scripts_typecheck",
+      "package_scripts_wdk_version",
+      "package_version",
+      "package_workspaces",
+      "ref_packages"
+    ],
+    "2": [
+      "modelcontextprotocol_sdk",
+      "packages_mcp_server_package",
+      "packages_mcp_server_package_bin",
+      "packages_mcp_server_package_bin_oraculo_mcp",
+      "packages_mcp_server_package_dependencies",
+      "packages_mcp_server_package_dependencies_modelcontextprotocol_sdk",
+      "packages_mcp_server_package_dependencies_oraculo_market_core",
+      "packages_mcp_server_package_dependencies_zod",
+      "packages_mcp_server_package_devdependencies",
+      "packages_mcp_server_package_devdependencies_types_node",
+      "packages_mcp_server_package_devdependencies_typescript",
+      "packages_mcp_server_package_json_oraculo_market_core",
+      "packages_mcp_server_package_json_typescript",
+      "packages_mcp_server_package_name",
+      "packages_mcp_server_package_scripts",
+      "packages_mcp_server_package_scripts_build",
+      "packages_mcp_server_package_scripts_start",
+      "packages_mcp_server_package_scripts_typecheck",
+      "packages_mcp_server_package_type",
+      "packages_mcp_server_package_version",
+      "types_node",
+      "zod"
+    ],
+    "3": [
+      "packages_wdk_bridge_package",
+      "packages_wdk_bridge_package_dependencies",
+      "packages_wdk_bridge_package_dependencies_tetherto_wdk",
+      "packages_wdk_bridge_package_dependencies_tetherto_wdk_cli",
+      "packages_wdk_bridge_package_devdependencies",
+      "packages_wdk_bridge_package_devdependencies_typescript",
+      "packages_wdk_bridge_package_exports",
+      "packages_wdk_bridge_package_json_tetherto_wdk",
+      "packages_wdk_bridge_package_json_tetherto_wdk_cli",
+      "packages_wdk_bridge_package_json_typescript",
+      "packages_wdk_bridge_package_main",
+      "packages_wdk_bridge_package_name",
+      "packages_wdk_bridge_package_private",
+      "packages_wdk_bridge_package_scripts",
+      "packages_wdk_bridge_package_scripts_build",
+      "packages_wdk_bridge_package_scripts_typecheck",
+      "packages_wdk_bridge_package_type",
+      "packages_wdk_bridge_package_types",
+      "packages_wdk_bridge_package_version"
+    ],
+    "4": [
+      "packages_demo_web_tsconfig",
+      "packages_demo_web_tsconfig_compileroptions",
+      "packages_demo_web_tsconfig_compileroptions_esmoduleinterop",
+      "packages_demo_web_tsconfig_compileroptions_isolatedmodules",
+      "packages_demo_web_tsconfig_compileroptions_jsx",
+      "packages_demo_web_tsconfig_compileroptions_lib",
+      "packages_demo_web_tsconfig_compileroptions_module",
+      "packages_demo_web_tsconfig_compileroptions_moduleresolution",
+      "packages_demo_web_tsconfig_compileroptions_noemit",
+      "packages_demo_web_tsconfig_compileroptions_resolvejsonmodule",
+      "packages_demo_web_tsconfig_compileroptions_skiplibcheck",
+      "packages_demo_web_tsconfig_compileroptions_strict",
+      "packages_demo_web_tsconfig_compileroptions_target",
+      "packages_demo_web_tsconfig_include",
+      "packages_demo_web_tsconfig_json_ref_es2022",
+      "packages_demo_web_tsconfig_json_ref_src",
+      "ref_dom",
+      "ref_dom_iterable"
+    ],
+    "5": [
+      "packages_demo_web_package",
+      "packages_demo_web_package_dependencies",
+      "packages_demo_web_package_dependencies_oraculo_market_core",
+      "packages_demo_web_package_dependencies_react",
+      "packages_demo_web_package_dependencies_react_dom",
+      "packages_demo_web_package_json_oraculo_market_core",
+      "packages_demo_web_package_name",
+      "packages_demo_web_package_private",
+      "packages_demo_web_package_scripts",
+      "packages_demo_web_package_scripts_build",
+      "packages_demo_web_package_scripts_dev",
+      "packages_demo_web_package_scripts_preview",
+      "packages_demo_web_package_type",
+      "packages_demo_web_package_version",
+      "react",
+      "react_dom"
+    ],
+    "6": [
+      "tsconfig_base",
+      "tsconfig_base_compileroptions",
+      "tsconfig_base_compileroptions_declaration",
+      "tsconfig_base_compileroptions_declarationmap",
+      "tsconfig_base_compileroptions_esmoduleinterop",
+      "tsconfig_base_compileroptions_forceconsistentcasinginfilenames",
+      "tsconfig_base_compileroptions_lib",
+      "tsconfig_base_compileroptions_module",
+      "tsconfig_base_compileroptions_moduleresolution",
+      "tsconfig_base_compileroptions_resolvejsonmodule",
+      "tsconfig_base_compileroptions_skiplibcheck",
+      "tsconfig_base_compileroptions_sourcemap",
+      "tsconfig_base_compileroptions_strict",
+      "tsconfig_base_compileroptions_target",
+      "tsconfig_base_json_ref_es2022"
+    ],
+    "7": [
+      "packages_market_core_package",
+      "packages_market_core_package_devdependencies",
+      "packages_market_core_package_devdependencies_typescript",
+      "packages_market_core_package_exports",
+      "packages_market_core_package_json_typescript",
+      "packages_market_core_package_main",
+      "packages_market_core_package_name",
+      "packages_market_core_package_scripts",
+      "packages_market_core_package_scripts_build",
+      "packages_market_core_package_scripts_typecheck",
+      "packages_market_core_package_type",
+      "packages_market_core_package_types",
+      "packages_market_core_package_version"
+    ],
+    "8": [
+      "packages_demo_web_package_devdependencies",
+      "packages_demo_web_package_devdependencies_types_react",
+      "packages_demo_web_package_devdependencies_types_react_dom",
+      "packages_demo_web_package_devdependencies_typescript",
+      "packages_demo_web_package_devdependencies_vite",
+      "packages_demo_web_package_devdependencies_vitejs_plugin_react",
+      "packages_demo_web_package_json_typescript",
+      "types_react",
+      "types_react_dom",
+      "vite",
+      "vitejs_plugin_react"
+    ],
+    "9": [
+      "dotenv",
+      "ethers",
+      "hardhat",
+      "nomicfoundation_hardhat_ethers",
+      "package_devdependencies",
+      "package_devdependencies_dotenv",
+      "package_devdependencies_ethers",
+      "package_devdependencies_hardhat",
+      "package_devdependencies_nomicfoundation_hardhat_ethers"
+    ],
+    "10": [
+      "packages_wdk_bridge_tsconfig",
+      "packages_wdk_bridge_tsconfig_compileroptions",
+      "packages_wdk_bridge_tsconfig_compileroptions_composite",
+      "packages_wdk_bridge_tsconfig_compileroptions_outdir",
+      "packages_wdk_bridge_tsconfig_compileroptions_rootdir",
+      "packages_wdk_bridge_tsconfig_extends",
+      "packages_wdk_bridge_tsconfig_include",
+      "packages_wdk_bridge_tsconfig_json_ref_src",
+      "packages_wdk_bridge_tsconfig_json_ref_tsconfig_base_json"
+    ],
+    "11": [
+      "packages_market_core_tsconfig",
+      "packages_market_core_tsconfig_compileroptions",
+      "packages_market_core_tsconfig_compileroptions_outdir",
+      "packages_market_core_tsconfig_compileroptions_rootdir",
+      "packages_market_core_tsconfig_extends",
+      "packages_market_core_tsconfig_include",
+      "packages_market_core_tsconfig_json_ref_src",
+      "packages_market_core_tsconfig_json_ref_tsconfig_base_json"
+    ],
+    "12": [
+      "packages_mcp_server_tsconfig",
+      "packages_mcp_server_tsconfig_compileroptions",
+      "packages_mcp_server_tsconfig_compileroptions_outdir",
+      "packages_mcp_server_tsconfig_compileroptions_rootdir",
+      "packages_mcp_server_tsconfig_extends",
+      "packages_mcp_server_tsconfig_include",
+      "packages_mcp_server_tsconfig_json_ref_src",
+      "packages_mcp_server_tsconfig_json_ref_tsconfig_base_json"
+    ],
+    "13": [
+      "contracts_scripts_deploy",
+      "contracts_scripts_deploy_fs",
+      "contracts_scripts_deploy_hre",
+      "contracts_scripts_deploy_main",
+      "contracts_scripts_deploy_path"
+    ],
+    "14": [
+      "packages_demo_web_src_app",
+      "packages_demo_web_src_app_app",
+      "packages_demo_web_src_app_app_loaddemo",
+      "packages_demo_web_src_app_app_oncontext",
+      "packages_demo_web_src_main"
+    ],
+    "15": [
+      "vercel",
+      "vercel_buildcommand",
+      "vercel_framework",
+      "vercel_installcommand",
+      "vercel_outputdirectory"
+    ],
+    "16": [
+      "packages_mcp_server_src_index",
+      "packages_mcp_server_src_index_main",
+      "packages_mcp_server_src_index_positionschema",
+      "packages_mcp_server_src_index_server"
+    ],
+    "17": [
+      "packages_demo_web_src_vite_env_d",
+      "packages_demo_web_src_vite_env_d_importmeta",
+      "packages_demo_web_src_vite_env_d_importmetaenv"
+    ],
+    "18": [
+      "packages_wdk_bridge_src_index",
+      "packages_wdk_bridge_src_index_getwdkintegrationmanifest",
+      "packages_wdk_bridge_src_index_wdk_packages"
+    ],
+    "19": [
+      "config",
+      "hardhat_config"
+    ],
+    "20": [
+      "packages_demo_web_vite_config"
+    ]
+  },
+  "cohesion": {
+    "0": 0.06464646464646465,
+    "1": 0.07407407407407407,
+    "2": 0.09090909090909091,
+    "3": 0.10526315789473684,
+    "4": 0.1111111111111111,
+    "5": 0.125,
+    "6": 0.13333333333333333,
+    "7": 0.15384615384615385,
+    "8": 0.18181818181818182,
+    "9": 0.2222222222222222,
+    "10": 0.2222222222222222,
+    "11": 0.25,
+    "12": 0.25,
+    "13": 0.4,
+    "14": 0.5,
+    "15": 0.4,
+    "16": 0.5,
+    "17": 0.6666666666666666,
+    "18": 0.6666666666666666,
+    "19": 1.0,
+    "20": 1.0
+  },
+  "gods": [
+    {
+      "id": "tsconfig_base_compileroptions",
+      "label": "compilerOptions",
+      "degree": 13
+    },
+    {
+      "id": "packages_demo_web_tsconfig_compileroptions",
+      "label": "compilerOptions",
+      "degree": 12
+    },
+    {
+      "id": "packages_market_core_src_index_getmarketpulse",
+      "label": "getMarketPulse()",
+      "degree": 12
+    },
+    {
+      "id": "package_scripts",
+      "label": "scripts",
+      "degree": 11
+    },
+    {
+      "id": "packages_market_core_src_index_normalizesymbol",
+      "label": "normalizeSymbol()",
+      "degree": 11
+    },
+    {
+      "id": "packages_market_core_src_index_getrisklevel",
+      "label": "getRiskLevel()",
+      "degree": 10
+    },
+    {
+      "id": "packages_market_core_src_index_getprice",
+      "label": "getPrice()",
+      "degree": 9
+    },
+    {
+      "id": "packages_market_core_src_index_isstable",
+      "label": "isStable()",
+      "degree": 5
+    },
+    {
+      "id": "packages_market_core_src_index_getportfoliostate",
+      "label": "getPortfolioState()",
+      "degree": 5
+    },
+    {
+      "id": "packages_market_core_src_index_getmarketcontext",
+      "label": "getMarketContext()",
+      "degree": 5
+    }
+  ],
+  "surprises": [],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `devDependencies` connect `Community 9` to `Community 1`?",
+      "why": "High betweenness centrality (0.007) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `devDependencies` connect `Community 8` to `Community 5`?",
+      "why": "High betweenness centrality (0.006) - this node is a cross-community bridge."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `hre`, `fs`, `path` to the rest of the system?",
+      "why": "153 weakly-connected nodes found - possible documentation gaps or missing edges."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 0` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.06464646464646465 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 1` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.07407407407407407 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 2` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.09090909090909091 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 3` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.10526315789473684 - nodes in this community are weakly interconnected."
+    }
+  ]
+}

@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>oraculo-radiohead — Complete Call Flow &amp; Architecture Documentation</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+:root {
+  --bg: #0f172a; --surface: #1e293b; --border: #334155;
+  --text: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8;
+  --warn: #fbbf24; --err: #f87171; --ok: #34d399;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+.container { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+h1 { font-size: 2.4rem; margin-bottom: 8px; background: linear-gradient(135deg, var(--accent), #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+h2 { font-size: 1.7rem; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--accent); }
+h3 { font-size: 1.25rem; margin: 32px 0 12px; color: var(--accent); }
+h4 { font-size: 1.05rem; margin: 20px 0 8px; color: var(--warn); }
+p { margin: 8px 0; color: var(--muted); }
+.subtitle { color: var(--muted); font-size: 1.1rem; margin-bottom: 32px; }
+.mermaid { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin: 20px 0; overflow-x: auto; position: relative; }
+.mermaid.is-enhanced { padding: 0; overflow: hidden; min-height: 260px; }
+.mermaid-viewport { padding: 54px 24px 24px; overflow: hidden; cursor: grab; touch-action: none; min-height: 260px; }
+.mermaid-viewport.is-dragging { cursor: grabbing; }
+.mermaid-viewport svg { max-width: none !important; height: auto; transform-origin: 0 0; transition: transform 120ms ease; }
+.mermaid-toolbar { position: absolute; top: 10px; right: 10px; z-index: 3; display: flex; align-items: center; gap: 6px; padding: 6px; background: rgba(15,23,42,0.92); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.28); }
+.mermaid-toolbar button, .mermaid-toolbar .zoom-level { height: 28px; min-width: 32px; border: 1px solid var(--border); border-radius: 6px; background: #1e293b; color: var(--text); font: 600 0.78rem system-ui, sans-serif; display: inline-flex; align-items: center; justify-content: center; }
+.mermaid-toolbar button { cursor: pointer; }
+.mermaid-toolbar button:hover { border-color: var(--accent); color: var(--accent); }
+.mermaid-toolbar .zoom-level { min-width: 52px; color: var(--muted); background: transparent; }
+.call-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; }
+.call-table th { background: #1a2744; color: var(--accent); text-align: left; padding: 10px 14px; border: 1px solid var(--border); }
+.call-table td { padding: 8px 14px; border: 1px solid var(--border); vertical-align: top; }
+.call-table tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+.tag-async { background: #7c3aed33; color: #a78bfa; }
+.tag-class { background: #05966933; color: var(--ok); }
+.tag-func { background: #2563eb33; color: var(--accent); }
+.tag-cmd { background: #d9770633; color: var(--warn); }
+.tag-endpoint { background: #dc262633; color: var(--err); }
+.tag-hook { background: #db277733; color: #f472b6; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin: 16px 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; margin: 16px 0; }
+.arrow-chain { font-family: 'Fira Code', monospace; font-size: 0.85rem; color: var(--accent); padding: 10px; background: rgba(56,189,248,0.06); border-radius: 6px; }
+code { font-family: 'Fira Code', 'Cascadia Code', monospace; background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 3px; font-size: 0.88em; }
+ul, ol { margin: 8px 0 8px 24px; color: var(--muted); }
+li { margin: 4px 0; }
+a { color: var(--accent); }
+hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+.nav { position: sticky; top: 0; background: var(--bg); z-index: 10; padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.9rem; }
+.nav a { text-decoration: none; }
+.nav a:hover { text-decoration: underline; }
+@media (max-width: 768px) { .container { padding: 16px; } h1 { font-size: 1.8rem; } }
+
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>oraculo-radiohead — Complete Call Flow &amp; Architecture Documentation</h1>
+<p class="subtitle">Generated from graphify knowledge graph: 258 nodes, 282 edges, 21 communities. Commit: 6f78816</p>
+
+<div class="nav">
+    <a href="#overview">Architecture Overview</a>
+    <a href="#build-graph">Graph Build</a>
+    <a href="#cli-skills">CLI &amp; Skill Installers</a>
+    <a href="#market-indexts-packages">Market Indexts Packages</a>
+    <a href="#deployjs-contracts-scripts">Deployjs Contracts Scripts</a>
+    <a href="#server-mcp-indexts">Server Mcp Indexts</a>
+    <a href="#vite-envdts-packages">Vite Envdts Packages</a>
+    <a href="#wdk-packages-bridge">Wdk Packages Bridge</a>
+    <a href="#hardhat-config-hardhatconfigjs">Hardhat Config Hardhatconfigjs</a>
+    <a href="#viteconfigts-packages-demo">Viteconfigts Packages Demo</a>
+</div>
+
+<!-- ====== Architecture Overview ====== -->
+<h2 id="overview">1. Architecture Overview</h2>
+
+<div class="mermaid">
+
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    BUILD_GRAPH_321CBB04("Graph Build<br/><small>180 nodes</small>")
+    class BUILD_GRAPH_321CBB04 module;
+    CLI_SKILLS_9964CBB8("CLI &amp; Skill Installers<br/><small>5 nodes</small>")
+    class CLI_SKILLS_9964CBB8 module;
+    MARKET_INDEXTS_PACKAGES_3050696E("Market Indexts Packages<br/><small>55 nodes</small>")
+    class MARKET_INDEXTS_PACKAGES_3050696E module;
+    DEPLOYJS_CONTRACTS_SCRIPTS_1CD85B29("Deployjs Contracts Scripts<br/><small>5 nodes</small>")
+    class DEPLOYJS_CONTRACTS_SCRIPTS_1CD85B29 module;
+    SERVER_MCP_INDEXTS_311EC0C5("Server Mcp Indexts<br/><small>4 nodes</small>")
+    class SERVER_MCP_INDEXTS_311EC0C5 module;
+    VITE_ENVDTS_PACKAGES_771FB4A3("Vite Envdts Packages<br/><small>3 nodes</small>")
+    class VITE_ENVDTS_PACKAGES_771FB4A3 module;
+    WDK_PACKAGES_BRIDGE_DF10707A("Wdk Packages Bridge<br/><small>3 nodes</small>")
+    class WDK_PACKAGES_BRIDGE_DF10707A module;
+    HARDHAT_CONFIG_HARDHATCONFIGJS_6963DC0F("Hardhat Config Hardhatconfigjs<br/><small>2 nodes</small>")
+    class HARDHAT_CONFIG_HARDHATCONFIGJS_6963DC0F module;
+    VITECONFIGTS_PACKAGES_DEMO_03B585CE("Viteconfigts Packages Demo<br/><small>1 nodes</small>")
+    class VITECONFIGTS_PACKAGES_DEMO_03B585CE module;
+    BUILD_GRAPH_321CBB04 -.-> CLI_SKILLS_9964CBB8
+    CLI_SKILLS_9964CBB8 -.-> MARKET_INDEXTS_PACKAGES_3050696E
+    MARKET_INDEXTS_PACKAGES_3050696E -.-> DEPLOYJS_CONTRACTS_SCRIPTS_1CD85B29
+    DEPLOYJS_CONTRACTS_SCRIPTS_1CD85B29 -.-> SERVER_MCP_INDEXTS_311EC0C5
+    SERVER_MCP_INDEXTS_311EC0C5 -.-> VITE_ENVDTS_PACKAGES_771FB4A3
+    VITE_ENVDTS_PACKAGES_771FB4A3 -.-> WDK_PACKAGES_BRIDGE_DF10707A
+    WDK_PACKAGES_BRIDGE_DF10707A -.-> HARDHAT_CONFIG_HARDHATCONFIGJS_6963DC0F
+    HARDHAT_CONFIG_HARDHATCONFIGJS_6963DC0F -.-> VITECONFIGTS_PACKAGES_DEMO_03B585CE
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h4>Architecture Layers</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>Layer</th><th>Nodes</th><th>Communities</th></tr>
+      <tr><td>Graph Build</td><td>180</td><td><code>1, 2, 3, 4, 5, 6, 7, 8, 10, 9, 11, 12, 15</code></td></tr><tr><td>CLI &amp; Skill Installers</td><td>5</td><td><code>14</code></td></tr><tr><td>Market Indexts Packages</td><td>55</td><td><code>0</code></td></tr><tr><td>Deployjs Contracts Scripts</td><td>5</td><td><code>13</code></td></tr><tr><td>Server Mcp Indexts</td><td>4</td><td><code>16</code></td></tr><tr><td>Vite Envdts Packages</td><td>3</td><td><code>17</code></td></tr><tr><td>Wdk Packages Bridge</td><td>3</td><td><code>18</code></td></tr><tr><td>Hardhat Config Hardhatconfigjs</td><td>2</td><td><code>19</code></td></tr><tr><td>Viteconfigts Packages Demo</td><td>1</td><td><code>20</code></td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Core Flow</h4>
+    <div class="arrow-chain">Graph Build -&gt; CLI &amp; Skill Installers -&gt; Market Indexts Packages -&gt; Deployjs Contracts Scripts -&gt; Server Mcp Indexts -&gt; Vite Envdts Packages -&gt; Wdk Packages Bridge</div>
+  </div>
+</div>
+<div class="grid">
+  <div class="card">
+    <h4>Graph Report Highlights</h4>
+    <ul>
+      <li>258 nodes · 282 edges · 21 communities (17 shown, 4 thin omitted)</li>
+      <li>Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS</li>
+      <li>Token cost: 0 input · 0 output</li>
+      <li>1. `compilerOptions` - 13 edges</li>
+      <li>2. `compilerOptions` - 12 edges</li>
+      <li>3. `getMarketPulse()` - 12 edges</li>
+    </ul>
+  </div>
+</div>
+<hr>
+<!-- ====== 2. Graph Build ====== -->
+<h2 id="build-graph">2. Graph Build</h2>
+<p>Graph Build groups implementation around packages, packagejson, demo, web, mostly in package.json, packages/demo-web/package.json, packages/mcp-server/package.json. This section covers 180 nodes and 169 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Graph Build (180 nodes, 169 edges)
+    subgraph build_graph_packages_mcp_server_package_json_1e5806af["packages/mcp-server/package.json"]
+        packages_mcp_server_package_dependencies_modelco_a67f873b("@modelcontextprotocol/sdk<br/><small>packages/mcp-server/package.json</small>")
+        modelcontextprotocol_sdk_6171ea96("@modelcontextprotocol/sdk<br/><small>packages/mcp-server/package.json</small>")
+        packages_mcp_server_package_dependencies_oraculo_a1834d1f("@oraculo/market-core<br/><small>packages/mcp-server/package.json</small>")
+        packages_mcp_server_package_json_oraculo_market_d6b76639("@oraculo/market-core<br/><small>packages/mcp-server/package.json</small>")
+        packages_mcp_server_package_dependencies_zod_aff59381("zod<br/><small>packages/mcp-server/package.json</small>")
+        zod_370c9d47("zod<br/><small>packages/mcp-server/package.json</small>")
+        packages_mcp_server_package_devdependencies_type_70c20f36("@types/node<br/><small>packages/mcp-server/package.json</small>")
+        types_node_eed9011c("@types/node<br/><small>packages/mcp-server/package.json</small>")
+        packages_mcp_server_package_devdependencies_type_44f9f932("typescript<br/><small>packages/mcp-server/package.json</small>")
+        packages_mcp_server_package_json_typescript_56cf0336("typescript<br/><small>packages/mcp-server/package.json</small>")
+    end
+    subgraph build_graph_package_json_4e40bfbd["package.json"]
+        package_dependencies_tetherto_wdk_7edd855a("@tetherto/wdk<br/><small>package.json</small>")
+        package_dependencies_tetherto_wdk_cli_c6c7a7f5("@tetherto/wdk-cli<br/><small>package.json</small>")
+        package_devdependencies_dotenv_111a184a("dotenv<br/><small>package.json</small>")
+        package_devdependencies_ethers_9a55678c("ethers<br/><small>package.json</small>")
+        package_devdependencies_hardhat_5716aab7("hardhat<br/><small>package.json</small>")
+        package_devdependencies_nomicfoundation_hardhat_7c5bc8b1("@nomicfoundation/hardhat-ethers<br/><small>package.json</small>")
+        package_json_tetherto_wdk_73229609("@tetherto/wdk<br/><small>package.json</small>")
+        package_json_tetherto_wdk_cli_86c20510("@tetherto/wdk-cli<br/><small>package.json</small>")
+    end
+    package_dependencies_tetherto_wdk_7edd855a -->|imports| package_json_tetherto_wdk_73229609
+    package_dependencies_tetherto_wdk_cli_c6c7a7f5 -->|imports| package_json_tetherto_wdk_cli_86c20510
+    packages_mcp_server_package_dependencies_modelco_a67f873b -->|imports| modelcontextprotocol_sdk_6171ea96
+    packages_mcp_server_package_dependencies_oraculo_a1834d1f -->|imports| packages_mcp_server_package_json_oraculo_market_d6b76639
+    packages_mcp_server_package_dependencies_zod_aff59381 -->|imports| zod_370c9d47
+    packages_mcp_server_package_devdependencies_type_70c20f36 -->|imports| types_node_eed9011c
+    packages_mcp_server_package_devdependencies_type_44f9f932 -->|imports| packages_mcp_server_package_json_typescript_56cf0336
+    %% Omitted for readability: 162 nodes, 0 edges
+    class packages_mcp_server_package_dependencies_modelco_a67f873b function;
+    class modelcontextprotocol_sdk_6171ea96 function;
+    class packages_mcp_server_package_dependencies_oraculo_a1834d1f function;
+    class packages_mcp_server_package_json_oraculo_market_d6b76639 function;
+    class packages_mcp_server_package_dependencies_zod_aff59381 function;
+    class zod_370c9d47 function;
+    class packages_mcp_server_package_devdependencies_type_70c20f36 function;
+    class types_node_eed9011c function;
+    class packages_mcp_server_package_devdependencies_type_44f9f932 function;
+    class packages_mcp_server_package_json_typescript_56cf0336 function;
+    class package_dependencies_tetherto_wdk_7edd855a function;
+    class package_dependencies_tetherto_wdk_cli_c6c7a7f5 entry;
+    class package_devdependencies_dotenv_111a184a function;
+    class package_devdependencies_ethers_9a55678c function;
+    class package_devdependencies_hardhat_5716aab7 function;
+    class package_devdependencies_nomicfoundation_hardhat_7c5bc8b1 function;
+    class package_json_tetherto_wdk_73229609 function;
+    class package_json_tetherto_wdk_cli_86c20510 entry;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>package.json</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>package.json node in package.json.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>author</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>author node in package.json.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>dependencies</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>dependencies node in package.json.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>@tetherto/wdk</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>@tetherto/wdk</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td>@tetherto/wdk node in package.json.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>@tetherto/wdk-cli</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-cmd">Entry</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>@tetherto/wdk-cli</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td>@tetherto/wdk-cli node in package.json.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>description</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>description node in package.json.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>engines</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>engines node in package.json.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>node</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>node node in package.json.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>license</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>license node in package.json.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>name</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>name node in package.json.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>private</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>private node in package.json.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>scripts</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>scripts node in package.json.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>build</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>build node in package.json.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>build:core</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>build:core node in package.json.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>contracts:compile</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>contracts:compile node in package.json.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>contracts:deploy:base</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>contracts:deploy:base node in package.json.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>contracts:deploy:local</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>contracts:deploy:local node in package.json.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>dev:mcp</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>dev:mcp node in package.json.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>dev:web</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>dev:web node in package.json.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>start:mcp</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>start:mcp node in package.json.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>typecheck</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>typecheck node in package.json.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>wdk:version</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>wdk:version node in package.json.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>version</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>version node in package.json.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>workspaces</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>workspaces node in package.json.</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>@tetherto/wdk</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>@tetherto/wdk</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>@tetherto/wdk node in package.json.</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td><code>@tetherto/wdk-cli</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-cmd">Entry</span></td>
+  <td><code>@tetherto/wdk-cli</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td>No direct outbound edge</td>
+  <td>@tetherto/wdk-cli node in package.json.</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td><code>packages/*</code><br><small style="color:var(--muted)">package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>packages/* node in package.json.</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td><code>mcp-server/package.json</code><br><small style="color:var(--muted)">packages/mcp-server/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>mcp-server/package.json node in packages/mcp-server/package.json.</td>
+</tr>
+<tr>
+  <td>29</td>
+  <td><code>bin</code><br><small style="color:var(--muted)">packages/mcp-server/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>bin node in packages/mcp-server/package.json.</td>
+</tr>
+<tr>
+  <td>30</td>
+  <td><code>oraculo-mcp</code><br><small style="color:var(--muted)">packages/mcp-server/package.json</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>oraculo-mcp node in packages/mcp-server/package.json.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>package.json</code></td><td>36 nodes</td></tr>
+<tr><td><code>packages/demo-web/package.json</code></td><td>27 nodes</td></tr>
+<tr><td><code>packages/mcp-server/package.json</code></td><td>22 nodes</td></tr>
+<tr><td><code>packages/wdk-bridge/package.json</code></td><td>19 nodes</td></tr>
+<tr><td><code>packages/demo-web/tsconfig.json</code></td><td>18 nodes</td></tr>
+<tr><td><code>tsconfig.base.json</code></td><td>15 nodes</td></tr>
+<tr><td><code>packages/market-core/package.json</code></td><td>13 nodes</td></tr>
+<tr><td><code>packages/wdk-bridge/tsconfig.json</code></td><td>9 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x134, imports x23, extends x12. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 3. CLI & Skill Installers ====== -->
+<h2 id="cli-skills">3. CLI &amp; Skill Installers</h2>
+<p>CLI &amp; Skill Installers groups implementation around packages, demo, web, apptsx, mostly in demo-web/src/App.tsx, demo-web/src/main.tsx. This section covers 5 nodes and 5 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: CLI &amp; Skill Installers (5 nodes, 5 edges)
+    subgraph cli_skills_demo_web_src_App_tsx_736f3d6d["demo-web/src/App.tsx"]
+        packages_demo_web_src_app_app_c2cde040("App()<br/><small>demo-web/src/App.tsx</small>")
+        packages_demo_web_src_app_ea33fd19("App.tsx")
+        packages_demo_web_src_app_app_loaddemo_198f9226("loadDemo()<br/><small>demo-web/src/App.tsx</small>")
+        packages_demo_web_src_app_app_oncontext_ec679d5a("onContext()<br/><small>demo-web/src/App.tsx</small>")
+    end
+    packages_demo_web_src_main_174e34c5("main.tsx")
+    packages_demo_web_src_main_174e34c5 -->|imports| packages_demo_web_src_app_app_c2cde040
+    packages_demo_web_src_main_174e34c5 -->|imports| packages_demo_web_src_app_ea33fd19
+    class packages_demo_web_src_app_app_c2cde040 ui;
+    class packages_demo_web_src_app_ea33fd19 ui;
+    class packages_demo_web_src_app_app_loaddemo_198f9226 ui;
+    class packages_demo_web_src_app_app_oncontext_ec679d5a ui;
+    class packages_demo_web_src_main_174e34c5 ui;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>App()</code><br><small style="color:var(--muted)">demo-web/src/App.tsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>main.tsx</code><br><small style="color:var(--muted)">demo-web/src/main.tsx</small></td>
+  <td>No direct outbound edge</td>
+  <td>App() node in demo-web/src/App.tsx.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>loadDemo()</code><br><small style="color:var(--muted)">demo-web/src/App.tsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>loadDemo() node in demo-web/src/App.tsx.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>onContext()</code><br><small style="color:var(--muted)">demo-web/src/App.tsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>onContext() node in demo-web/src/App.tsx.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>App.tsx</code><br><small style="color:var(--muted)">demo-web/src/App.tsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td><code>main.tsx</code><br><small style="color:var(--muted)">demo-web/src/main.tsx</small></td>
+  <td>No direct outbound edge</td>
+  <td>Module file in demo-web/src/App.tsx.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>main.tsx</code><br><small style="color:var(--muted)">demo-web/src/main.tsx</small></td>
+  <td><span class="tag tag-hook">UI</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>App()</code><br><small style="color:var(--muted)">demo-web/src/App.tsx</small><br><code>App.tsx</code><br><small style="color:var(--muted)">demo-web/src/App.tsx</small></td>
+  <td>Module file in demo-web/src/main.tsx.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>demo-web/src/App.tsx</code></td><td>4 nodes</td></tr>
+<tr><td><code>demo-web/src/main.tsx</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x3, imports x1, imports x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 4. Market Indexts Packages ====== -->
+<h2 id="market-indexts-packages">4. Market Indexts Packages</h2>
+<p>Market Indexts Packages groups implementation around market, indexts, packages, news, mostly in market-core/src/index.ts. This section covers 55 nodes and 96 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Market Indexts Packages (55 nodes, 96 edges)
+    packages_market_core_src_index_getmarketpulse_26b0f875("getMarketPulse()<br/><small>market-core/src/index.ts</small>")
+    packages_market_core_src_index_getrisklevel_784526aa("getRiskLevel()<br/><small>market-core/src/index.ts</small>")
+    packages_market_core_src_index_getmarketcontext_012df49a("getMarketContext()<br/><small>market-core/src/index.ts</small>")
+    packages_market_core_src_index_fetchheadlines_eb8ac11f("fetchHeadlines()<br/><small>market-core/src/index.ts</small>")
+    packages_market_core_src_index_getextendedquote_56c975e2("getExtendedQuote()<br/><small>market-core/src/index.ts</small>")
+    packages_market_core_src_index_getportfoliostate_98a0b045("getPortfolioState()<br/><small>market-core/src/index.ts</small>")
+    packages_market_core_src_index_checkwdkguardrail_70bb2626("checkWdkGuardrail()<br/><small>market-core/src/index.ts</small>")
+    packages_market_core_src_index_normalizesymbol_b9db3506("normalizeSymbol()<br/><small>market-core/src/index.ts</small>")
+    packages_market_core_src_index_mockheadlines_88dfff32("mockHeadlines()<br/><small>market-core/src/index.ts</small>")
+    packages_market_core_src_index_scoreheadlinetitl_980ec478("scoreHeadlineTitle()<br/><small>market-core/src/index.ts</small>")
+    packages_market_core_src_index_resolvecoinid_57cc4930("resolveCoinId()<br/><small>market-core/src/index.ts</small>")
+    packages_market_core_src_index_getprice_22551b6e("getPrice()<br/><small>market-core/src/index.ts</small>")
+    packages_market_core_src_index_computebias_e524eb64("computeBias()<br/><small>market-core/src/index.ts</small>")
+    packages_market_core_src_index_isstable_dcd4e347("isStable()<br/><small>market-core/src/index.ts</small>")
+    packages_market_core_src_index_getfeargreed_71ff1423("getFearGreed()<br/><small>market-core/src/index.ts</small>")
+    packages_market_core_src_index_biasfromchange_9b7f3133("biasFromChange()<br/><small>market-core/src/index.ts</small>")
+    packages_market_core_src_index_trendstrengthfrom_a9593ef9("trendStrengthFromChange()<br/><small>market-core/src/index.ts</small>")
+    packages_market_core_src_index_newsbiasfromscore_46b66a37("newsBiasFromScore()<br/><small>market-core/src/index.ts</small>")
+    packages_market_core_src_index_checkwdkguardrail_70bb2626 -->|calls| packages_market_core_src_index_getrisklevel_784526aa
+    packages_market_core_src_index_fetchheadlines_eb8ac11f -->|calls| packages_market_core_src_index_normalizesymbol_b9db3506
+    packages_market_core_src_index_fetchheadlines_eb8ac11f -->|calls| packages_market_core_src_index_mockheadlines_88dfff32
+    packages_market_core_src_index_fetchheadlines_eb8ac11f -->|calls| packages_market_core_src_index_scoreheadlinetitl_980ec478
+    packages_market_core_src_index_getextendedquote_56c975e2 -->|calls| packages_market_core_src_index_normalizesymbol_b9db3506
+    packages_market_core_src_index_getextendedquote_56c975e2 -->|calls| packages_market_core_src_index_resolvecoinid_57cc4930
+    packages_market_core_src_index_getextendedquote_56c975e2 -->|calls| packages_market_core_src_index_getprice_22551b6e
+    packages_market_core_src_index_getmarketcontext_012df49a -->|calls| packages_market_core_src_index_getprice_22551b6e
+    packages_market_core_src_index_getmarketcontext_012df49a -->|calls| packages_market_core_src_index_computebias_e524eb64
+    packages_market_core_src_index_getmarketcontext_012df49a -->|calls| packages_market_core_src_index_isstable_dcd4e347
+    packages_market_core_src_index_getmarketcontext_012df49a -->|calls| packages_market_core_src_index_normalizesymbol_b9db3506
+    packages_market_core_src_index_getmarketpulse_26b0f875 -->|calls| packages_market_core_src_index_normalizesymbol_b9db3506
+    packages_market_core_src_index_getmarketpulse_26b0f875 -->|calls| packages_market_core_src_index_getextendedquote_56c975e2
+    packages_market_core_src_index_getmarketpulse_26b0f875 -->|calls| packages_market_core_src_index_getrisklevel_784526aa
+    packages_market_core_src_index_getmarketpulse_26b0f875 -->|calls| packages_market_core_src_index_getfeargreed_71ff1423
+    packages_market_core_src_index_getmarketpulse_26b0f875 -->|calls| packages_market_core_src_index_fetchheadlines_eb8ac11f
+    packages_market_core_src_index_getmarketpulse_26b0f875 -->|calls| packages_market_core_src_index_biasfromchange_9b7f3133
+    packages_market_core_src_index_getmarketpulse_26b0f875 -->|calls| packages_market_core_src_index_trendstrengthfrom_a9593ef9
+    packages_market_core_src_index_getmarketpulse_26b0f875 -->|calls| packages_market_core_src_index_newsbiasfromscore_46b66a37
+    packages_market_core_src_index_getportfoliostate_98a0b045 -->|calls| packages_market_core_src_index_getprice_22551b6e
+    packages_market_core_src_index_getportfoliostate_98a0b045 -->|calls| packages_market_core_src_index_normalizesymbol_b9db3506
+    packages_market_core_src_index_getportfoliostate_98a0b045 -->|calls| packages_market_core_src_index_isstable_dcd4e347
+    packages_market_core_src_index_getprice_22551b6e -->|calls| packages_market_core_src_index_normalizesymbol_b9db3506
+    packages_market_core_src_index_getprice_22551b6e -->|calls| packages_market_core_src_index_resolvecoinid_57cc4930
+    %% Omitted for readability: 37 nodes, 6 edges
+    class packages_market_core_src_index_getmarketpulse_26b0f875 function;
+    class packages_market_core_src_index_getrisklevel_784526aa function;
+    class packages_market_core_src_index_getmarketcontext_012df49a function;
+    class packages_market_core_src_index_fetchheadlines_eb8ac11f function;
+    class packages_market_core_src_index_getextendedquote_56c975e2 function;
+    class packages_market_core_src_index_getportfoliostate_98a0b045 function;
+    class packages_market_core_src_index_checkwdkguardrail_70bb2626 function;
+    class packages_market_core_src_index_normalizesymbol_b9db3506 function;
+    class packages_market_core_src_index_mockheadlines_88dfff32 function;
+    class packages_market_core_src_index_scoreheadlinetitl_980ec478 function;
+    class packages_market_core_src_index_resolvecoinid_57cc4930 function;
+    class packages_market_core_src_index_getprice_22551b6e function;
+    class packages_market_core_src_index_computebias_e524eb64 function;
+    class packages_market_core_src_index_isstable_dcd4e347 function;
+    class packages_market_core_src_index_getfeargreed_71ff1423 function;
+    class packages_market_core_src_index_biasfromchange_9b7f3133 function;
+    class packages_market_core_src_index_trendstrengthfrom_a9593ef9 function;
+    class packages_market_core_src_index_newsbiasfromscore_46b66a37 function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>FearGreedSnapshot</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>FearGreedSnapshot node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>HealthStatus</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>HealthStatus node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>MarketBias</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>MarketBias node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>MarketContext</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>MarketContext node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>MarketFavor</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>MarketFavor node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>MarketMeters</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>MarketMeters node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>MarketPulse</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>MarketPulse node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>MarketPulseWhy</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>MarketPulseWhy node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td><code>MarketSummary</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>MarketSummary node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td><code>NewsBias</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>NewsBias node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td><code>PortfolioState</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>PortfolioState node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td><code>PositionInput</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>PositionInput node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td><code>PositionState</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>PositionState node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td><code>PriceQuote</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>PriceQuote node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td><code>PulseHeadline</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>PulseHeadline node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td><code>RiskAssessment</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-async">Async</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>RiskAssessment node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td><code>RiskBand</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>RiskBand node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td><code>RiskFactor</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>RiskFactor node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td><code>TrendStrength</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>TrendStrength node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td><code>WdkAction</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>WdkAction node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td><code>WdkGuardrailResult</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>WdkGuardrailResult node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td><code>actionFromBand()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>getRiskLevel()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td>No direct outbound edge</td>
+  <td>actionFromBand() node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td><code>bandFromScore()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>getRiskLevel()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td>No direct outbound edge</td>
+  <td>bandFromScore() node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td><code>biasFromChange()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>getMarketPulse()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td>No direct outbound edge</td>
+  <td>biasFromChange() node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td><code>checkWdkGuardrail()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>getRiskLevel()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td>checkWdkGuardrail() node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td><code>clamp()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>getMarketPulse()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small><br><code>riskFromChangeAndUsdtShare()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small><br><code>scoreHeadlineTitle()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td>No direct outbound edge</td>
+  <td>clamp() node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td><code>computeBias()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>getMarketContext()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small><br><code>getMarketSummary()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td>No direct outbound edge</td>
+  <td>computeBias() node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td><code>fetchHeadlines()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>getMarketPulse()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><code>mockHeadlines()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small><br><code>normalizeSymbol()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small><br><code>scoreHeadlineTitle()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td>fetchHeadlines() node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>29</td>
+  <td><code>getExtendedQuote()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>getMarketPulse()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><code>getPrice()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small><br><code>normalizeSymbol()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small><br><code>resolveCoinId()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td>getExtendedQuote() node in market-core/src/index.ts.</td>
+</tr>
+<tr>
+  <td>30</td>
+  <td><code>getFearGreed()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>getMarketPulse()</code><br><small style="color:var(--muted)">market-core/src/index.ts</small></td>
+  <td>No direct outbound edge</td>
+  <td>getFearGreed() node in market-core/src/index.ts.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>market-core/src/index.ts</code></td><td>55 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x54, calls x42. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 5. Deployjs Contracts Scripts ====== -->
+<h2 id="deployjs-contracts-scripts">5. Deployjs Contracts Scripts</h2>
+<p>Deployjs Contracts Scripts groups implementation around deployjs, contracts, scripts, hre, mostly in contracts/scripts/deploy.js. This section covers 5 nodes and 4 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Deployjs Contracts Scripts (5 nodes, 4 edges)
+    contracts_scripts_deploy_9dd414c0("deploy.js")
+    contracts_scripts_deploy_hre_5291afbd("hre<br/><small>contracts/scripts/deploy.js</small>")
+    contracts_scripts_deploy_fs_b200d0af("fs<br/><small>contracts/scripts/deploy.js</small>")
+    contracts_scripts_deploy_path_cb15a6c4("path<br/><small>contracts/scripts/deploy.js</small>")
+    contracts_scripts_deploy_main_08280660("main()<br/><small>contracts/scripts/deploy.js</small>")
+    contracts_scripts_deploy_9dd414c0 -->|contains| contracts_scripts_deploy_hre_5291afbd
+    contracts_scripts_deploy_9dd414c0 -->|contains| contracts_scripts_deploy_fs_b200d0af
+    contracts_scripts_deploy_9dd414c0 -->|contains| contracts_scripts_deploy_path_cb15a6c4
+    contracts_scripts_deploy_9dd414c0 -->|contains| contracts_scripts_deploy_main_08280660
+    class contracts_scripts_deploy_9dd414c0 module;
+    class contracts_scripts_deploy_hre_5291afbd function;
+    class contracts_scripts_deploy_fs_b200d0af function;
+    class contracts_scripts_deploy_path_cb15a6c4 function;
+    class contracts_scripts_deploy_main_08280660 function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>main()</code><br><small style="color:var(--muted)">contracts/scripts/deploy.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>main() node in contracts/scripts/deploy.js.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>deploy.js</code><br><small style="color:var(--muted)">contracts/scripts/deploy.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>deploy.js node in contracts/scripts/deploy.js.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>fs</code><br><small style="color:var(--muted)">contracts/scripts/deploy.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>fs node in contracts/scripts/deploy.js.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>hre</code><br><small style="color:var(--muted)">contracts/scripts/deploy.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>hre node in contracts/scripts/deploy.js.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>path</code><br><small style="color:var(--muted)">contracts/scripts/deploy.js</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>path node in contracts/scripts/deploy.js.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>contracts/scripts/deploy.js</code></td><td>5 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x4. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 6. Server Mcp Indexts ====== -->
+<h2 id="server-mcp-indexts">6. Server Mcp Indexts</h2>
+<p>Server Mcp Indexts groups implementation around server, mcp, indexts, packages, mostly in mcp-server/src/index.ts. This section covers 4 nodes and 3 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Server Mcp Indexts (4 nodes, 3 edges)
+    packages_mcp_server_src_index_f423c231("index.ts")
+    packages_mcp_server_src_index_server_82558ddd("server<br/><small>mcp-server/src/index.ts</small>")
+    packages_mcp_server_src_index_main_3af65ebd("main()<br/><small>mcp-server/src/index.ts</small>")
+    packages_mcp_server_src_index_positionschema_df2518cd("positionSchema<br/><small>mcp-server/src/index.ts</small>")
+    packages_mcp_server_src_index_f423c231 -->|contains| packages_mcp_server_src_index_server_82558ddd
+    packages_mcp_server_src_index_f423c231 -->|contains| packages_mcp_server_src_index_main_3af65ebd
+    packages_mcp_server_src_index_f423c231 -->|contains| packages_mcp_server_src_index_positionschema_df2518cd
+    class packages_mcp_server_src_index_f423c231 module;
+    class packages_mcp_server_src_index_server_82558ddd function;
+    class packages_mcp_server_src_index_main_3af65ebd function;
+    class packages_mcp_server_src_index_positionschema_df2518cd function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>main()</code><br><small style="color:var(--muted)">mcp-server/src/index.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>main() node in mcp-server/src/index.ts.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>mcp-server/src/index.ts</code><br><small style="color:var(--muted)">mcp-server/src/index.ts</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Module file in mcp-server/src/index.ts.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>positionSchema</code><br><small style="color:var(--muted)">mcp-server/src/index.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>positionSchema node in mcp-server/src/index.ts.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>server</code><br><small style="color:var(--muted)">mcp-server/src/index.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>server node in mcp-server/src/index.ts.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>mcp-server/src/index.ts</code></td><td>4 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x3. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 7. Vite Envdts Packages ====== -->
+<h2 id="vite-envdts-packages">7. Vite Envdts Packages</h2>
+<p>Vite Envdts Packages groups implementation around vite, envdts, packages, demo, mostly in demo-web/src/vite-env.d.ts. This section covers 3 nodes and 2 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Vite Envdts Packages (3 nodes, 2 edges)
+    packages_demo_web_src_vite_env_d_6d9e2c26("vite-env.d.ts")
+    packages_demo_web_src_vite_env_d_importmetaenv_a1f176a0("ImportMetaEnv<br/><small>demo-web/src/vite-env.d.ts</small>")
+    packages_demo_web_src_vite_env_d_importmeta_346b7a31("ImportMeta<br/><small>demo-web/src/vite-env.d.ts</small>")
+    packages_demo_web_src_vite_env_d_6d9e2c26 -->|contains| packages_demo_web_src_vite_env_d_importmetaenv_a1f176a0
+    packages_demo_web_src_vite_env_d_6d9e2c26 -->|contains| packages_demo_web_src_vite_env_d_importmeta_346b7a31
+    class packages_demo_web_src_vite_env_d_6d9e2c26 module;
+    class packages_demo_web_src_vite_env_d_importmetaenv_a1f176a0 klass;
+    class packages_demo_web_src_vite_env_d_importmeta_346b7a31 klass;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>ImportMeta</code><br><small style="color:var(--muted)">demo-web/src/vite-env.d.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>ImportMeta node in demo-web/src/vite-env.d.ts.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>ImportMetaEnv</code><br><small style="color:var(--muted)">demo-web/src/vite-env.d.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>ImportMetaEnv node in demo-web/src/vite-env.d.ts.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>vite-env.d.ts</code><br><small style="color:var(--muted)">demo-web/src/vite-env.d.ts</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Module file in demo-web/src/vite-env.d.ts.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>demo-web/src/vite-env.d.ts</code></td><td>3 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x2. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 8. Wdk Packages Bridge ====== -->
+<h2 id="wdk-packages-bridge">8. Wdk Packages Bridge</h2>
+<p>Wdk Packages Bridge groups implementation around wdk, packages, bridge, indexts, mostly in wdk-bridge/src/index.ts. This section covers 3 nodes and 2 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Wdk Packages Bridge (3 nodes, 2 edges)
+    packages_wdk_bridge_src_index_50e28e88("index.ts")
+    packages_wdk_bridge_src_index_getwdkintegrationm_0d812841("getWdkIntegrationManifest()<br/><small>wdk-bridge/src/index.ts</small>")
+    packages_wdk_bridge_src_index_wdk_packages_3aacd95e("WDK_PACKAGES<br/><small>wdk-bridge/src/index.ts</small>")
+    packages_wdk_bridge_src_index_50e28e88 -->|contains| packages_wdk_bridge_src_index_getwdkintegrationm_0d812841
+    packages_wdk_bridge_src_index_50e28e88 -->|contains| packages_wdk_bridge_src_index_wdk_packages_3aacd95e
+    class packages_wdk_bridge_src_index_50e28e88 module;
+    class packages_wdk_bridge_src_index_getwdkintegrationm_0d812841 function;
+    class packages_wdk_bridge_src_index_wdk_packages_3aacd95e klass;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>getWdkIntegrationManifest()</code><br><small style="color:var(--muted)">wdk-bridge/src/index.ts</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>getWdkIntegrationManifest() node in wdk-bridge/src/index.ts.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>wdk-bridge/src/index.ts</code><br><small style="color:var(--muted)">wdk-bridge/src/index.ts</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Module file in wdk-bridge/src/index.ts.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>WDK_PACKAGES</code><br><small style="color:var(--muted)">wdk-bridge/src/index.ts</small></td>
+  <td><span class="tag tag-class">Class</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>WDK_PACKAGES node in wdk-bridge/src/index.ts.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>wdk-bridge/src/index.ts</code></td><td>3 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: contains x2. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 9. Hardhat Config Hardhatconfigjs ====== -->
+<h2 id="hardhat-config-hardhatconfigjs">9. Hardhat Config Hardhatconfigjs</h2>
+<p>Hardhat Config Hardhatconfigjs groups implementation around hardhat, config, hardhatconfigjs, mostly in hardhat/config, hardhat.config.js. This section covers 2 nodes and 1 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Hardhat Config Hardhatconfigjs (2 nodes, 1 edges)
+    hardhat_config_2bf7cfd8("hardhat.config.js")
+    config_dfba7aad("hardhat/config")
+    hardhat_config_2bf7cfd8 -->|dynamic import| config_dfba7aad
+    class hardhat_config_2bf7cfd8 module;
+    class config_dfba7aad function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>hardhat/config</code><br><small style="color:var(--muted)">hardhat/config</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Reads, resolves, or persists project configuration.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>hardhat.config.js</code><br><small style="color:var(--muted)">hardhat.config.js</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Reads, resolves, or persists project configuration.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>hardhat.config.js</code></td><td>1 nodes</td></tr>
+<tr><td><code>hardhat/config</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: dynamic import x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 10. Viteconfigts Packages Demo ====== -->
+<h2 id="viteconfigts-packages-demo">10. Viteconfigts Packages Demo</h2>
+<p>Viteconfigts Packages Demo groups implementation around viteconfigts, packages, demo, web, mostly in packages/demo-web/vite.config.ts. This section covers 1 nodes and 0 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Viteconfigts Packages Demo (1 nodes, 0 edges)
+    packages_demo_web_vite_config_9c538444("vite.config.ts")
+    class packages_demo_web_vite_config_9c538444 module;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>vite.config.ts</code><br><small style="color:var(--muted)">packages/demo-web/vite.config.ts</small></td>
+  <td><span class="tag tag-class">Module</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>Module file in packages/demo-web/vite.config.ts.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>packages/demo-web/vite.config.ts</code></td><td>1 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: No high-confidence call edges detected. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<h2 id="stats">Project Statistics</h2>
+
+<div class="grid">
+  <div class="card">
+    <h4>Graph</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><td>Nodes</td><td>258</td></tr>
+      <tr><td>Edges</td><td>282</td></tr>
+      <tr><td>Hyperedges</td><td>0</td></tr>
+      <tr><td>Communities</td><td>21</td></tr>
+      <tr><td>Documented Sections</td><td>9</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Edge Confidence</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><td>EXTRACTED</td><td>282</td></tr>
+      <tr><td>INFERRED</td><td>0</td></tr>
+      <tr><td>AMBIGUOUS</td><td>0</td></tr>
+    </table>
+  </div>
+</div>
+
+<div style="text-align:center; padding:40px 0; color: var(--muted); font-size:0.9rem;">
+  <p>oraculo-radiohead — Architecture Documentation</p>
+  <p>Generated: 2026-08-22 22:16 UTC · graphify callflow-html</p>
+</div>
+
+</div><!-- .container -->
+
+<script>
+(function () {
+  const mermaidConfig = {
+    startOnLoad: false,
+    theme: 'dark',
+    securityLevel: 'loose',
+    flowchart: { htmlLabels: true, useMaxWidth: true },
+    themeVariables: {
+      primaryColor: '#1e293b',
+      primaryTextColor: '#e2e8f0',
+      primaryBorderColor: '#38bdf8',
+      secondaryColor: '#0f172a',
+      tertiaryColor: '#334155',
+      lineColor: '#64748b',
+      textColor: '#e2e8f0',
+    }
+  };
+
+  mermaid.initialize(mermaidConfig);
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function enhanceMermaidDiagrams() {
+    document.querySelectorAll('.mermaid').forEach((container) => {
+      if (container.dataset.zoomReady === 'true') return;
+      const svg = container.querySelector('svg');
+      if (!svg) return;
+
+      container.dataset.zoomReady = 'true';
+      container.classList.add('is-enhanced');
+
+      const viewport = document.createElement('div');
+      viewport.className = 'mermaid-viewport';
+      svg.parentNode.insertBefore(viewport, svg);
+      viewport.appendChild(svg);
+
+      const toolbar = document.createElement('div');
+      toolbar.className = 'mermaid-toolbar';
+      toolbar.innerHTML = [
+        '<button type="button" data-action="zoom-out" title="Zoom out">-</button>',
+        '<span class="zoom-level" data-role="level">100%</span>',
+        '<button type="button" data-action="zoom-in" title="Zoom in">+</button>',
+        '<button type="button" data-action="fit" title="Fit width">Fit</button>',
+        '<button type="button" data-action="reset" title="Reset view">Reset</button>'
+      ].join('');
+      container.insertBefore(toolbar, viewport);
+
+      const state = { scale: 1, x: 0, y: 0, dragging: false, startX: 0, startY: 0, originX: 0, originY: 0 };
+      const level = toolbar.querySelector('[data-role="level"]');
+
+      function applyTransform() {
+        svg.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
+        level.textContent = `${Math.round(state.scale * 100)}%`;
+      }
+
+      function zoomBy(delta) {
+        state.scale = clamp(state.scale + delta, 0.25, 3);
+        applyTransform();
+      }
+
+      function reset() {
+        state.scale = 1;
+        state.x = 0;
+        state.y = 0;
+        applyTransform();
+      }
+
+      function fitWidth() {
+        const rawWidth = svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.width
+          ? svg.viewBox.baseVal.width
+          : svg.getBoundingClientRect().width / state.scale;
+        if (!rawWidth) {
+          reset();
+          return;
+        }
+        state.scale = clamp((viewport.clientWidth - 48) / rawWidth, 0.25, 1.4);
+        state.x = 0;
+        state.y = 0;
+        applyTransform();
+      }
+
+      toolbar.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-action]');
+        if (!button) return;
+        const action = button.dataset.action;
+        if (action === 'zoom-in') zoomBy(0.15);
+        if (action === 'zoom-out') zoomBy(-0.15);
+        if (action === 'fit') fitWidth();
+        if (action === 'reset') reset();
+      });
+
+      viewport.addEventListener('wheel', (event) => {
+        if (!event.ctrlKey && !event.metaKey) return;
+        event.preventDefault();
+        zoomBy(event.deltaY < 0 ? 0.1 : -0.1);
+      }, { passive: false });
+
+      viewport.addEventListener('pointerdown', (event) => {
+        if (event.button !== 0) return;
+        state.dragging = true;
+        state.startX = event.clientX;
+        state.startY = event.clientY;
+        state.originX = state.x;
+        state.originY = state.y;
+        viewport.classList.add('is-dragging');
+        viewport.setPointerCapture(event.pointerId);
+      });
+
+      viewport.addEventListener('pointermove', (event) => {
+        if (!state.dragging) return;
+        state.x = state.originX + event.clientX - state.startX;
+        state.y = state.originY + event.clientY - state.startY;
+        applyTransform();
+      });
+
+      function endDrag(event) {
+        if (!state.dragging) return;
+        state.dragging = false;
+        viewport.classList.remove('is-dragging');
+        if (viewport.hasPointerCapture(event.pointerId)) {
+          viewport.releasePointerCapture(event.pointerId);
+        }
+      }
+
+      viewport.addEventListener('pointerup', endDrag);
+      viewport.addEventListener('pointercancel', endDrag);
+      applyTransform();
+    });
+  }
+
+  function renderMermaid() {
+    const result = mermaid.run
+      ? mermaid.run({ querySelector: '.mermaid' })
+      : Promise.resolve();
+    Promise.resolve(result)
+      .then(enhanceMermaidDiagrams)
+      .catch((error) => {
+        console.error('Mermaid render failed:', error);
+        enhanceMermaidDiagrams();
+      });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderMermaid);
+  } else {
+    renderMermaid();
+  }
+})();
+</script>
+
+</body>
+</html>
