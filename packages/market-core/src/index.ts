@@ -1,7 +1,19 @@
-export type MarketBias = "bullish" | "bearish" | "sideways";
-export type RiskBand = "low" | "med" | "high";
-/** Structured action for agents + WDK guardrails (Aleph WDK track). */
-export type WdkAction = "proceed" | "caution" | "avoid";
+export type {
+  MarketBias,
+  RiskBand,
+  WdkAction,
+} from "./types.js";
+import type { MarketBias, RiskBand, WdkAction } from "./types.js";
+import { buildMarketPulse, type MarketPulse, type MarketFavor } from "./pulse.js";
+import { fetchMarketNews, type MarketNews, type MarketNewsArticle, type MarketNewsSource, type MarketStateSnapshot, type MarketNumbers } from "./news.js";
+import {
+  canonicalPortfolioPayload,
+  bandToUint8,
+  CASANDRA_REGISTRY_ABI,
+  BASE_SEPOLIA_CHAIN,
+  BASE_SEPOLIA_CHAIN_ID,
+  type OnChainRiskSnapshot,
+} from "./onchain.js";
 
 export interface PriceQuote {
   symbol: string;
@@ -28,13 +40,8 @@ export interface HealthStatus {
 }
 
 /** Position input for portfolio / risk tools */
-export interface PositionInput {
-  symbol: string;
-  /** Quantity of the asset */
-  quantity: number;
-  /** Optional cost basis per unit in USD */
-  cost_basis_usd?: number;
-}
+export type { PositionInput } from "./types.js";
+import type { PositionInput } from "./types.js";
 
 export interface PositionState {
   symbol: string;
@@ -55,28 +62,8 @@ export interface PortfolioState {
   disclaimer: string;
 }
 
-export interface RiskFactor {
-  name: string;
-  value: number;
-  weight: number;
-  note: string;
-}
-
-export interface RiskAssessment {
-  score: number;
-  risk_pct: number;
-  band: RiskBand;
-  /** proceed | caution | avoid — agents must gate WDK send_token on this */
-  action: WdkAction;
-  verdict: string;
-  verdict_es: string;
-  factors: RiskFactor[];
-  scope: "symbol" | "portfolio";
-  symbol?: string;
-  fetched_at: string;
-  algorithm: string;
-  disclaimer: string;
-}
+export type { RiskFactor, RiskAssessment } from "./types.js";
+import type { RiskFactor, RiskAssessment } from "./types.js";
 
 export interface WdkGuardrailResult {
   allow_wdk_send: boolean;
@@ -164,7 +151,7 @@ function clamp(n: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, n));
 }
 
-function bandFromScore(score: number): RiskBand {
+export function bandFromScore(score: number): RiskBand {
   if (score <= 33) return "low";
   if (score <= 66) return "med";
   return "high";
@@ -519,6 +506,126 @@ export async function getMarketContext(symbol: string): Promise<MarketContext> {
     disclaimer: DISCLAIMER,
   };
 }
+
+export async function getMarketPulse(
+  symbols: string[] = ["btc", "eth", "usdt"]
+) {
+  return buildMarketPulse(symbols, getMarketSummary);
+}
+
+export async function getMarketNews(symbol: string): Promise<MarketNews> {
+  const normalized = normalizeSymbol(symbol);
+  const { fetchMarketNewsFromRss, getRssFeedMeta } = await import("./news-rss.js");
+  const { analyzeNewsHeadlines } = await import("./news-analysis.js");
+
+  const [raw, quote, btc, risk, pulse] = await Promise.all([
+    fetchMarketNewsFromRss(normalized),
+    getPrice(normalized),
+    getPrice("btc"),
+    getRiskLevel({ symbol: normalized }),
+    buildMarketPulse([normalized, "btc", "usdt"], getMarketSummary),
+  ]);
+
+  const feed = getRssFeedMeta(normalized);
+  const analysis = analyzeNewsHeadlines(normalized, raw.articles);
+  const fetched_at = new Date().toISOString();
+
+  const sources: MarketNewsSource[] = [
+    {
+      id: 1,
+      name: feed.label,
+      url: feed.url,
+      type: "news",
+    },
+    {
+      id: 2,
+      name: quote.source,
+      url: "https://www.coingecko.com",
+      type: "price",
+    },
+    {
+      id: 3,
+      name: "Fear & Greed Index",
+      url: "https://alternative.me/crypto/fear-and-greed-index/",
+      type: "index",
+    },
+    ...raw.articles.map((a, i) => ({
+      id: i + 4,
+      name: a.source,
+      url: a.url,
+      type: "news" as const,
+    })),
+  ];
+
+  return {
+    symbol: normalized,
+    articles: raw.articles,
+    summary: raw.summary,
+    summary_es: raw.summary_es,
+    analysis,
+    market_state: {
+      bias: pulse.market_bias,
+      market_favor: pulse.market_favor,
+      fear_greed_index: pulse.fear_greed_index,
+      fear_greed_label: pulse.fear_greed_label,
+      state_summary_es: `Estado: sesgo ${pulse.market_bias}, mercado ${pulse.market_favor}, Fear&Greed ${pulse.fear_greed_index} (${pulse.fear_greed_label}).`,
+    },
+    market_numbers: {
+      symbol: normalized,
+      price_usd: quote.price_usd,
+      change_24h_pct: quote.change_24h_pct,
+      btc_change_24h_pct: btc.change_24h_pct,
+      risk_pct: risk.risk_pct,
+      risk_band: risk.band,
+      fear_greed_index: pulse.fear_greed_index,
+      price_source: quote.source,
+      fetched_at,
+    },
+    sources,
+    fetched_at,
+    source: raw.source,
+    disclaimer:
+      "Headline + market data for context only — NOT investment advice. Verify sources.",
+  };
+}
+
+/** Off-chain snapshot ready for `publishRiskSnapshot` (hash: ethers.id(portfolioPayload)). */
+export async function prepareOnChainRiskSnapshot(
+  positions?: PositionInput[]
+): Promise<OnChainRiskSnapshot> {
+  const list = positions?.length ? positions : DEFAULT_DEMO_POSITIONS;
+  const risk = await getRiskLevel({ positions: list });
+  const portfolioPayload = canonicalPortfolioPayload(list);
+  return {
+    portfolioPayload,
+    band: bandToUint8(risk.band),
+    score: Math.round(risk.score),
+    timestamp: Math.floor(Date.now() / 1000),
+    risk,
+  };
+}
+
+export {
+  buildMarketPulse,
+  fetchMarketNews,
+  canonicalPortfolioPayload,
+  bandToUint8,
+  CASANDRA_REGISTRY_ABI,
+  BASE_SEPOLIA_CHAIN,
+  BASE_SEPOLIA_CHAIN_ID,
+};
+export { analyzeNewsHeadlines } from "./news-analysis.js";
+export type { NewsAnalysis } from "./news-analysis.js";
+export type {
+  MarketPulse,
+  MarketFavor,
+  MarketNews,
+  MarketNewsArticle,
+  MarketNewsSource,
+  MarketStateSnapshot,
+  MarketNumbers,
+  OnChainRiskSnapshot,
+};
 
 export function getHealth(): HealthStatus {
   return {

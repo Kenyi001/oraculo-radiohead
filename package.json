@@ -16,7 +16,11 @@
     "wdk:version": "node -e \"import('@oraculo/wdk-bridge').then(m=>console.log(JSON.stringify(m.getWdkIntegrationManifest(),null,2)))\"",
     "contracts:compile": "hardhat compile",
     "contracts:deploy:local": "hardhat run contracts/scripts/deploy.js --network hardhat",
-    "contracts:deploy:base": "hardhat run contracts/scripts/deploy.js --network baseSepolia"
+    "contracts:deploy:base": "hardhat run contracts/scripts/deploy.js --network baseSepolia",
+    "contracts:publish:risk": "npm run build:core && hardhat run contracts/scripts/publish-risk.js --network baseSepolia",
+    "contracts:publish:risk:local": "npm run build:core && hardhat run contracts/scripts/publish-risk.js --network hardhat",
+    "test:core": "npm run test -w @oraculo/market-core",
+    "wdk:demo": "npm run build:core && npm run build -w @oraculo/wdk-bridge && node scripts/wdk-guardrail-demo.mjs"
   },
   "engines": {
     "node": ">=20"

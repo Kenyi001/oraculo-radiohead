@@ -29,6 +29,22 @@ async function main() {
   fs.writeFileSync(outPath, JSON.stringify(out, null, 2) + "\n");
   console.log(`Wrote ${outPath}`);
 
+  if (chainId === 84532 && out.explorer) {
+    const demoEnvPath = path.join(
+      __dirname,
+      "..",
+      "..",
+      "packages",
+      "demo-web",
+      ".env"
+    );
+    const demoEnv =
+      `VITE_CASANDRA_REGISTRY_ADDRESS=${address}\n` +
+      `VITE_CASANDRA_REGISTRY_EXPLORER=${out.explorer}\n`;
+    fs.writeFileSync(demoEnvPath, demoEnv);
+    console.log(`Updated ${demoEnvPath} for demo web`);
+  }
+
   // Demo publish so judges see a non-empty registry
   const hash = hre.ethers.id("casandra-demo-portfolio-v1");
   const tx = await registry.publishRiskSnapshot(hash, 0, 20, Math.floor(Date.now() / 1000));

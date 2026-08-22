@@ -1,3 +1,5 @@
+import type { WdkGuardrailResult } from "@oraculo/market-core";
+
 /**
  * WDK track evidence: this package declares @tetherto/wdk as a core dependency
  * of Casandra. Agents use wdk-mcp for wallet ops and Casandra check_wdk_guardrail
@@ -22,10 +24,36 @@ export function getWdkIntegrationManifest() {
     policy: "docs/AGENT_WDK_POLICY.md",
     wdk_policy_errors: ["PolicyConfigurationError", "PolicyViolationError"],
     flow: [
-      "unlock wallet (human)",
+      "npx wdk wallet unlock --name casandra-dev --ttl 5",
       "casandra.check_wdk_guardrail",
-      "if allow_wdk_send: wdk-mcp get_balance / send_token dryRun",
-      "lock wallet",
+      "if allow_wdk_send: wdk-mcp get_balance",
+      "if allow_wdk_send: wdk-mcp send_token dryRun:true",
+      "human confirm → send_token dryRun:false",
+      "npx wdk wallet lock",
     ],
   };
+}
+
+/** Deterministic step list for demos / scripts after guardrail runs. */
+export function buildWdkAgentSteps(guardrail: WdkGuardrailResult): string[] {
+  const steps: string[] = [
+    "Human: npx wdk wallet unlock --name casandra-dev --ttl 5",
+    "Agent: Casandra check_wdk_guardrail (done — see JSON above)",
+  ];
+  if (!guardrail.allow_wdk_send) {
+    steps.push("STOP — allow_wdk_send=false. Do NOT call wdk-mcp send_token.");
+    steps.push(...guardrail.next_steps);
+    steps.push("Human: npx wdk wallet lock");
+    return steps;
+  }
+  steps.push("Agent: wdk-mcp get_balance (Sepolia test USDT)");
+  if (guardrail.action === "caution") {
+    steps.push("Agent: wdk-mcp send_token with dryRun:true only; smaller size");
+    steps.push("Human: confirm before any dryRun:false send");
+  } else {
+    steps.push("Agent: wdk-mcp send_token dryRun:true (preview)");
+    steps.push("Human: explicit confirm → send_token dryRun:false");
+  }
+  steps.push("Human: npx wdk wallet lock");
+  return steps;
 }

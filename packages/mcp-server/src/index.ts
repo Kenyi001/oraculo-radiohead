@@ -6,6 +6,8 @@ import {
   checkWdkGuardrail,
   getHealth,
   getMarketContext,
+  getMarketNews,
+  getMarketPulse,
   getMarketSummary,
   getPortfolioState,
   getPrice,
@@ -105,6 +107,37 @@ server.tool(
     const ctx = await getMarketContext(symbol);
     return {
       content: [{ type: "text" as const, text: JSON.stringify(ctx, null, 2) }],
+    };
+  }
+);
+
+server.tool(
+  "get_market_pulse",
+  "Casandra: Fear & Greed + 24h bias → market_favor (favorable/neutral/unfavorable) + verdict for agents.",
+  {
+    symbols: z
+      .array(z.string())
+      .optional()
+      .describe("Symbols for bias calc. Default: btc, eth, usdt"),
+  },
+  async ({ symbols }) => {
+    const pulse = await getMarketPulse(symbols ?? ["btc", "eth", "usdt"]);
+    return {
+      content: [{ type: "text" as const, text: JSON.stringify(pulse, null, 2) }],
+    };
+  }
+);
+
+server.tool(
+  "get_market_news",
+  "Casandra: recent crypto headlines + casandra-news-v1 analysis (favor, invest hint, verdict). NOT financial advice.",
+  {
+    symbol: z.string().describe("Ticker, e.g. btc or usdt"),
+  },
+  async ({ symbol }) => {
+    const news = await getMarketNews(symbol);
+    return {
+      content: [{ type: "text" as const, text: JSON.stringify(news, null, 2) }],
     };
   }
 );

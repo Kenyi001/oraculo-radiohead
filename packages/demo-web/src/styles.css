@@ -60,6 +60,31 @@ h1 {
   font-size: 1rem;
 }
 
+.subheading {
+  margin: 1rem 0 0.5rem;
+  font-size: 0.95rem;
+  color: var(--accent);
+}
+
+.json-block {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #0b1220;
+  color: #cbd5e1;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.format-hint {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+}
+
 .hero-top {
   display: flex;
   justify-content: space-between;
@@ -143,6 +168,42 @@ button:disabled {
   letter-spacing: 0.06em;
   font-size: 0.85rem;
   color: var(--muted);
+}
+
+.pulse-favor {
+  margin: 0.5rem 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
+
+.favor-favorable {
+  border-color: #34d399;
+  color: #a7f3d0;
+}
+
+.favor-unfavorable {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.favor-neutral {
+  border-color: var(--warn);
+  color: var(--warn);
+}
+
+.verdict {
+  margin-top: 1rem;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.news-list a {
+  color: var(--accent);
+}
+
+.news-list li {
+  margin-bottom: 0.5rem;
 }
 
 .wdk-action {
