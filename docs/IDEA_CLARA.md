@@ -19,6 +19,18 @@ Entrega un **Evidence Pack** (precio, riesgo, noticias, sentimiento, `why` / `re
 
 **No es:** exchange, predictor, ni app de trading automática / money-mover.
 
+### Qué simplifica
+
+El agente deja de inventar precios/razones y de armar el contexto a mano.  
+**Una llamada** → Evidence Pack completo → el agente decide.
+
+### Qué ofrece que otros no
+
+- **Porqués con números** (`why` + `reasons[]`), no opinión de chat  
+- **Consume-only** — el agente no reinventar la fórmula  
+- **Fuentes + timestamp** en el mismo JSON  
+- **No es money-mover**: informar primero; WDK opcional después  
+
 **Tracks Hacki:** General (vas siempre — producto intel) + sponsor **WDK** (prueba de ejecución).
 
 ---

@@ -20,6 +20,21 @@ Oráculo de **evidencia de mercado** (precio + riesgo + sentimiento + noticias +
 **One-liner:**  
 > Casandra gives AI agents sourced, timestamped market evidence — price, risk, news, and why — so the agent can decide on its own. Not predictions. Not financial advice. WDK optional for execution under evidence.
 
+### Qué simplifica (para el agente)
+
+Sin Casandra el agente tiene que: scrapear precios, inventar “porqués”, mezclar noticias a ojo, y decidir si mueve wallet con alucinaciones.  
+**Con Casandra:** una sola tool (`get_market_pulse`) → Evidence Pack listo (`why` + `reasons` + meters + headlines + `fetched_at`). El agente **lee y decide**; no recalcula la fórmula (`consume_only`).
+
+### Qué ofrece que otros no
+
+| Otros (genéricos) | Casandra |
+|-------------------|----------|
+| Chat que “opina” del mercado | JSON **determinista** + algoritmo versionado |
+| Solo precio o solo wallet send | Precio + riesgo + F&G + noticias + **por qué** en un pack |
+| Black-box LLM advice | `reasons[]` con **números reales** de esta corrida |
+| “Confía en el modelo” | `consume_only` + timestamp — el agente no reinventa |
+| Producto = mover USD₮ | Producto = **informar**; WDK solo si el agente elige actuar |
+
 ```
 Agente → get_market_pulse (Evidence Pack) → Agente decide
                 ↓ (solo si elige actuar)

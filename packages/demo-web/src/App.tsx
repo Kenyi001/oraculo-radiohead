@@ -72,9 +72,9 @@ export function App() {
         <p className="eyebrow">Aleph 2026 · Santa Cruz · General + WDK sponsor</p>
         <h1>Casandra</h1>
         <p className="tagline">
-          Decision substrate for AI agents — sourced market evidence so the agent
-          decides on its own. Not predictions. Not a money-mover. Not financial
-          advice.
+          One call → Evidence Pack (price, risk, news, why). The agent decides —
+          we don&apos;t invent numbers or move money for you. Not predictions. Not
+          financial advice.
         </p>
       </header>
 

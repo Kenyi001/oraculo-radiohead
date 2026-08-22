@@ -6,7 +6,7 @@
 
 ## Pitch script (~2:30–3:00 EN) — Augusto presenta
 
-> Hi — I'm Augusto from the Casandra team, Santa Cruz, Bolivia. AI agents invent prices and invent reasons. Casandra is not a money-mover and not a price predictor. It is a decision substrate: a consume-only Evidence Pack — live price, risk, Fear and Greed, news headlines, and a structured why — so the agent can decide on its own. Demo: Market Pulse first — reasons with numbers, then a context hint proceed, caution, or avoid. Same engine in Cursor via get_market_pulse. Only if the agent chooses to act, we optionally check a WDK guardrail and dry-run a USD₮ send — sponsor proof, not the product. Submitted under Aleph General plus WDK. Not financial advice. Thanks.
+> Hi — I'm Augusto from the Casandra team, Santa Cruz, Bolivia. AI agents invent prices and invent reasons. Casandra simplifies that: one Evidence Pack — live price, risk, Fear and Greed, news, and a structured why — so the agent decides on its own. We don't predict prices and we don't move money for you. What others don't offer: deterministic, consume-only JSON with numbered reasons and timestamps — not chat opinion, not a wallet demo. Demo: Market Pulse first. Same engine in Cursor via get_market_pulse. Only if the agent chooses to act, optional WDK dry-run — sponsor proof, not the product. Submitted under Aleph General plus WDK. Not financial advice. Thanks.
 
 | Second | Focus | Augusto muestra |
 |---|---|---|

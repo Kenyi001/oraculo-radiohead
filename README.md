@@ -11,6 +11,21 @@ Not predictions. Not a money-mover. Not financial advice.
 
 AI agents invent prices and invent reasons. **Casandra** returns a consume-only **Evidence Pack** — live price, risk, Fear&Greed, news headlines, and a structured `why` / `reasons[]` — so the **agent can decide on its own**. Same engine powers the **web demo** for judges. **WDK** (`wdk-mcp`) is an optional second layer: only if the agent chooses to act, a guardrail can gate a USD₮ dry-run (sponsor track proof — not the product).
 
+### What it simplifies
+
+Without Casandra, the agent scrapes prices, invents “whys”, and may move a wallet on hallucinations.  
+**With Casandra:** one call (`get_market_pulse`) → ready Evidence Pack → the agent **reads and decides** (`consume_only: true`).
+
+### What others don’t offer
+
+| Typical hackathon agent | Casandra |
+|-------------------------|----------|
+| Chat opinion / black-box advice | Versioned, deterministic JSON |
+| Price-only **or** send-token demo | Price + risk + F&G + news + **why** in one pack |
+| Product = move USD₮ | Product = **inform**; execution optional |
+
+Full thesis: [docs/DIRECTION.md](docs/DIRECTION.md).
+
 ## Team
 
 | Role | Owner |

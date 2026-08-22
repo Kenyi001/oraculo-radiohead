@@ -57,6 +57,8 @@
 ## Datos que puedes citar
 
 - Producto: **Casandra** — Evidence Pack / Decision Substrate  
+- **Simplifica:** una tool → evidencia completa; el agente decide (no inventa)  
+- **Vs otros:** no es chat-opinion ni money-mover; es JSON con `why`/`reasons` + timestamp  
 - Tools héroe: `get_market_pulse` (`casandra-pulse-v1`)  
 - Hint: proceed / caution / avoid = contexto para el agente  
 - WDK: `@tetherto/wdk` + `wdk-mcp` — capa opcional  
