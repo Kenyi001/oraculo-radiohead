@@ -1,58 +1,68 @@
-# Oraculo (radiohead)
+# Casandra (repo: oraculo-radiohead)
 
-**Market Oracle MCP — real market state for AI agents, not hallucinations.**
+**Investment oracle MCP for AI agents — portfolio state, market context, and transparent risk. Not hallucinations.**
 
-> ES: Oráculo de mercado vía MCP para agentes (Cursor/Claude). Datos reales (CoinGecko) + UI demo para jueces.
-
-Built for **[Aleph Hackathon 2026](https://hacki.crecimiento.build/h/aleph-hackathon-2026)** — Santa Cruz chapter (EMI / Ethereum Bolivia).
+> Named after Cassandra, the prophetess. Built for [Aleph Hackathon 2026](https://hacki.crecimiento.build/h/aleph-hackathon-2026) — Santa Cruz (EMI / Ethereum Bolivia).  
+> Spec-driven: [specs/constitution.md](specs/constitution.md) · [TASKS.md](TASKS.md)
 
 ## Problem / Solution
 
-AI agents invent prices when asked “how is the market?”. Oraculo exposes **MCP tools** that fetch live quotes and a simple 24h bias (`bullish` / `bearish` / `sideways`). Same logic powers a **web demo** so judges can try it without an MCP client.
+AI agents invent prices and “risk opinions.” **Casandra** exposes MCP tools that return live quotes, portfolio state, a documented **risk score (0–100)**, and short market-context bullets — with timestamps. Same core powers the **web demo** for judges.
+
+## Team
+
+| Role | Owner |
+|---|---|
+| MCP + core + risk algorithm | **Dax** ([Kenyi001](https://github.com/Kenyi001)) |
+| Demo web + deploy + video support | **Partner** (name TBD) |
 
 ## Aleph 2026
 
 | | |
 |---|---|
-| Track | **AI / vibe coding** (MCP as agent↔data interface) |
-| Chapter | Santa Cruz · EMI · [chapter site](https://aleph-hackathon-2026-santa-cruz.vercel.app/#lugar) |
-| Team | Solo — [Kenyi001](https://github.com/Kenyi001) (Dax Kenji Tellez Duran) |
-| Platform | [Hacki](https://hacki.crecimiento.build/h/aleph-hackathon-2026) · DoraHacks submit |
-
-Optional DeFi angle: include **USDT** in summaries (Tether ecosystem relevance).
+| Track | **AI** + Tether/USDT narrative |
+| Chapter | [Santa Cruz EMI](https://aleph-hackathon-2026-santa-cruz.vercel.app/#lugar) |
+| Judging focus | Demo wow + sponsor bounty |
+| Platform | [Hacki](https://hacki.crecimiento.build/h/aleph-hackathon-2026) |
 
 ## MCP tools
 
-| Tool | Input | Output |
-|---|---|---|
-| `get_price` | `symbol` (btc, eth, usdt…) | price_usd, change_24h_pct, source, fetched_at |
-| `get_market_summary` | `symbols[]` | bias + bullets + quotes |
-| `health` | — | ok, version, last_fetch |
+| Tool | Purpose |
+|---|---|
+| `get_price` | USD price + 24h change |
+| `get_portfolio_state` | Value, PnL %, weights, USDT share |
+| `get_risk_level` | Score 0–100 + band + factors |
+| `get_market_context` | Fast bias bullets (not advice) |
+| `get_market_summary` | Multi-symbol bias |
+| `health` | Version / last fetch |
 
-Data source: **CoinGecko** public API. Mock fallback if rate-limited / offline.
+## Risk algorithm v1 (`casandra-risk-v1`)
+
+```
+score = 0.45 * abs_change_component
+      + 0.35 * relative_vol_vs_btc
+      + 0.20 * (100 - usdt_share_pct)
+```
+
+- Bands: **0–33 low** · **34–66 med** · **67–100 high**
+- More **USDT** in the portfolio → lower risk contribution
+- Full factor breakdown returned in JSON
 
 ## Quick start
 
 ```bash
 npm install
-npm run build:core
-npm run build -w @oraculo/mcp-server
-```
-
-### Run MCP (stdio)
-
-```bash
-npm run start:mcp
+npm run build
+npm run start:mcp    # MCP stdio
+npm run dev:web      # http://localhost:5173
 ```
 
 ### Cursor MCP config
 
-Add to Cursor MCP settings (path adjusted to your clone):
-
 ```json
 {
   "mcpServers": {
-    "oraculo-market": {
+    "casandra": {
       "command": "node",
       "args": ["D:/_Dev/Projects/Oraculo-radiohead/packages/mcp-server/dist/index.js"]
     }
@@ -60,64 +70,24 @@ Add to Cursor MCP settings (path adjusted to your clone):
 }
 ```
 
-Then ask: *“How is BTC today? Use the oraculo tools.”*
+Ask: *“What’s my portfolio risk? Use Casandra tools.”*
 
-### Claude Desktop (`claude_desktop_config.json`)
-
-```json
-{
-  "mcpServers": {
-    "oraculo-market": {
-      "command": "node",
-      "args": ["D:/_Dev/Projects/Oraculo-radiohead/packages/mcp-server/dist/index.js"]
-    }
-  }
-}
-```
-
-### Demo web (judges)
-
-```bash
-npm run dev:web
-```
-
-Open http://localhost:5173
-
-**Live demo:** deploy with `npx vercel --prod` (requires `vercel login`) — then paste URL here.  
-Repo: https://github.com/Kenyi001/oraculo-radiohead
-
-```bash
-# Deploy from repo root (Vercel CLI or dashboard)
-# vercel.json points output to packages/demo-web/dist
-npx vercel --prod
-```
+**Live demo:** deploy with `npx vercel --prod` (needs `vercel login`) — paste URL here.  
+**Repo:** https://github.com/Kenyi001/oraculo-radiohead
 
 ## Monorepo
 
 ```
-packages/
-  market-core/   # fetch + normalize + bias (shared)
-  mcp-server/    # @modelcontextprotocol/sdk stdio server
-  demo-web/      # Vite + React UI for judges
-docs/HACKATHON.md
+packages/market-core   # prices, portfolio, risk, context
+packages/mcp-server    # Casandra MCP
+packages/demo-web      # judges UI
+specs/                 # Speckit
+TASKS.md               # human task board
 ```
-
-## Hackathon rules
-
-- Code for this project was written **during** Aleph Hackathon (kickoff onwards).
-- Reused only public libraries (MCP SDK, Vite, React, TypeScript) — not a pre-built product.
-- See [docs/HACKATHON.md](docs/HACKATHON.md) for submission checklist.
-
-## Links
-
-- Hacki: https://hacki.crecimiento.build/h/aleph-hackathon-2026
-- Chapter SCZ: https://aleph-hackathon-2026-santa-cruz.vercel.app/
-- Official Aleph: https://alephhackathon.crecimiento.build/
-- Demo video: _(YouTube / Drive — add before submit)_
 
 ## Disclaimer
 
-**Not financial advice.** Prices and bias are informational demos only. Do not trade based on this tool.
+**Not financial advice.** Casandra does not execute trades or predict returns.
 
 ## License
 
