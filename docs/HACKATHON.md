@@ -6,27 +6,34 @@
 - Repo: public + README
 - Demo video ≤ **3 minutes** (EN preferred for async judging)
 - Deployed app URL for judges without MCP
-- Select **AI** track (and any sponsor bounty) on DoraHacks / Hacki
+- **General** by default + select sponsor track **WDK** on DoraHacks / Hacki → [TRACK.md](TRACK.md) · [WDK.md](WDK.md)
+- Optimize pitch for **General** judging criteria
+- If contract deployed → provide address
 - Team size 1–4; each member applied individually
 
-## Oraculo deliverables
+## Oraculo / Casandra deliverables
 
 - [ ] `npm run build` succeeds
-- [ ] MCP tools work in Cursor (`get_price`, `get_market_summary`, `health`)
+- [ ] MCP tools work in Cursor (incl. `check_wdk_guardrail`)
+- [ ] Dual MCP: Casandra + `wdk-mcp` documented
 - [ ] Demo web live on Vercel (URL in README)
+- [ ] CasandraRegistry address (Base Sepolia) in README + demo
 - [ ] Repo public: `Kenyi001/oraculo-radiohead`
-- [ ] Video ≤3 min uploaded (YouTube or Drive)
-- [ ] Hacki / DoraHacks submit with track **AI**
+- [ ] Video ≤3 min uploaded (YouTube or Drive) — Casandra→WDK loop
+- [ ] Hacki / DoraHacks submit with **General + WDK**
 - [ ] Apply Aleph + Luma chapter SCZ completed
+
+Full checklist: [REQUIREMENTS.md](REQUIREMENTS.md)
 
 ## Pitch outline (video)
 
-1. Problem — agents hallucinate market prices  
-2. Solution — MCP tools + live CoinGecko  
-3. Live demo — Cursor tool call **or** web UI  
-4. Timestamp / source in JSON  
-5. “Not financial advice” + call to try repo
+1. Problem — agents hallucinate prices / may send unsafely  
+2. Solution — Casandra MCP + risk `action`  
+3. WDK — guardrail → balance / dry-run send  
+4. Live demo — web UI + Cursor  
+5. On-chain registry address (optional proof)  
+6. “Not financial advice” + repo URL
 
 ## Out of scope (v1)
 
-Trading bots, custody, ML prediction, full multi-chain, QVAC/WDK (nice-to-have only).
+Trading bots · custody · ML prediction · QVAC · Pears · WDK gasless Track 2

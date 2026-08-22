@@ -6,8 +6,15 @@ build/
 .env
 .env.*
 !.env.example
+!.env.wdk.example
+!.env*.example
 .DS_Store
 Thumbs.db
 *.tsbuildinfo
 .vercel/
 coverage/
+contracts/cache/
+contracts/artifacts/
+contracts/deployments/hardhat.json
+contracts/scripts/deployments/
+typechain-types/

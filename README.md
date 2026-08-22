@@ -1,123 +1,130 @@
-# Oraculo (radiohead)
+# Casandra (repo: oraculo-radiohead)
 
-**Market Oracle MCP — real market state for AI agents, not hallucinations.**
+**Investment oracle MCP + WDK-guarded USD₮ wallet for AI agents — not hallucinations.**
 
-> ES: Oráculo de mercado vía MCP para agentes (Cursor/Claude). Datos reales (CoinGecko) + UI demo para jueces.
-
-Built for **[Aleph Hackathon 2026](https://hacki.crecimiento.build/h/aleph-hackathon-2026)** — Santa Cruz chapter (EMI / Ethereum Bolivia).
+> Named after Cassandra, the prophetess. Built for [Aleph Hackathon 2026](https://hacki.crecimiento.build/h/aleph-hackathon-2026) — Santa Cruz (EMI / Ethereum Bolivia).  
+> **General (default) + sponsor [WDK](https://hacki.crecimiento.build/h/aleph-hackathon-2026/tracks/wdk-track).** Specs: [specs/constitution.md](specs/constitution.md) · [docs/WDK.md](docs/WDK.md)
 
 ## Problem / Solution
 
-AI agents invent prices when asked “how is the market?”. Oraculo exposes **MCP tools** that fetch live quotes and a simple 24h bias (`bullish` / `bearish` / `sideways`). Same logic powers a **web demo** so judges can try it without an MCP client.
+AI agents invent prices/risk and may send tokens unsafely. **Casandra** returns live portfolio state, a transparent **risk score (0–100)** with `action` (`proceed` / `caution` / `avoid`), and gates **Tether WDK** (`wdk-mcp`) so `send_token` is blocked when risk is `avoid`. Same core powers the **web demo** for judges.
+
+## Team
+
+| Role | Owner |
+|---|---|
+| MCP + core + risk + submit | **Dax** ([Kenyi001](https://github.com/Kenyi001)) |
+| Market Pulse (mercado a favor / medidores para agentes) | **David** ([arnez69](https://github.com/arnez69)) |
+| Contrato + Web3 (Base Sepolia) | **Vctor11180** ([Vctor11180](https://github.com/Vctor11180)) |
+| Demo web + Vercel + video support | Partner / equipo |
+| Pitch + video (exposición) | **Augusto** ([RonaldGaymer2002](https://github.com/RonaldGaymer2002)) — [docs/PITCH_AUGUSTO.md](docs/PITCH_AUGUSTO.md) |
 
 ## Aleph 2026
 
 | | |
 |---|---|
-| Track | **AI / vibe coding** (MCP as agent↔data interface) |
-| Chapter | Santa Cruz · EMI · [chapter site](https://aleph-hackathon-2026-santa-cruz.vercel.app/#lugar) |
-| Team | Solo — [Kenyi001](https://github.com/Kenyi001) (Dax Kenji Tellez Duran) |
-| Platform | [Hacki](https://hacki.crecimiento.build/h/aleph-hackathon-2026) · DoraHacks submit |
+| **General (default)** | [docs/TRACK.md](docs/TRACK.md) — best overall |
+| **Sponsor track** | **WDK** ([docs/WDK.md](docs/WDK.md)) — `wdk-mcp` + Casandra guardrails |
+| **Direction** | [docs/DIRECTION.md](docs/DIRECTION.md) |
+| Chapter | [Santa Cruz EMI](https://aleph-hackathon-2026-santa-cruz.vercel.app/#lugar) |
+| Platform | [Hacki](https://hacki.crecimiento.build/h/aleph-hackathon-2026) · [WDK track](https://hacki.crecimiento.build/h/aleph-hackathon-2026/tracks/wdk-track) |
+| Product flavor | USDT ballast + WDK-guarded agent wallet |
+| Framework | [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) · [TASKS.md](TASKS.md) · [docs/BOARD.md](docs/BOARD.md) |
 
-Optional DeFi angle: include **USDT** in summaries (Tether ecosystem relevance).
+## MCP tools (Casandra)
 
-## MCP tools
+| Tool | Purpose |
+|---|---|
+| `get_price` | USD price + 24h change |
+| `get_portfolio_state` | Value, PnL %, weights, USDT share |
+| `get_risk_level` | Score 0–100 + band + `action` + verdict |
+| `check_wdk_guardrail` | **WDK:** allow/deny `send_token` before wdk-mcp |
+| `get_market_context` | Fast bias bullets (not advice) |
+| `get_market_summary` | Multi-symbol bias |
+| `health` | Version / last fetch |
 
-| Tool | Input | Output |
-|---|---|---|
-| `get_price` | `symbol` (btc, eth, usdt…) | price_usd, change_24h_pct, source, fetched_at |
-| `get_market_summary` | `symbols[]` | bias + bullets + quotes |
-| `health` | — | ok, version, last_fetch |
+Pair with **`wdk-mcp`** tools (`get_balance`, `send_token`, …) — see [docs/WDK.md](docs/WDK.md) · [docs/AGENT_WDK_POLICY.md](docs/AGENT_WDK_POLICY.md).
 
-Data source: **CoinGecko** public API. Mock fallback if rate-limited / offline.
+### WDK permalinks (for judges)
+
+- Guardrail: [`packages/market-core/src/index.ts`](packages/market-core/src/index.ts) (`checkWdkGuardrail`)
+- MCP tool: [`packages/mcp-server/src/index.ts`](packages/mcp-server/src/index.ts) (`check_wdk_guardrail`)
+- Dual MCP config: [`docs/mcp-casandra-wdk.example.json`](docs/mcp-casandra-wdk.example.json)
+- Packages: `@tetherto/wdk@1.0.0-beta.16`, `@tetherto/wdk-cli@1.0.0-beta.3`
+
+## Risk algorithm v1 (`casandra-risk-v1`)
+
+```
+score = 0.45 * abs_change_component
+      + 0.35 * relative_vol_vs_btc
+      + 0.20 * (100 - usdt_share_pct)
+```
+
+- Bands: **0–33 low** · **34–66 med** · **67–100 high**
+- More **USDT** in the portfolio → lower risk contribution
+- Full factor breakdown returned in JSON
 
 ## Quick start
 
 ```bash
 npm install
-npm run build:core
-npm run build -w @oraculo/mcp-server
+npm run build
+npm run start:mcp    # MCP stdio
+npm run dev:web      # http://localhost:5173
 ```
 
-### Run MCP (stdio)
-
-```bash
-npm run start:mcp
-```
-
-### Cursor MCP config
-
-Add to Cursor MCP settings (path adjusted to your clone):
+### Cursor MCP config (Casandra + WDK)
 
 ```json
 {
   "mcpServers": {
-    "oraculo-market": {
+    "casandra": {
       "command": "node",
-      "args": ["D:/_Dev/Projects/Oraculo-radiohead/packages/mcp-server/dist/index.js"]
+      "args": ["D:/_Dev/Projects/oraculo-radiohead/packages/mcp-server/dist/index.js"]
+    },
+    "wdk-wallet": {
+      "command": "wdk-mcp"
     }
   }
 }
 ```
 
-Then ask: *“How is BTC today? Use the oraculo tools.”*
+Full guide: [docs/WDK.md](docs/WDK.md). Ask: *“Run check_wdk_guardrail on the demo portfolio. If allow_wdk_send, dry-run a Sepolia send; if avoid, do not send.”*
 
-### Claude Desktop (`claude_desktop_config.json`)
-
-```json
-{
-  "mcpServers": {
-    "oraculo-market": {
-      "command": "node",
-      "args": ["D:/_Dev/Projects/Oraculo-radiohead/packages/mcp-server/dist/index.js"]
-    }
-  }
-}
-```
-
-### Demo web (judges)
-
-```bash
-npm run dev:web
-```
-
-Open http://localhost:5173
-
-**Live demo:** deploy with `npx vercel --prod` (requires `vercel login`) — then paste URL here.  
-Repo: https://github.com/Kenyi001/oraculo-radiohead
-
-```bash
-# Deploy from repo root (Vercel CLI or dashboard)
-# vercel.json points output to packages/demo-web/dist
-npx vercel --prod
-```
+**Live demo:** deploy with `npx vercel --prod` (needs `vercel login`) — paste URL here.  
+**Repo:** https://github.com/Kenyi001/oraculo-radiohead
 
 ## Monorepo
 
 ```
-packages/
-  market-core/   # fetch + normalize + bias (shared)
-  mcp-server/    # @modelcontextprotocol/sdk stdio server
-  demo-web/      # Vite + React UI for judges
-docs/HACKATHON.md
+packages/market-core   # prices, portfolio, risk, WDK guardrail
+packages/mcp-server    # Casandra MCP (+ check_wdk_guardrail)
+packages/wdk-bridge    # WDK package manifest (Aleph WDK track)
+packages/demo-web      # judges UI
+contracts/             # CasandraRegistry (Base Sepolia)
+docs/WDK.md            # WDK setup + permalinks for judges
+specs/                 # Speckit
+TASKS.md               # human task board
 ```
 
-## Hackathon rules
+## On-chain (CasandraRegistry)
 
-- Code for this project was written **during** Aleph Hackathon (kickoff onwards).
-- Reused only public libraries (MCP SDK, Vite, React, TypeScript) — not a pre-built product.
-- See [docs/HACKATHON.md](docs/HACKATHON.md) for submission checklist.
+Minimal risk-snapshot registry for Aleph (Hacki requires address if deployed).
 
-## Links
+```bash
+npm run contracts:compile
+# fund wallet in contracts/deployments/baseSepolia.json → deployWallet
+npm run contracts:deploy:base
+```
 
-- Hacki: https://hacki.crecimiento.build/h/aleph-hackathon-2026
-- Chapter SCZ: https://aleph-hackathon-2026-santa-cruz.vercel.app/
-- Official Aleph: https://alephhackathon.crecimiento.build/
-- Demo video: _(YouTube / Drive — add before submit)_
+See [contracts/README.md](contracts/README.md). After deploy, set `VITE_CASANDRA_REGISTRY_*` in `packages/demo-web/.env` and paste address below.
+
+**Contract address (Base Sepolia):** _pending faucet → `npm run contracts:deploy:base`_  
+**Explorer:** _TBD_
 
 ## Disclaimer
 
-**Not financial advice.** Prices and bias are informational demos only. Do not trade based on this tool.
+**Not financial advice.** Casandra does not execute trades or predict returns.
 
 ## License
 
