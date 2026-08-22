@@ -1,11 +1,9 @@
-export type {
-  MarketBias,
-  RiskBand,
-  WdkAction,
-} from "./types.js";
-import type { MarketBias, RiskBand, WdkAction } from "./types.js";
-import { buildMarketPulse, type MarketPulse, type MarketFavor } from "./pulse.js";
-import { fetchMarketNews, type MarketNews, type MarketNewsArticle, type MarketNewsSource, type MarketStateSnapshot, type MarketNumbers } from "./news.js";
+export type MarketBias = "bullish" | "bearish" | "sideways";
+export type RiskBand = "low" | "med" | "high";
+/** Structured context hint for agents (also used by optional WDK guardrail). Not a trade order. */
+export type WdkAction = "proceed" | "caution" | "avoid";
+import type { MarketNews, MarketNewsArticle, MarketNewsSource } from "./news.js";
+import { fetchMarketNews } from "./news.js";
 import {
   canonicalPortfolioPayload,
   bandToUint8,
@@ -91,6 +89,63 @@ export interface MarketContext {
   bullets: string[];
   fetched_at: string;
   disclaimer: string;
+}
+
+export type MarketFavor = "for" | "against" | "neutral";
+export type TrendStrength = "strong" | "weak" | "none";
+export type NewsBias = "bullish" | "bearish" | "neutral";
+
+export interface PulseHeadline {
+  title: string;
+  source: string;
+  published_at: string;
+  url: string;
+  score: number;
+}
+
+export interface MarketMeters {
+  price_usd: number;
+  change_1h_pct: number | null;
+  change_24h_pct: number | null;
+  bias: MarketBias;
+  trend_strength: TrendStrength;
+  fear_greed_value: number;
+  fear_greed_label: string;
+  news_score: number;
+  news_bias: NewsBias;
+}
+
+export interface MarketPulseWhy {
+  market: string;
+  news: string;
+  sentiment: string;
+  alignment: string;
+}
+
+/** Consume-only payload for AI agents (MCP / API-shaped JSON). */
+export interface MarketPulse {
+  symbol: string;
+  fetched_at: string;
+  market_favor: MarketFavor;
+  risk_pct: number;
+  band: RiskBand;
+  verdict: WdkAction;
+  confidence: number;
+  meters: MarketMeters;
+  reasons: string[];
+  why: MarketPulseWhy;
+  headlines: PulseHeadline[];
+  consume_only: true;
+  algorithm: string;
+  disclaimer: string;
+}
+
+export interface FearGreedSnapshot {
+  value: number;
+  label: string;
+  source: string;
+  fetched_at: string;
+  mock?: boolean;
 }
 
 /** CoinGecko id map for common tickers */
@@ -369,8 +424,8 @@ export async function getRiskLevel(input: {
     );
     const band = bandFromScore(score);
     const action = actionFromBand(band);
-    const verdict = `Portfolio risk: ${band.toUpperCase()} (${score}/100). ${portfolio.usdt_share_pct.toFixed(1)}% USDT allocation reduces overall volatility. WDK action: ${action}.`;
-    const verdict_es = `Riesgo del portafolio: ${band === "low" ? "BAJO" : band === "med" ? "MEDIO" : "ALTO"} (${score}/100). ${portfolio.usdt_share_pct.toFixed(1)}% asignado a USDT reduce la volatilidad general. Acción WDK: ${action}.`;
+    const verdict = `Portfolio risk: ${band.toUpperCase()} (${score}/100). ${portfolio.usdt_share_pct.toFixed(1)}% USDT allocation reduces overall volatility. Agent decision hint: ${action} (context only — not a trade or send order).`;
+    const verdict_es = `Riesgo del portafolio: ${band === "low" ? "BAJO" : band === "med" ? "MEDIO" : "ALTO"} (${score}/100). ${portfolio.usdt_share_pct.toFixed(1)}% asignado a USDT reduce la volatilidad general. Hint para el agente: ${action} (contexto — no es orden de trade ni de envío).`;
 
     return {
       score,
@@ -397,8 +452,8 @@ export async function getRiskLevel(input: {
   );
   const band = bandFromScore(score);
   const action = actionFromBand(band);
-  const verdict = `${symbol.toUpperCase()} risk level: ${band.toUpperCase()} (${score}/100). 24h change ${quote.change_24h_pct == null ? "n/a" : `${quote.change_24h_pct >= 0 ? "+" : ""}${quote.change_24h_pct.toFixed(2)}%`}. WDK action: ${action}.`;
-  const verdict_es = `Nivel de riesgo de ${symbol.toUpperCase()}: ${band === "low" ? "BAJO" : band === "med" ? "MEDIO" : "ALTO"} (${score}/100). Cambio 24h ${quote.change_24h_pct == null ? "n/a" : `${quote.change_24h_pct >= 0 ? "+" : ""}${quote.change_24h_pct.toFixed(2)}%`}. Acción WDK: ${action}.`;
+  const verdict = `${symbol.toUpperCase()} risk level: ${band.toUpperCase()} (${score}/100). 24h change ${quote.change_24h_pct == null ? "n/a" : `${quote.change_24h_pct >= 0 ? "+" : ""}${quote.change_24h_pct.toFixed(2)}%`}. Agent decision hint: ${action} (context only — not a trade or send order).`;
+  const verdict_es = `Nivel de riesgo de ${symbol.toUpperCase()}: ${band === "low" ? "BAJO" : band === "med" ? "MEDIO" : "ALTO"} (${score}/100). Cambio 24h ${quote.change_24h_pct == null ? "n/a" : `${quote.change_24h_pct >= 0 ? "+" : ""}${quote.change_24h_pct.toFixed(2)}%`}. Hint para el agente: ${action} (contexto — no es orden de trade ni de envío).`;
 
   return {
     score,
@@ -507,10 +562,377 @@ export async function getMarketContext(symbol: string): Promise<MarketContext> {
   };
 }
 
-export async function getMarketPulse(
-  symbols: string[] = ["btc", "eth", "usdt"]
-) {
-  return buildMarketPulse(symbols, getMarketSummary);
+const PULSE_ALGORITHM = "casandra-pulse-v1";
+
+const NEWS_POS = [
+  "etf",
+  "approval",
+  "partnership",
+  "upgrade",
+  "inflow",
+  "listing",
+  "record",
+  "adoption",
+  "rally",
+  "surge",
+];
+const NEWS_NEG = [
+  "hack",
+  "exploit",
+  "ban",
+  "lawsuit",
+  "outage",
+  "liquidation",
+  "crash",
+  "sec",
+  "probe",
+  "fraud",
+];
+
+function trendStrengthFromChange(change: number | null): TrendStrength {
+  if (change == null) return "none";
+  const a = Math.abs(change);
+  if (a >= 3) return "strong";
+  if (a >= 1.5) return "weak";
+  return "none";
+}
+
+function biasFromChange(change: number | null): MarketBias {
+  if (change == null) return "sideways";
+  if (change > 1.5) return "bullish";
+  if (change < -1.5) return "bearish";
+  return "sideways";
+}
+
+export function scoreHeadlineTitle(title: string): number {
+  const t = title.toLowerCase();
+  let s = 0;
+  for (const w of NEWS_POS) if (t.includes(w)) s += 1;
+  for (const w of NEWS_NEG) if (t.includes(w)) s -= 1;
+  return clamp(s, -1, 1);
+}
+
+export function newsBiasFromScore(score: number): NewsBias {
+  if (score > 0.25) return "bullish";
+  if (score < -0.25) return "bearish";
+  return "neutral";
+}
+
+export async function getFearGreed(): Promise<FearGreedSnapshot> {
+  const fetched_at = new Date().toISOString();
+  try {
+    const res = await fetch("https://api.alternative.me/fng/?limit=1", {
+      signal: AbortSignal.timeout(6000),
+    });
+    if (!res.ok) throw new Error("fng http");
+    const data = (await res.json()) as {
+      data?: { value?: string; value_classification?: string }[];
+    };
+    const row = data.data?.[0];
+    const value = Number(row?.value);
+    if (!Number.isFinite(value)) throw new Error("fng parse");
+    return {
+      value,
+      label: row?.value_classification ?? "Unknown",
+      source: "alternative.me",
+      fetched_at,
+    };
+  } catch {
+    return {
+      value: 50,
+      label: "Neutral",
+      source: "mock-fallback",
+      fetched_at,
+      mock: true,
+    };
+  }
+}
+
+async function getExtendedQuote(symbol: string): Promise<{
+  quote: PriceQuote;
+  change_1h_pct: number | null;
+}> {
+  const normalized = normalizeSymbol(symbol);
+  const coinId = resolveCoinId(normalized);
+  const url =
+    `https://api.coingecko.com/api/v3/coins/markets` +
+    `?vs_currency=usd&ids=${encodeURIComponent(coinId)}` +
+    `&price_change_percentage=1h,24h`;
+  try {
+    const res = await fetch(url, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) {
+      const q = await getPrice(symbol);
+      return { quote: q, change_1h_pct: null };
+    }
+    const rows = (await res.json()) as {
+      current_price?: number;
+      price_change_percentage_24h_in_currency?: number;
+      price_change_percentage_1h_in_currency?: number;
+      name?: string;
+    }[];
+    const row = rows[0];
+    if (!row || typeof row.current_price !== "number") {
+      const q = await getPrice(symbol);
+      return { quote: q, change_1h_pct: null };
+    }
+    const fetched_at = new Date().toISOString();
+    lastFetchAt = fetched_at;
+    return {
+      quote: {
+        symbol: normalized,
+        name: row.name ?? coinId,
+        price_usd: row.current_price,
+        change_24h_pct:
+          typeof row.price_change_percentage_24h_in_currency === "number"
+            ? row.price_change_percentage_24h_in_currency
+            : null,
+        source: "coingecko-markets",
+        fetched_at,
+      },
+      change_1h_pct:
+        typeof row.price_change_percentage_1h_in_currency === "number"
+          ? row.price_change_percentage_1h_in_currency
+          : null,
+    };
+  } catch {
+    const q = await getPrice(symbol);
+    return { quote: q, change_1h_pct: null };
+  }
+}
+
+function mockHeadlines(symbol: string): PulseHeadline[] {
+  const s = symbol.toUpperCase();
+  const now = new Date().toISOString();
+  return [
+    {
+      title: `${s} sees mixed flows as ETF narrative continues`,
+      source: "mock-news",
+      published_at: now,
+      url: "https://example.com/mock/etf",
+      score: 1,
+    },
+    {
+      title: `Markets watch for liquidation cascades after volatility spike`,
+      source: "mock-news",
+      published_at: now,
+      url: "https://example.com/mock/liquidation",
+      score: -1,
+    },
+    {
+      title: `Analysts debate partnership rumors around ${s} ecosystem`,
+      source: "mock-news",
+      published_at: now,
+      url: "https://example.com/mock/partnership",
+      score: 1,
+    },
+  ];
+}
+
+/** Free RSS (CoinTelegraph). Keyword-filter by symbol; fallback mock. */
+export async function fetchHeadlines(
+  symbol: string,
+  _lookbackHours = 24
+): Promise<PulseHeadline[]> {
+  const key = normalizeSymbol(symbol);
+  const aliases = [key, key.toUpperCase()];
+  if (key === "btc") aliases.push("bitcoin");
+  if (key === "eth") aliases.push("ethereum");
+  try {
+    const res = await fetch("https://cointelegraph.com/rss", {
+      signal: AbortSignal.timeout(8000),
+      headers: { Accept: "application/rss+xml, application/xml, text/xml" },
+    });
+    if (!res.ok) return mockHeadlines(key);
+    const xml = await res.text();
+    const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)].slice(0, 20);
+    const headlines: PulseHeadline[] = [];
+    for (const m of items) {
+      const block = m[1];
+      const title =
+        block.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/i)?.[1] ??
+        block.match(/<title>(.*?)<\/title>/i)?.[1] ??
+        "";
+      const link =
+        block.match(/<link>(.*?)<\/link>/i)?.[1]?.trim() ??
+        "https://cointelegraph.com";
+      const pub =
+        block.match(/<pubDate>(.*?)<\/pubDate>/i)?.[1] ??
+        new Date().toISOString();
+      if (!title) continue;
+      const hit = aliases.some((a) => title.toLowerCase().includes(a.toLowerCase()));
+      if (!hit && headlines.length >= 3) continue;
+      if (!hit && aliases.every((a) => a.length < 4)) continue;
+      headlines.push({
+        title: title.trim(),
+        source: "cointelegraph-rss",
+        published_at: new Date(pub).toISOString(),
+        url: link,
+        score: scoreHeadlineTitle(title),
+      });
+      if (headlines.length >= 5) break;
+    }
+    if (headlines.length === 0) return mockHeadlines(key);
+    return headlines;
+  } catch {
+    return mockHeadlines(key);
+  }
+}
+
+function marketFavorFromBias(
+  bias: MarketBias,
+  side?: "buy" | "sell"
+): MarketFavor {
+  if (!side) {
+    if (bias === "bullish") return "for";
+    if (bias === "bearish") return "against";
+    return "neutral";
+  }
+  if (bias === "sideways") return "neutral";
+  if (bias === "bullish") return side === "buy" ? "for" : "against";
+  return side === "sell" ? "for" : "against";
+}
+
+function worsenVerdict(a: WdkAction, b: WdkAction): WdkAction {
+  const rank = { proceed: 0, caution: 1, avoid: 2 };
+  return rank[a] >= rank[b] ? a : b;
+}
+
+/**
+ * Product pulse for AI agents: price + Fear&Greed + news + why.
+ * Consume-only — agents must not reinvent casandra-pulse-v1.
+ */
+export async function getMarketPulse(input: {
+  symbol: string;
+  side?: "buy" | "sell";
+  lookback_hours?: number;
+  include_news?: boolean;
+}): Promise<MarketPulse> {
+  const symbol = normalizeSymbol(input.symbol);
+  const includeNews = input.include_news !== false;
+  const lookback = input.lookback_hours ?? 24;
+
+  const [{ quote, change_1h_pct }, risk, fng, headlinesRaw] = await Promise.all([
+    getExtendedQuote(symbol),
+    getRiskLevel({ symbol }),
+    getFearGreed(),
+    includeNews
+      ? fetchHeadlines(symbol, lookback)
+      : Promise.resolve([] as PulseHeadline[]),
+  ]);
+
+  const change24 = quote.change_24h_pct;
+  const bias = biasFromChange(change24);
+  const strength = trendStrengthFromChange(change24);
+  const newsScore =
+    headlinesRaw.length === 0
+      ? 0
+      : headlinesRaw.reduce((a, h) => a + h.score, 0) / headlinesRaw.length;
+  const nBias = newsBiasFromScore(newsScore);
+  const favor = marketFavorFromBias(bias, input.side);
+
+  let confidence = 0.7;
+  let verdict: WdkAction = risk.action;
+  const reasons: string[] = [];
+
+  reasons.push(
+    `${symbol.toUpperCase()} 24h ${
+      change24 == null ? "n/a" : `${change24 >= 0 ? "+" : ""}${change24.toFixed(2)}%`
+    } → bias ${bias} (${strength})`
+  );
+  reasons.push(
+    `Fear&Greed=${fng.value} ${fng.label}${fng.mock ? " [mock]" : ""} (source ${fng.source})`
+  );
+  reasons.push(
+    `Risk casandra-risk-v1: ${risk.risk_pct}/100 band=${risk.band} action=${risk.action}`
+  );
+
+  if (includeNews) {
+    reasons.push(
+      `News score ${newsScore.toFixed(2)} (${nBias}) from ${headlinesRaw.length} headlines`
+    );
+  }
+
+  const newsDisagrees =
+    (nBias === "bullish" && bias === "bearish") ||
+    (nBias === "bearish" && bias === "bullish");
+  if (newsDisagrees) {
+    confidence -= 0.25;
+    verdict = worsenVerdict(verdict, "caution");
+    reasons.push("News bias disagrees with price bias → confidence down, max caution");
+  }
+
+  if (fng.value > 75 && input.side === "buy") {
+    verdict = worsenVerdict(verdict, "caution");
+    confidence -= 0.15;
+    reasons.push("Extreme/high greed + BUY → block FOMO proceed");
+  }
+  if (fng.value < 25 && input.side === "sell") {
+    verdict = worsenVerdict(verdict, "caution");
+    confidence -= 0.1;
+    reasons.push("Extreme/high fear + SELL → caution (capitulation risk)");
+  }
+  if (favor === "against" && input.side) {
+    verdict = worsenVerdict(verdict, "caution");
+    if (risk.band === "high") verdict = "avoid";
+    reasons.push(
+      `side=${input.side} vs market bias=${bias} → market_favor=against`
+    );
+  } else if (input.side) {
+    reasons.push(
+      `side=${input.side} aligns as market_favor=${favor} with bias=${bias}`
+    );
+  }
+
+  confidence = clamp(confidence, 0.15, 0.95);
+
+  const why: MarketPulseWhy = {
+    market: `${symbol.toUpperCase()} 24h ${
+      change24 == null ? "n/a" : `${change24 >= 0 ? "+" : ""}${change24.toFixed(2)}%`
+    } → bias ${bias}`,
+    news: includeNews
+      ? `news_score ${newsScore.toFixed(2)} (${nBias}); sample: ${
+          headlinesRaw[0]?.title ?? "n/a"
+        }`
+      : "news omitted (include_news=false)",
+    sentiment: `Fear&Greed=${fng.value} ${fng.label}`,
+    alignment: input.side
+      ? `side=${input.side} → market_favor=${favor}; verdict=${verdict}`
+      : `no side → market_favor=${favor}; verdict=${verdict}`,
+  };
+
+  while (reasons.length < 3) {
+    reasons.push(`Pulse algorithm ${PULSE_ALGORITHM} consume_only=true`);
+  }
+
+  return {
+    symbol,
+    fetched_at: new Date().toISOString(),
+    market_favor: favor,
+    risk_pct: risk.risk_pct,
+    band: risk.band,
+    verdict,
+    confidence: Math.round(confidence * 100) / 100,
+    meters: {
+      price_usd: quote.price_usd,
+      change_1h_pct,
+      change_24h_pct: change24,
+      bias,
+      trend_strength: strength,
+      fear_greed_value: fng.value,
+      fear_greed_label: fng.label,
+      news_score: Math.round(newsScore * 100) / 100,
+      news_bias: nBias,
+    },
+    reasons,
+    why,
+    headlines: headlinesRaw,
+    consume_only: true,
+    algorithm: PULSE_ALGORITHM,
+    disclaimer: DISCLAIMER,
+  };
 }
 
 export async function getMarketNews(symbol: string): Promise<MarketNews> {
@@ -523,7 +945,7 @@ export async function getMarketNews(symbol: string): Promise<MarketNews> {
     getPrice(normalized),
     getPrice("btc"),
     getRiskLevel({ symbol: normalized }),
-    buildMarketPulse([normalized, "btc", "usdt"], getMarketSummary),
+    getMarketPulse({ symbol: normalized, include_news: false }),
   ]);
 
   const feed = getRssFeedMeta(normalized);
@@ -564,11 +986,11 @@ export async function getMarketNews(symbol: string): Promise<MarketNews> {
     summary_es: raw.summary_es,
     analysis,
     market_state: {
-      bias: pulse.market_bias,
-      market_favor: pulse.market_favor,
-      fear_greed_index: pulse.fear_greed_index,
-      fear_greed_label: pulse.fear_greed_label,
-      state_summary_es: `Estado: sesgo ${pulse.market_bias}, mercado ${pulse.market_favor}, Fear&Greed ${pulse.fear_greed_index} (${pulse.fear_greed_label}).`,
+      bias: pulse.meters.bias,
+      market_favor: analysis.news_favor,
+      fear_greed_index: pulse.meters.fear_greed_value,
+      fear_greed_label: pulse.meters.fear_greed_label,
+      state_summary_es: `Estado: sesgo ${pulse.meters.bias}, noticias ${analysis.news_favor}, Fear&Greed ${pulse.meters.fear_greed_value} (${pulse.meters.fear_greed_label}).`,
     },
     market_numbers: {
       symbol: normalized,
@@ -577,7 +999,7 @@ export async function getMarketNews(symbol: string): Promise<MarketNews> {
       btc_change_24h_pct: btc.change_24h_pct,
       risk_pct: risk.risk_pct,
       risk_band: risk.band,
-      fear_greed_index: pulse.fear_greed_index,
+      fear_greed_index: pulse.meters.fear_greed_value,
       price_source: quote.source,
       fetched_at,
     },
@@ -606,7 +1028,6 @@ export async function prepareOnChainRiskSnapshot(
 }
 
 export {
-  buildMarketPulse,
   fetchMarketNews,
   canonicalPortfolioPayload,
   bandToUint8,
@@ -617,13 +1038,9 @@ export {
 export { analyzeNewsHeadlines } from "./news-analysis.js";
 export type { NewsAnalysis } from "./news-analysis.js";
 export type {
-  MarketPulse,
-  MarketFavor,
   MarketNews,
   MarketNewsArticle,
   MarketNewsSource,
-  MarketStateSnapshot,
-  MarketNumbers,
   OnChainRiskSnapshot,
 };
 

@@ -81,7 +81,7 @@ server.tool(
 
 server.tool(
   "get_risk_level",
-  "Casandra: transparent risk score 0–100 (low/med/high) for a symbol or portfolio. Explainable factors — not financial advice.",
+  "Casandra supporting evidence: transparent risk score 0–100 (low/med/high) with explainable factors. action is an agent decision hint (context), not a trade/send order. Prefer get_market_pulse for full Evidence Pack. Not financial advice.",
   {
     symbol: z.string().optional().describe("Single asset ticker, e.g. btc"),
     positions: z
@@ -113,17 +113,33 @@ server.tool(
 
 server.tool(
   "get_market_pulse",
-  "Casandra: Fear & Greed + 24h bias → market_favor (favorable/neutral/unfavorable) + verdict for agents.",
+  "PRIMARY Casandra tool — consume-only Evidence Pack so the agent can decide on its own: why{}, reasons[], meters (price/F&G/news), headlines, confidence, market_favor, and verdict as a CONTEXT HINT (not a trade order, not a prediction). Do not reinvent casandra-pulse-v1 — read JSON only. Call this before any optional WDK action.",
   {
-    symbols: z
-      .array(z.string())
+    symbol: z.string().describe("Ticker, e.g. btc, eth, sol"),
+    side: z
+      .enum(["buy", "sell"])
       .optional()
-      .describe("Symbols for bias calc. Default: btc, eth, usdt"),
+      .describe("Optional trade side to align market_favor"),
+    lookback_hours: z
+      .number()
+      .optional()
+      .describe("News/context window hours (default 24)"),
+    include_news: z
+      .boolean()
+      .optional()
+      .describe("Include headlines + news_score (default true)"),
   },
-  async ({ symbols }) => {
-    const pulse = await getMarketPulse(symbols ?? ["btc", "eth", "usdt"]);
+  async ({ symbol, side, lookback_hours, include_news }) => {
+    const pulse = await getMarketPulse({
+      symbol,
+      side,
+      lookback_hours,
+      include_news,
+    });
     return {
-      content: [{ type: "text" as const, text: JSON.stringify(pulse, null, 2) }],
+      content: [
+        { type: "text" as const, text: JSON.stringify(pulse, null, 2) },
+      ],
     };
   }
 );
@@ -144,7 +160,7 @@ server.tool(
 
 server.tool(
   "check_wdk_guardrail",
-  "Aleph WDK track: BEFORE calling wdk-mcp send_token, call this. Returns allow_wdk_send (false when action=avoid). Pair with wdk-wallet MCP (get_balance / send_token dryRun).",
+  "OPTIONAL sponsor WDK gate: only AFTER get_market_pulse and only if the agent chooses to act. BEFORE wdk-mcp send_token, call this. Returns allow_wdk_send (false when action=avoid). Casandra informs; the agent decides; WDK is not the product.",
   {
     symbol: z.string().optional().describe("Single asset ticker, e.g. eth"),
     positions: z

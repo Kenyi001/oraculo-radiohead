@@ -20,7 +20,8 @@
     "contracts:publish:risk": "npm run build:core && hardhat run contracts/scripts/publish-risk.js --network baseSepolia",
     "contracts:publish:risk:local": "npm run build:core && hardhat run contracts/scripts/publish-risk.js --network hardhat",
     "test:core": "npm run test -w @oraculo/market-core",
-    "wdk:demo": "npm run build:core && npm run build -w @oraculo/wdk-bridge && node scripts/wdk-guardrail-demo.mjs"
+    "wdk:demo": "npm run build:core && npm run build -w @oraculo/wdk-bridge && node scripts/wdk-guardrail-demo.mjs",
+    "deploy:web": "npx vercel --prod"
   },
   "engines": {
     "node": ">=20"

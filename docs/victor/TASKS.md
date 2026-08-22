@@ -38,20 +38,27 @@ Tracks: see [docs/TRACK.md](../TRACK.md) · WDK: [docs/WDK.md](../WDK.md)
 
 ---
 
+## ⚠️ Corrección (2026-08-22) — red equivocada
+
+Deploy reportado en **Ethereum Sepolia** (`0x27544Fe45b81C09fC91f99c0A7374970839eC4FF` / [etherscan](https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF)) **no cuenta**. #10 exige **Base Sepolia** (chainId `84532`, explorer `sepolia.basescan.org`). El `.sol` está OK; hay que **redeploy** en Base. Detalle: [issue #10](https://github.com/Kenyi001/oraculo-radiohead/issues/10).
+
 ## 🏁 Pasos Finales para Despliegue a Base Sepolia
 
-1. **Configuración de Variables de Entorno:**
-   Colocar la clave privada en `.env` (en la raíz del proyecto):
+1. **Fondear wallet en Base Sepolia** (no Ethereum Sepolia): [Alchemy faucet](https://www.alchemy.com/faucets/base-sepolia) o Coinbase CDP. MetaMask: chainId `84532`.
+
+2. **Variables de entorno** en `.env` (raíz del repo — nunca committear la key):
    ```env
    PRIVATE_KEY=tu_private_key_aqui
    BASE_SEPOLIA_RPC=https://base-sepolia-rpc.publicnode.com
    ```
 
-2. **Ejecutar Despliegue Final:**
+3. **Deploy:**
    ```bash
    npm run contracts:deploy:base
    ```
+   Verificar log: `chainId: 84532` y link `https://sepolia.basescan.org/address/0x...`
 
-3. **Actualización Automática:**
-   - La dirección obtenida se registrará en `contracts/deployments/baseSepolia.json`.
-   - Se actualizará la dirección en `README.md` y `packages/demo-web/.env`.
+4. **Actualizar:**
+   - `contracts/deployments/baseSepolia.json` (lo escribe el script)
+   - `README.md` + `packages/demo-web/.env` (`VITE_CASANDRA_REGISTRY_ADDRESS` + `VITE_CASANDRA_REGISTRY_EXPLORER`)
+   - Comentar la address en [#10](https://github.com/Kenyi001/oraculo-radiohead/issues/10)
