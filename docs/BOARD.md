@@ -21,4 +21,4 @@
 
 ## Full checklist
 
-[REQUIREMENTS.md](REQUIREMENTS.md) · [TASKS.md](../TASKS.md)
+[REQUIREMENTS.md](REQUIREMENTS.md) · [TASKS.md](../TASKS.md) · [victor/TASKS.md](victor/TASKS.md)
