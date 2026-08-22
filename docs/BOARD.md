@@ -3,7 +3,7 @@
 **Repo:** https://github.com/Kenyi001/oraculo-radiohead  
 **Deadline:** Sun 23 Aug ~11:00 America/La_Paz  
 **Tracks:** **General** (default) + sponsor **WDK**  
-**Objetivo + roles:** [TEAM_BRIEF.md](TEAM_BRIEF.md) · [TRACK.md](TRACK.md) · [WDK.md](WDK.md) · [SHIP.md](SHIP.md)
+**Objetivo + roles:** [IDEA_CLARA.md](IDEA_CLARA.md) · [TEAM_BRIEF.md](TEAM_BRIEF.md) · [TRACK.md](TRACK.md) · [WDK.md](WDK.md) · [SHIP.md](SHIP.md)
 
 ## Objetivo (claro)
 
