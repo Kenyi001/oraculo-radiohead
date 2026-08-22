@@ -44,7 +44,7 @@ Sin esto **no se puede submit**:
 
 | # | Qué | Quién | Bloqueo típico |
 |---|-----|-------|----------------|
-| 5 | URL Vercel del demo | **Augusto** | Login Vercel |
+| 5 | URL Vercel del demo | **Dax** | [docs/VERCEL.md](VERCEL.md) · login Vercel |
 | 6 | Video ≤3 min (pitch) | **Augusto** | Grabar con demo + Cursor |
 | 10 | Address del contrato | **Victor** | Faucet ETH Base Sepolia + private key |
 | 8 | Wallet WDK de prueba unlock | **Dax** | Crear wallet test (no plata real) |
@@ -59,7 +59,7 @@ Sin esto **no se puede submit**:
 ```
 Hoy código OK
     ↓
-Augusto: Vercel (#5)
+Dax: Vercel (#5) — docs/VERCEL.md
 Victor: contrato (#10)
 Dax: unlock WDK (#8)
     ↓

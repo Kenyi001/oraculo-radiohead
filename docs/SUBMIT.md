@@ -22,8 +22,8 @@ Full direction: [DIRECTION.md](DIRECTION.md).
 
 1. **Augusto:** grabar Loom/YouTube ≤3 min con [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md) (demo web + Cursor).
 2. Pegar video URL en README + comentar en #6.
-3. **Augusto:** `npx vercel --prod` → pegar live URL en README (#5).
-4. Victor: deploy CasandraRegistry → address (#10) — Augusto lo menciona si ya está.
+3. **Dax:** Vercel — [VERCEL.md](VERCEL.md) → `npm run deploy:web` → pegar live URL en README (#5).
+4. Victor: deploy CasandraRegistry **Base Sepolia** → address (#10) — mencionarla si ya está.
 5. Dax: submit Hacki/DoraHacks — **General** + **WDK**; adjuntar repo/video/deploy/contract (#7).
 6. Confirm apply Aleph + Luma SCZ done.
 

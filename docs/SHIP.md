@@ -28,12 +28,17 @@ Tracks: **General (default) + WDK sponsor** — [TRACK.md](TRACK.md) · [WDK.md]
 2. `npm run contracts:deploy:base`
 3. Paste address into README + `packages/demo-web/.env`
 
-### 3) Vercel (#5)
+### 3) Vercel (#5 — @Kenyi001 / Dax)
+
+Full guide: [VERCEL.md](VERCEL.md)
 
 ```bash
 npx vercel login
-npx vercel --prod
+npx vercel link          # first time only
+npm run deploy:web       # = npx vercel --prod
 ```
+
+Paste HTTPS URL into README + comment on #5.
 
 ### 4) Video (#6)
 

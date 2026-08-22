@@ -9,10 +9,10 @@
 
 | Who | Owns |
 |---|---|
-| Dax | MCP, market-core, WDK guardrail, submit |
+| Dax | MCP, market-core, WDK guardrail, **Vercel (#5)**, submit |
 | David (@arnez69) | Market Pulse (#17) |
 | Vctor11180 | Contrato Base Sepolia (#10) |
-| Partner | Demo polish, Vercel, video support |
+| Augusto (@RonaldGaymer2002) | Pitch + video (#6) |
 
 ## Work order (remaining)
 
@@ -28,9 +28,9 @@
 | ID | Task | Owner | Status |
 |---|---|---|---|
 | T1–T7 | Specs / core / MCP / UI / requirements | Dax | **done** |
-| T8 | Vercel live URL | Partner | open (#5) |
-| T9 | CasandraRegistry Base Sepolia | Vctor11180 | local smoke done · faucet (#10) |
-| T10 | Video 3 min (incl. WDK) | Partner+Dax | open (#6) |
+| T8 | Vercel live URL | Dax | ready — [docs/VERCEL.md](docs/VERCEL.md) (#5) |
+| T9 | CasandraRegistry Base Sepolia | Vctor11180 | local smoke done · redeploy Base (#10) |
+| T10 | Video 3 min (incl. WDK) | Augusto+Dax | open (#6) |
 | T11 | Hacki submit General + WDK | Dax | open (#7) |
 | T12 | WDK CLI/`wdk-mcp` + guardrail | Dax | **code done** · human unlock for video (#8) |
 

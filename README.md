@@ -16,7 +16,7 @@ AI agents invent prices/risk and may send tokens unsafely. **Casandra** returns 
 | MCP + core + risk + submit | **Dax** ([Kenyi001](https://github.com/Kenyi001)) |
 | Market Pulse (mercado a favor / medidores para agentes) | **David** ([arnez69](https://github.com/arnez69)) |
 | Contrato + Web3 (Base Sepolia) | **Vctor11180** ([Vctor11180](https://github.com/Vctor11180)) |
-| Demo web + Vercel + video support | Partner / equipo |
+| Vercel live demo (#5) | **Dax** — [docs/VERCEL.md](docs/VERCEL.md) |
 | Pitch + video (exposición) | **Augusto** ([RonaldGaymer2002](https://github.com/RonaldGaymer2002)) — [docs/PITCH_AUGUSTO.md](docs/PITCH_AUGUSTO.md) |
 
 ## Aleph 2026
@@ -109,8 +109,9 @@ Agents **must not** reinvent the formula. Call `get_market_pulse` and read JSON:
 
 David’s product requirements: [docs/david/REQUISITOS_PULSE.md](docs/david/REQUISITOS_PULSE.md).
 
-**Live demo:** deploy with `npx vercel --prod` (needs `vercel login`) — paste URL here.  
+**Live demo:** _pending_ — follow [docs/VERCEL.md](docs/VERCEL.md) (`npx vercel login` → `npm run deploy:web`) then paste URL here.  
 **Repo:** https://github.com/Kenyi001/oraculo-radiohead
+
 ## Monorepo
 
 ```

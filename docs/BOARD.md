@@ -15,13 +15,13 @@ Agente IA → Casandra (riesgo + `action`) → solo si no es `avoid` → WDK USD
 |---------|--------|-------|-------------|
 | **Victor** | @Vctor11180 | [#10](https://github.com/Kenyi001/oraculo-radiohead/issues/10) | Deploy Base Sepolia + address en README/demo |
 | **David** | @arnez69 | [#17](https://github.com/Kenyi001/oraculo-radiohead/issues/17) | **Pulse producto:** noticias + why + algoritmo — [REQUISITOS_PULSE.md](david/REQUISITOS_PULSE.md) |
-| **Augusto** | @RonaldGaymer2002 | [#5](https://github.com/Kenyi001/oraculo-radiohead/issues/5) · [#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6) | **Pitch + video + Vercel** — guía [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md) |
-| **Dax** | @Kenyi001 | [#8](https://github.com/Kenyi001/oraculo-radiohead/issues/8) · [#7](https://github.com/Kenyi001/oraculo-radiohead/issues/7) | Wallet WDK lista para el demo de Augusto + submit General+WDK |
+| **Augusto** | @RonaldGaymer2002 | [#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6) | **Pitch + video** — guía [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md) |
+| **Dax** | @Kenyi001 | [#5](https://github.com/Kenyi001/oraculo-radiohead/issues/5) · [#8](https://github.com/Kenyi001/oraculo-radiohead/issues/8) · [#7](https://github.com/Kenyi001/oraculo-radiohead/issues/7) | **Vercel** [VERCEL.md](VERCEL.md) + wallet WDK + submit General+WDK |
 
 ## Orden (no bloquearse)
 
 ```
-#10 Victor + #5 Augusto + #8 Dax  →  #6 video  →  #7 submit
+#10 Victor + #5 Dax + #8 Dax  →  #6 video (Augusto)  →  #7 submit
 #17 David en paralelo
 ```
 
@@ -32,7 +32,7 @@ Agente IA → Casandra (riesgo + `action`) → solo si no es `avoid` → WDK USD
 | `master` | Fuente de verdad (usar esta) |
 | `rama-victor` | Mergeado; solo falta deploy #10 |
 | `feature/Arnez` | Investigación mergeada; David → código #17 |
-| `rama-augusto` | Vacía; Augusto toma #5/#6 desde master |
+| `rama-augusto` | Vacía; Augusto toma #6 desde master |
 
 ## Already done
 
