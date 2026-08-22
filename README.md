@@ -109,7 +109,7 @@ Agents **must not** reinvent the formula. Call `get_market_pulse` and read JSON:
 
 David’s product requirements: [docs/david/REQUISITOS_PULSE.md](docs/david/REQUISITOS_PULSE.md).
 
-**Live demo:** _pending_ — follow [docs/VERCEL.md](docs/VERCEL.md) (`npx vercel login` → `npm run deploy:web`) then paste URL here.  
+**Live demo:** https://casandra-two.vercel.app  
 **Repo:** https://github.com/Kenyi001/oraculo-radiohead
 
 ## Monorepo
