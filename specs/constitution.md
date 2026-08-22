@@ -21,9 +21,10 @@ Repo codename: `oraculo-radiohead` · GitHub: https://github.com/Kenyi001/oracul
 2. **Explainable risk** — formula documented in README; never claim prediction or financial advice.
 3. **Single source of truth** — web and MCP call the same `@oraculo/market-core` APIs.
 4. **Demo** — ≤3 min video (EN preferred) + live deploy URL for judges without MCP.
-5. **Tether story** — happy path always includes **USDT**; WDK wallet hook is P1 only if P0 is green.
-6. **Tracks** — submit **AI** + Tether/USDT bounty narrative on Hacki/DoraHacks.
+5. **USDT in product** — happy path includes **USDT** as ballast in risk math (flavor for LATAM stables). Optional bounty only if form allows *with* AI track — never blocks P0.
+6. **One challenge track + General judging** — submit **AI** track; optimize demo/video for Hacki **General** criteria. See [docs/TRACK.md](../docs/TRACK.md). No multi-challenge-track.
 7. **Deadline** — Sun 23 Aug ~11:00 America/La_Paz.
+8. **Work framework** — Constitution → [docs/REQUIREMENTS.md](../docs/REQUIREMENTS.md) → [TASKS.md](../TASKS.md) → GitHub Issues.
 
 ## Out of constitution (forbidden as P0)
 

@@ -1,0 +1,9 @@
+{
+  "address": null,
+  "chainId": 84532,
+  "network": "baseSepolia",
+  "explorer": null,
+  "status": "pending_faucet",
+  "deployWallet": "0xB950B05E02FEFBE0Ede519004892da4bf71d9c06",
+  "instructions": "Fund deployWallet on Base Sepolia (faucet), then: BASE_SEPOLIA_RPC=https://base-sepolia-rpc.publicnode.com npm run contracts:deploy:base"
+}

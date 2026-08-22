@@ -12,11 +12,20 @@
     "dev:mcp": "npm run build:core && npm run start -w @oraculo/mcp-server",
     "dev:web": "npm run build:core && npm run dev -w @oraculo/demo-web",
     "start:mcp": "npm run start -w @oraculo/mcp-server",
-    "typecheck": "npm run typecheck -w @oraculo/market-core && npm run typecheck -w @oraculo/mcp-server"
+    "typecheck": "npm run typecheck -w @oraculo/market-core && npm run typecheck -w @oraculo/mcp-server",
+    "contracts:compile": "hardhat compile",
+    "contracts:deploy:local": "hardhat run contracts/scripts/deploy.js --network hardhat",
+    "contracts:deploy:base": "hardhat run contracts/scripts/deploy.js --network baseSepolia"
   },
   "engines": {
     "node": ">=20"
   },
   "author": "Dax Kenji Tellez Duran",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "dotenv": "^17.4.2",
+    "ethers": "^6.13.5",
+    "hardhat": "^2.22.19"
+  }
 }

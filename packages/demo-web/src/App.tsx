@@ -59,7 +59,7 @@ export function App() {
   return (
     <main className="page">
       <header>
-        <p className="eyebrow">Aleph Hackathon 2026 · Santa Cruz · AI + USDT</p>
+        <p className="eyebrow">Aleph Hackathon 2026 · Santa Cruz · AI track · General criteria</p>
         <h1>Casandra</h1>
         <p className="tagline">
           Investment oracle for AI agents — portfolio state, market context, and
@@ -191,6 +191,25 @@ export function App() {
         <p>
           Same engine as MCP (<code>packages/mcp-server</code>).{" "}
           <strong>Not financial advice.</strong>
+        </p>
+        <p className="onchain muted">
+          On-chain registry (Base Sepolia):{" "}
+          {import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS ? (
+            <a
+              href={
+                import.meta.env.VITE_CASANDRA_REGISTRY_EXPLORER ||
+                `https://sepolia.basescan.org/address/${import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS}`
+              }
+              target="_blank"
+              rel="noreferrer"
+            >
+              {String(import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS).slice(0, 10)}…
+            </a>
+          ) : (
+            <span>
+              pending deploy — see <code>contracts/README.md</code>
+            </span>
+          )}
         </p>
       </footer>
     </main>

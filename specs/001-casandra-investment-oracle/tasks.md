@@ -12,9 +12,11 @@ Owners: **Dax** · **Partner** (name TBD)
 - [x] market-core: `get_market_context` — **Dax**
 - [x] mcp-server: expose R2–R4 tools — **Dax**
 - [x] demo-web: Casandra UI (portfolio + risk gauge) — **Partner** (Dax fallback)
-- [ ] Vercel deploy + URL in README — **Partner**
-- [ ] Video ≤3 min EN + pitch — **Partner** + Dax voice
-- [ ] Hacki/DoraHacks submit AI + Tether narrative — **Dax**
+- [x] docs/REQUIREMENTS.md + TRACK AI+General — **Dax** (#9)
+- [ ] Vercel deploy + URL in README — **Partner** (#5)
+- [ ] CasandraRegistry Base Sepolia + address in demo — **Dax** (#10)
+- [ ] Video ≤3 min EN + pitch — **Partner** + Dax voice (#6)
+- [ ] Hacki/DoraHacks submit **AI** + General criteria — **Dax** (#7)
 
 ## P1
 

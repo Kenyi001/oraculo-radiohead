@@ -20,10 +20,12 @@ AI agents invent prices and “risk opinions.” **Casandra** exposes MCP tools 
 
 | | |
 |---|---|
-| Track | **AI** + Tether/USDT narrative |
+| **Challenge track (1)** | **AI** ([docs/TRACK.md](docs/TRACK.md)) |
+| **General judging** | Technicality · Originality · UI/UX/DX · Practicality · Presentation |
 | Chapter | [Santa Cruz EMI](https://aleph-hackathon-2026-santa-cruz.vercel.app/#lugar) |
-| Judging focus | Demo wow + sponsor bounty |
-| Platform | [Hacki](https://hacki.crecimiento.build/h/aleph-hackathon-2026) |
+| Platform | [Hacki](https://hacki.crecimiento.build/h/aleph-hackathon-2026) · [alephhackathon.crecimiento.build](https://alephhackathon.crecimiento.build/) |
+| Product flavor | USDT ballast in risk score |
+| Framework | [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) · [TASKS.md](TASKS.md) |
 
 ## MCP tools
 
@@ -81,9 +83,26 @@ Ask: *“What’s my portfolio risk? Use Casandra tools.”*
 packages/market-core   # prices, portfolio, risk, context
 packages/mcp-server    # Casandra MCP
 packages/demo-web      # judges UI
+contracts/             # CasandraRegistry (Base Sepolia)
 specs/                 # Speckit
 TASKS.md               # human task board
+docs/REQUIREMENTS.md   # Hacki + product checklist
 ```
+
+## On-chain (CasandraRegistry)
+
+Minimal risk-snapshot registry for Aleph (Hacki requires address if deployed).
+
+```bash
+npm run contracts:compile
+# fund wallet in contracts/deployments/baseSepolia.json → deployWallet
+npm run contracts:deploy:base
+```
+
+See [contracts/README.md](contracts/README.md). After deploy, set `VITE_CASANDRA_REGISTRY_*` in `packages/demo-web/.env` and paste address below.
+
+**Contract address (Base Sepolia):** _pending faucet → `npm run contracts:deploy:base`_  
+**Explorer:** _TBD_
 
 ## Disclaimer
 

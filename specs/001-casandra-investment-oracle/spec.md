@@ -2,7 +2,7 @@
 
 ## Intent
 
-Ship **Casandra**: an MCP server + demo web so AI agents can ask for (1) current investment/portfolio state, (2) fast market context for a symbol, and (3) a transparent **risk level** — optimized for Aleph 2026 Demo wow + Tether (USDT) narrative.
+Ship **Casandra**: an MCP server + demo web so AI agents can ask for (1) current investment/portfolio state, (2) fast market context for a symbol, and (3) a transparent **risk level** — submit Aleph **AI** track; optimize for **General** judging (Technicality, Originality, UI/UX/DX, Practicality, Presentation). See [docs/TRACK.md](../../docs/TRACK.md) · [docs/REQUIREMENTS.md](../../docs/REQUIREMENTS.md).
 
 Related: [`../constitution.md`](../constitution.md)
 

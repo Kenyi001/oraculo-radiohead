@@ -18,10 +18,11 @@ Data: CoinGecko public API. Mock fallback on failure.
 4. Casandra UI (partner) + Vercel
 5. Video + Hacki submit (Sun morning)
 
-## Tether angle
+## USDT (product flavor inside AI track + General judging)
 
 - P0: USDT always in demo portfolio + risk factors mention stablecoin share
 - P1: WDK / address stub if time
+- Submit: **AI** challenge track only — optimize for General criteria — see `docs/TRACK.md` · `docs/SHIP.md`
 
 ## Risks
 

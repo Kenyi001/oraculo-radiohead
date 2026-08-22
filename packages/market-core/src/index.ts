@@ -240,7 +240,7 @@ export async function getMarketSummary(
   };
 }
 
-/** Default demo portfolio (USDT-first happy path for Tether story) */
+/** Default demo portfolio (USDT ballast for General-track demo) */
 export const DEFAULT_DEMO_POSITIONS: PositionInput[] = [
   { symbol: "usdt", quantity: 5000, cost_basis_usd: 1 },
   { symbol: "btc", quantity: 0.05, cost_basis_usd: 70000 },
