@@ -38,6 +38,7 @@ AI agents invent prices/risk and may send tokens unsafely. **Casandra** returns 
 | `get_price` | USD price + 24h change |
 | `get_portfolio_state` | Value, PnL %, weights, USDT share |
 | `get_risk_level` | Score 0–100 + band + `action` + verdict |
+| `get_market_pulse` | **Consume-only pulse:** favor + why + news + F&G + verdict |
 | `check_wdk_guardrail` | **WDK:** allow/deny `send_token` before wdk-mcp |
 | `get_market_context` | Fast bias bullets (not advice) |
 | `get_market_summary` | Multi-symbol bias |
@@ -89,11 +90,27 @@ npm run dev:web      # http://localhost:5173
 }
 ```
 
-Full guide: [docs/WDK.md](docs/WDK.md). Ask: *“Run check_wdk_guardrail on the demo portfolio. If allow_wdk_send, dry-run a Sepolia send; if avoid, do not send.”*
+Full guide: [docs/WDK.md](docs/WDK.md). Ask: *“Run get_market_pulse for eth side=buy, then check_wdk_guardrail. If avoid, do not send.”*
+
+## Market Pulse — consume-only API for agents
+
+Agents **must not** reinvent the formula. Call `get_market_pulse` and read JSON:
+
+| Field | Use |
+|-------|-----|
+| `verdict` | `proceed` / `caution` / `avoid` |
+| `market_favor` | `for` / `against` / `neutral` |
+| `why` | Human/agent-readable **por qué** (market, news, sentiment, alignment) |
+| `reasons[]` | ≥3 concrete reasons with numbers |
+| `meters` | price changes, Fear&Greed, news_score |
+| `headlines[]` | News titles (RSS or mock fallback) |
+| `consume_only` | always `true` |
+| `algorithm` | `casandra-pulse-v1` |
+
+David’s product requirements: [docs/david/REQUISITOS_PULSE.md](docs/david/REQUISITOS_PULSE.md).
 
 **Live demo:** deploy with `npx vercel --prod` (needs `vercel login`) — paste URL here.  
 **Repo:** https://github.com/Kenyi001/oraculo-radiohead
-
 ## Monorepo
 
 ```
