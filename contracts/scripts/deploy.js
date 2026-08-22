@@ -20,6 +20,8 @@ async function main() {
     explorer:
       chainId === 84532
         ? `https://sepolia.basescan.org/address/${address}`
+        : chainId === 11155111
+        ? `https://sepolia.etherscan.io/address/${address}`
         : null,
     deployedAt: new Date().toISOString(),
   };

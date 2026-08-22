@@ -29,7 +29,7 @@
 |---|---|---|---|
 | T1–T7 | Specs / core / MCP / UI / requirements | Dax | **done** |
 | T8 | Vercel live URL | Partner | open (#5) |
-| T9 | CasandraRegistry Base Sepolia | Vctor11180 | local smoke done · faucet (#10) |
+| T9 | CasandraRegistry Sepolia | Vctor11180 | **done (`0x27544Fe45b81C09fC91f99c0A7374970839eC4FF`)** |
 | T10 | Video 3 min (incl. WDK) | Partner+Dax | open (#6) |
 | T11 | Hacki submit General + WDK | Dax | open (#7) |
 | T12 | WDK CLI/`wdk-mcp` + guardrail | Dax | **code done** · human unlock for video (#8) |

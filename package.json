@@ -16,7 +16,8 @@
     "wdk:version": "node -e \"import('@oraculo/wdk-bridge').then(m=>console.log(JSON.stringify(m.getWdkIntegrationManifest(),null,2)))\"",
     "contracts:compile": "hardhat compile",
     "contracts:deploy:local": "hardhat run contracts/scripts/deploy.js --network hardhat",
-    "contracts:deploy:base": "hardhat run contracts/scripts/deploy.js --network baseSepolia"
+    "contracts:deploy:base": "hardhat run contracts/scripts/deploy.js --network baseSepolia",
+    "contracts:deploy:sepolia": "hardhat run contracts/scripts/deploy.js --network sepolia"
   },
   "engines": {
     "node": ">=20"

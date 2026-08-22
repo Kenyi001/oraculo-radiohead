@@ -119,8 +119,8 @@ npm run contracts:deploy:base
 
 See [contracts/README.md](contracts/README.md). After deploy, set `VITE_CASANDRA_REGISTRY_*` in `packages/demo-web/.env` and paste address below.
 
-**Contract address (Base Sepolia):** _pending faucet → `npm run contracts:deploy:base`_  
-**Explorer:** _TBD_
+**Contract address (Sepolia Testnet):** [`0x27544Fe45b81C09fC91f99c0A7374970839eC4FF`](https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF)  
+**Explorer:** https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF
 
 ## Disclaimer
 

@@ -10,7 +10,7 @@
 
 - [x] **Sincronizar cambios de GitHub en la rama local (`master`)**
 - [x] **Verificar y preparar el Contrato Inteligente (`CasandraRegistry.sol`)**
-- [ ] **Despliegue a Base Sepolia y actualización de dirección en README + Demo** (#10)
+- [x] **Despliegue de Contrato (`0x27544Fe45b81C09fC91f99c0A7374970839eC4FF`) y actualización en README + Demo** (#10)
 
 Tracks: see [docs/TRACK.md](../TRACK.md) · WDK: [docs/WDK.md](../WDK.md)
 
