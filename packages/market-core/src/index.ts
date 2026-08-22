@@ -62,7 +62,10 @@ export interface RiskFactor {
 
 export interface RiskAssessment {
   score: number;
+  risk_pct: number;
   band: RiskBand;
+  verdict: string;
+  verdict_es: string;
   factors: RiskFactor[];
   scope: "symbol" | "portfolio";
   symbol?: string;
@@ -348,9 +351,16 @@ export async function getRiskLevel(input: {
       btc.change_24h_pct,
       portfolio.usdt_share_pct
     );
+    const band = bandFromScore(score);
+    const verdict = `Portfolio risk: ${band.toUpperCase()} (${score}/100). ${portfolio.usdt_share_pct.toFixed(1)}% USDT allocation reduces overall volatility.`;
+    const verdict_es = `Riesgo del portafolio: ${band === "low" ? "BAJO" : band === "med" ? "MEDIO" : "ALTO"} (${score}/100). ${portfolio.usdt_share_pct.toFixed(1)}% asignado a USDT reduce la volatilidad general.`;
+
     return {
       score,
-      band: bandFromScore(score),
+      risk_pct: score,
+      band,
+      verdict,
+      verdict_es,
       factors,
       scope: "portfolio",
       fetched_at,
@@ -367,9 +377,16 @@ export async function getRiskLevel(input: {
     btc.change_24h_pct,
     usdtShare
   );
+  const band = bandFromScore(score);
+  const verdict = `${symbol.toUpperCase()} risk level: ${band.toUpperCase()} (${score}/100). 24h change ${quote.change_24h_pct == null ? "n/a" : `${quote.change_24h_pct >= 0 ? "+" : ""}${quote.change_24h_pct.toFixed(2)}%`}.`;
+  const verdict_es = `Nivel de riesgo de ${symbol.toUpperCase()}: ${band === "low" ? "BAJO" : band === "med" ? "MEDIO" : "ALTO"} (${score}/100). Cambio 24h ${quote.change_24h_pct == null ? "n/a" : `${quote.change_24h_pct >= 0 ? "+" : ""}${quote.change_24h_pct.toFixed(2)}%`}.`;
+
   return {
     score,
-    band: bandFromScore(score),
+    risk_pct: score,
+    band,
+    verdict,
+    verdict_es,
     factors,
     scope: "symbol",
     symbol,

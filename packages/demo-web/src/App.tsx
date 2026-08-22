@@ -85,6 +85,9 @@ export function App() {
               <span className="gauge-score">{risk.score}</span>
               <span className="gauge-band">{risk.band}</span>
             </div>
+            <p className="verdict" style={{ marginTop: "1rem", fontWeight: 600, fontSize: "1.05rem" }}>
+              💬 {risk.verdict_es}
+            </p>
             <p className="muted">
               Algorithm <code>{risk.algorithm}</code> · scope {risk.scope}
             </p>
