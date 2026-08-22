@@ -139,6 +139,15 @@ See [contracts/README.md](contracts/README.md). After deploy, set `VITE_CASANDRA
 **Contract address (Base Sepolia):** _pending faucet → `npm run contracts:deploy:base`_  
 **Explorer:** _TBD_
 
+## Code graph ([graphify](https://github.com/graphify-project))
+
+AST map of the monorepo (no LLM): [graphify-out/GRAPH_REPORT.md](graphify-out/GRAPH_REPORT.md) · interactive [graphify-out/graph.html](graphify-out/graph.html) · call-flow [graphify-out/oraculo-radiohead-callflow.html](graphify-out/oraculo-radiohead-callflow.html).
+
+```bash
+graphify extract . --code-only --no-cluster
+graphify cluster-only . --no-label
+```
+
 ## Disclaimer
 
 **Not financial advice.** Casandra does not execute trades or predict returns.
