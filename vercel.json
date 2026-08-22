@@ -1,0 +1,6 @@
+{
+  "buildCommand": "npm run build -w @oraculo/market-core && npm run build -w @oraculo/demo-web",
+  "outputDirectory": "packages/demo-web/dist",
+  "installCommand": "npm install",
+  "framework": null
+}
