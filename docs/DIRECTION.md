@@ -1,70 +1,82 @@
 # Casandra — Dirección del proyecto
 
 Documento canónico: **qué somos**, **tracks**, **pitch**, **mantenimiento**.  
-Complementa: [TRACK.md](TRACK.md) · [SUBMIT.md](SUBMIT.md) · [WDK.md](WDK.md) · [BOARD.md](BOARD.md)
+Complementa: [TRACK.md](TRACK.md) · [SUBMIT.md](SUBMIT.md) · [WDK.md](WDK.md) · [BOARD.md](BOARD.md) · [david/REQUISITOS_PULSE.md](david/REQUISITOS_PULSE.md)
 
 ---
 
-## 1. Tracks (Hacki)
+## 1. Tesis de producto
+
+**Casandra = Decision Substrate for AI agents**  
+Oráculo de **evidencia de mercado** (precio + riesgo + sentimiento + noticias + `why` / `reasons`), `consume_only: true`, algoritmos versionados (`casandra-risk-v1`, `casandra-pulse-v1`).
+
+| Casandra **es** | Casandra **no es** |
+|-----------------|-------------------|
+| Pack de evidencia sourced + timestamped | Predictor de precio |
+| Contexto para que el **agente decida** | Bot que compra/vende por ti |
+| Semáforo = **hint de contexto** | Orden de envío de tokens |
+| WDK = prueba **opcional** post-evidencia | App genérica de “mover dinero” |
+
+**One-liner:**  
+> Casandra gives AI agents sourced, timestamped market evidence — price, risk, news, and why — so the agent can decide on its own. Not predictions. Not financial advice. WDK optional for execution under evidence.
+
+```
+Agente → get_market_pulse (Evidence Pack) → Agente decide
+                ↓ (solo si elige actuar)
+         check_wdk_guardrail → wdk-mcp dry-run (sponsor proof)
+```
+
+---
+
+## 2. Tracks (Hacki)
 
 | Capa | Decisión |
 |------|----------|
-| **General** | Por **defecto** — best overall (incluye AI/MCP) |
-| **Sponsor (1)** | **WDK** Track 1 — `@tetherto/wdk-cli` / `wdk-mcp` |
+| **General** | Por **defecto** — best overall (producto = intel para agentes) |
+| **Sponsor (1)** | **WDK** Track 1 — ejecución opcional con evidencia |
 | **No** | QVAC · Pears |
-
-**Equipos:** 1–4 miembros.
 
 Detalle: [TRACK.md](TRACK.md).
 
-### Producto unificado
+---
 
-**Casandra** = oráculo de inversión MCP para agentes.  
-**WDK** = brazo de wallet/USD₮ bajo guardrails de `verdict`.
+## 3. Qué queremos (evidencia)
 
-```
-Agente → Casandra (riesgo/verdict) → si no avoid → wdk-mcp (balance/send)
-```
+| # | Queremos | Proof |
+|---|----------|-------|
+| 1 | Sin alucinaciones de mercado | MCP + `fetched_at` + fuentes |
+| 2 | El agente entiende el **por qué** | `why{}` + `reasons[]` (≥3) |
+| 3 | Consume-only | `consume_only: true` · `casandra-pulse-v1` |
+| 4 | Juez entiende en &lt;30s | Demo Pulse primero (web) |
+| 5 | Sponsor WDK (opcional) | `check_wdk_guardrail` + dry-run tras leer Pulse |
+| 6 | Proof on-chain | CasandraRegistry (#10) |
 
 ---
 
-## 2. Idea (lo que queremos)
+## 4. Pitch (70 / 20 / 10)
 
-Un agente pregunta: *“¿cómo está mi inversión / este activo y puedo operar?”*  
-Casandra responde con **números + veredicto**; WDK solo actúa si el guardrail lo permite.
+Ver [SUBMIT.md](SUBMIT.md) · [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md):
 
-| # | Queremos | Evidencia |
-|---|----------|-----------|
-| 1 | Sin alucinaciones de precio/riesgo | MCP + `fetched_at` |
-| 2 | Juez entiende en &lt;30s | Demo gauge + portfolio + USDT |
-| 3 | Decisión medible | `risk_pct`, `verdict`, `reasons` |
-| 4 | Send seguro | `check_wdk_guardrail` → allow/deny antes de `send_token` |
-| 5 | Proof on-chain | CasandraRegistry (#10) |
-
-**One-liner:**  
-> Casandra: investment oracle MCP + WDK-guarded USD₮ wallet for AI agents. Not hallucinations. Not financial advice.
+- **70%** Evidence Pack / Pulse (`why`, reasons, meters, headlines)  
+- **20%** WDK dry-run solo si el agente elige actuar  
+- **10%** tracks + disclaimer  
 
 ---
 
-## 3. Pitch
-
-Ver [SUBMIT.md](SUBMIT.md) — incluir 20–30s Casandra verdict → WDK.
-
----
-
-## 4. Mantenimiento
+## 5. Mantenimiento
 
 | Área | Owner |
 |------|-------|
-| Core + MCP + guardrail WDK + submit | Dax |
-| Market Pulse (#17) | David (@arnez69) |
+| Core + MCP + Pulse + submit | Dax |
+| Market Pulse calidad (#17) | David (@arnez69) |
 | Contrato Base Sepolia (#10) | @Vctor11180 |
-| Demo / Vercel / video | Partner / equipo |
+| Pitch + video (#6) | Augusto |
+| Vercel (#5) | Dax |
 
-Principios: single `market-core`; algoritmos versionados; sin ML v1; disclaimer permanente.
+Principios: single `market-core`; algoritmos versionados; sin ML v1; el **agente decide**; disclaimer permanente.
 
 ---
 
-## 5. Mensaje de equipo
+## 6. Mensaje de equipo
 
-Participamos en **General por defecto** y marcamos sponsor **WDK**. Casandra es el oráculo; WDK es la wallet del agente bajo `verdict`. Victor despliega contrato; David pulse; Dax core + WDK guardrail + submit.
+Participamos en **General** (intel/evidencia para agentes) y marcamos sponsor **WDK** (ejecución opcional bajo evidencia). Casandra no predice ni mueve plata por el usuario: entrega el Evidence Pack; el agente decide.

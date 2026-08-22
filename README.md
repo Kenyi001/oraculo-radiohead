@@ -1,57 +1,83 @@
 # Casandra (repo: oraculo-radiohead)
 
-**Investment oracle MCP + WDK-guarded USD₮ wallet for AI agents — not hallucinations.**
+**Decision substrate for AI agents — sourced, timestamped market evidence so the agent decides on its own.**  
+Not predictions. Not a money-mover. Not financial advice.
 
 > Named after Cassandra, the prophetess. Built for [Aleph Hackathon 2026](https://hacki.crecimiento.build/h/aleph-hackathon-2026) — Santa Cruz (EMI / Ethereum Bolivia).  
-> **General (default) + sponsor [WDK](https://hacki.crecimiento.build/h/aleph-hackathon-2026/tracks/wdk-track).** Specs: [specs/constitution.md](specs/constitution.md) · [docs/WDK.md](docs/WDK.md)
+> **General (default)** + sponsor **[WDK](https://hacki.crecimiento.build/h/aleph-hackathon-2026/tracks/wdk-track)** (optional execution under evidence).  
+> Specs: [specs/constitution.md](specs/constitution.md) · Direction: [docs/DIRECTION.md](docs/DIRECTION.md)
 
 ## Problem / Solution
 
-AI agents invent prices/risk and may send tokens unsafely. **Casandra** returns live portfolio state, a transparent **risk score (0–100)** with `action` (`proceed` / `caution` / `avoid`), and gates **Tether WDK** (`wdk-mcp`) so `send_token` is blocked when risk is `avoid`. Same core powers the **web demo** for judges.
+AI agents invent prices and invent reasons. **Casandra** returns a consume-only **Evidence Pack** — live price, risk, Fear&Greed, news headlines, and a structured `why` / `reasons[]` — so the **agent can decide on its own**. Same engine powers the **web demo** for judges. **WDK** (`wdk-mcp`) is an optional second layer: only if the agent chooses to act, a guardrail can gate a USD₮ dry-run (sponsor track proof — not the product).
 
 ## Team
 
 | Role | Owner |
 |---|---|
-| MCP + core + risk + submit | **Dax** ([Kenyi001](https://github.com/Kenyi001)) |
-| Market Pulse (mercado a favor / medidores para agentes) | **David** ([arnez69](https://github.com/arnez69)) |
+| MCP + core + Pulse + submit | **Dax** ([Kenyi001](https://github.com/Kenyi001)) |
+| Market Pulse quality | **David** ([arnez69](https://github.com/arnez69)) |
 | Contrato + Web3 (Base Sepolia) | **Vctor11180** ([Vctor11180](https://github.com/Vctor11180)) |
-| Vercel live demo (#5) | **Dax** — [docs/VERCEL.md](docs/VERCEL.md) |
-| Pitch + video (exposición) | **Augusto** ([RonaldGaymer2002](https://github.com/RonaldGaymer2002)) — [docs/PITCH_AUGUSTO.md](docs/PITCH_AUGUSTO.md) |
+| Vercel live demo | **Dax** — [docs/VERCEL.md](docs/VERCEL.md) |
+| Pitch + video | **Augusto** ([RonaldGaymer2002](https://github.com/RonaldGaymer2002)) — [docs/PITCH_AUGUSTO.md](docs/PITCH_AUGUSTO.md) |
 
 ## Aleph 2026
 
 | | |
 |---|---|
-| **General (default)** | [docs/TRACK.md](docs/TRACK.md) — best overall |
-| **Sponsor track** | **WDK** ([docs/WDK.md](docs/WDK.md)) — `wdk-mcp` + Casandra guardrails |
+| **General (default)** | Evidence Pack / Decision Substrate — [docs/TRACK.md](docs/TRACK.md) |
+| **Sponsor** | **WDK** — optional execution under evidence — [docs/WDK.md](docs/WDK.md) |
 | **Direction** | [docs/DIRECTION.md](docs/DIRECTION.md) |
 | Chapter | [Santa Cruz EMI](https://aleph-hackathon-2026-santa-cruz.vercel.app/#lugar) |
-| Platform | [Hacki](https://hacki.crecimiento.build/h/aleph-hackathon-2026) · [WDK track](https://hacki.crecimiento.build/h/aleph-hackathon-2026/tracks/wdk-track) |
-| Product flavor | USDT ballast + WDK-guarded agent wallet |
+| Platform | [Hacki](https://hacki.crecimiento.build/h/aleph-hackathon-2026) |
 | Framework | [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) · [TASKS.md](TASKS.md) · [docs/BOARD.md](docs/BOARD.md) |
 
 ## MCP tools (Casandra)
 
 | Tool | Purpose |
 |---|---|
+| **`get_market_pulse`** | **Primary:** consume-only Evidence Pack — favor + why + news + F&G + context hint |
 | `get_price` | USD price + 24h change |
 | `get_portfolio_state` | Value, PnL %, weights, USDT share |
-| `get_risk_level` | Score 0–100 + band + `action` + verdict |
-| `get_market_pulse` | **Consume-only pulse:** favor + why + news + F&G + verdict |
-| `check_wdk_guardrail` | **WDK:** allow/deny `send_token` before wdk-mcp |
+| `get_risk_level` | Score 0–100 + band + context hint `action` |
 | `get_market_context` | Fast bias bullets (not advice) |
 | `get_market_summary` | Multi-symbol bias |
+| `check_wdk_guardrail` | **Optional WDK:** allow/deny before `send_token` |
 | `health` | Version / last fetch |
 
-Pair with **`wdk-mcp`** tools (`get_balance`, `send_token`, …) — see [docs/WDK.md](docs/WDK.md) · [docs/AGENT_WDK_POLICY.md](docs/AGENT_WDK_POLICY.md).
+Agent policy: [docs/AGENT_WDK_POLICY.md](docs/AGENT_WDK_POLICY.md) — **agent decides**; Pulse first; WDK only after.
 
-### WDK permalinks (for judges)
+## Market Pulse — consume-only Evidence Pack
+
+Agents **must not** reinvent the formula. Call `get_market_pulse` and read JSON:
+
+| Field | Use |
+|-------|-----|
+| `why` | Structured **por qué** (market, news, sentiment, alignment) |
+| `reasons[]` | ≥3 concrete reasons with numbers |
+| `meters` | price changes, Fear&Greed, news_score |
+| `headlines[]` | News titles (RSS or mock fallback) |
+| `verdict` | Context hint: `proceed` / `caution` / `avoid` (not a trade order) |
+| `market_favor` | `for` / `against` / `neutral` |
+| `confidence` | 0–1 |
+| `consume_only` | always `true` |
+| `algorithm` | `casandra-pulse-v1` |
+| `fetched_at` | ISO timestamp |
+
+Product requirements: [docs/david/REQUISITOS_PULSE.md](docs/david/REQUISITOS_PULSE.md).
+
+**Live demo:** https://casandra-two.vercel.app  
+**Repo:** https://github.com/Kenyi001/oraculo-radiohead
+
+### Sponsor track proof (WDK) — secondary
 
 - Guardrail: [`packages/market-core/src/index.ts`](packages/market-core/src/index.ts) (`checkWdkGuardrail`)
-- MCP tool: [`packages/mcp-server/src/index.ts`](packages/mcp-server/src/index.ts) (`check_wdk_guardrail`)
-- Dual MCP config: [`docs/mcp-casandra-wdk.example.json`](docs/mcp-casandra-wdk.example.json)
+- MCP: [`packages/mcp-server/src/index.ts`](packages/mcp-server/src/index.ts) (`check_wdk_guardrail`)
+- Dual MCP: [`docs/mcp-casandra-wdk.example.json`](docs/mcp-casandra-wdk.example.json)
 - Packages: `@tetherto/wdk@1.0.0-beta.16`, `@tetherto/wdk-cli@1.0.0-beta.3`
+- Full guide: [docs/WDK.md](docs/WDK.md)
+
+Ask: *“Run get_market_pulse for eth side=buy. Summarize why and reasons. Only if you would act, check_wdk_guardrail and dry-run — never invent numbers.”*
 
 ## Risk algorithm v1 (`casandra-risk-v1`)
 
@@ -62,7 +88,7 @@ score = 0.45 * abs_change_component
 ```
 
 - Bands: **0–33 low** · **34–66 med** · **67–100 high**
-- More **USDT** in the portfolio → lower risk contribution
+- Context hint: low → proceed · med → caution · high → avoid
 - Full factor breakdown returned in JSON
 
 ## Quick start
@@ -74,7 +100,7 @@ npm run start:mcp    # MCP stdio
 npm run dev:web      # http://localhost:5173
 ```
 
-### Cursor MCP config (Casandra + WDK)
+### Cursor MCP config (Casandra + optional WDK)
 
 ```json
 {
@@ -90,39 +116,15 @@ npm run dev:web      # http://localhost:5173
 }
 ```
 
-Full guide: [docs/WDK.md](docs/WDK.md). Ask: *“Run get_market_pulse for eth side=buy, then check_wdk_guardrail. If avoid, do not send.”*
-
-## Market Pulse — consume-only API for agents
-
-Agents **must not** reinvent the formula. Call `get_market_pulse` and read JSON:
-
-| Field | Use |
-|-------|-----|
-| `verdict` | `proceed` / `caution` / `avoid` |
-| `market_favor` | `for` / `against` / `neutral` |
-| `why` | Human/agent-readable **por qué** (market, news, sentiment, alignment) |
-| `reasons[]` | ≥3 concrete reasons with numbers |
-| `meters` | price changes, Fear&Greed, news_score |
-| `headlines[]` | News titles (RSS or mock fallback) |
-| `consume_only` | always `true` |
-| `algorithm` | `casandra-pulse-v1` |
-
-David’s product requirements: [docs/david/REQUISITOS_PULSE.md](docs/david/REQUISITOS_PULSE.md).
-
-**Live demo:** https://casandra-two.vercel.app  
-**Repo:** https://github.com/Kenyi001/oraculo-radiohead
-
 ## Monorepo
 
 ```
-packages/market-core   # prices, portfolio, risk, WDK guardrail
-packages/mcp-server    # Casandra MCP (+ check_wdk_guardrail)
-packages/wdk-bridge    # WDK package manifest (Aleph WDK track)
-packages/demo-web      # judges UI
+packages/market-core   # prices, portfolio, risk, Pulse, optional WDK guardrail
+packages/mcp-server    # Casandra MCP (get_market_pulse primary)
+packages/wdk-bridge    # WDK package manifest (sponsor track)
+packages/demo-web      # judges UI — Pulse-first
 contracts/             # CasandraRegistry (Base Sepolia)
-docs/WDK.md            # WDK setup + permalinks for judges
-specs/                 # Speckit
-TASKS.md               # human task board
+docs/                  # DIRECTION, TRACK, WDK, pitch
 ```
 
 ## On-chain (CasandraRegistry)
@@ -131,27 +133,21 @@ Minimal risk-snapshot registry for Aleph (Hacki requires address if deployed).
 
 ```bash
 npm run contracts:compile
-# fund wallet in contracts/deployments/baseSepolia.json → deployWallet
 npm run contracts:deploy:base
 ```
 
-See [contracts/README.md](contracts/README.md). After deploy, set `VITE_CASANDRA_REGISTRY_*` in `packages/demo-web/.env` and paste address below.
+See [contracts/README.md](contracts/README.md).
 
 **Contract address (Base Sepolia):** _pending faucet → `npm run contracts:deploy:base`_  
 **Explorer:** _TBD_
 
 ## Code graph ([graphify](https://github.com/graphify-project))
 
-AST map of the monorepo (no LLM): [graphify-out/GRAPH_REPORT.md](graphify-out/GRAPH_REPORT.md) · interactive [graphify-out/graph.html](graphify-out/graph.html) · call-flow [graphify-out/oraculo-radiohead-callflow.html](graphify-out/oraculo-radiohead-callflow.html).
-
-```bash
-graphify extract . --code-only --no-cluster
-graphify cluster-only . --no-label
-```
+[graphify-out/GRAPH_REPORT.md](graphify-out/GRAPH_REPORT.md) · [graphify-out/graph.html](graphify-out/graph.html) · [graphify-out/oraculo-radiohead-callflow.html](graphify-out/oraculo-radiohead-callflow.html).
 
 ## Disclaimer
 
-**Not financial advice.** Casandra does not execute trades or predict returns.
+**Not financial advice.** Casandra does not execute trades or predict returns. The agent decides.
 
 ## License
 

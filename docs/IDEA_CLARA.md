@@ -6,77 +6,61 @@ Léelo en 2 minutos. Esto es **todo** lo que importa para terminar.
 
 ## 1. Qué es (la idea)
 
-**Casandra** = una app/oráculo que le da a un **agente de IA** (Cursor, Claude) datos reales de mercado y riesgo, para que **no invente números** y **no mande plata a lo loco**.
+**Casandra** = oráculo de **evidencia** para agentes de IA.  
+No inventa números. No predice el precio. **No mueve la plata por ti.**  
+Entrega un **Evidence Pack** (precio, riesgo, noticias, sentimiento, `why` / `reasons`) para que el **agente decida solo**.
 
 | Parte | Qué hace |
 |-------|----------|
-| **Casandra** | Precio, portafolio, riesgo 0–100, dice `proceed` / `caution` / `avoid` |
-| **WDK** (Tether) | Wallet del agente (USD₮). Solo se usa si Casandra no dice `avoid` |
-| **Demo web** | Lo mismo en pantalla para que el juez lo vea sin instalar MCP |
-| **Contrato** | Opcional: deja un “sello” del riesgo en Base Sepolia |
+| **Casandra (héroe)** | `get_market_pulse` → evidencia consume-only + hint `proceed`/`caution`/`avoid` |
+| **Demo web** | Muestra el Pulse a jueces sin instalar MCP |
+| **WDK (opcional)** | Solo si el agente **elige** actuar: dry-run USD₮ bajo evidencia (track sponsor) |
+| **Contrato** | Opcional: “sello” on-chain del snapshot en Base Sepolia |
 
-**No es:** exchange, predicción del futuro, ni app de trading automática.
+**No es:** exchange, predictor, ni app de trading automática / money-mover.
 
-**Tracks Hacki:** General (vas siempre) + elegimos sponsor **WDK**.
+**Tracks Hacki:** General (vas siempre — producto intel) + sponsor **WDK** (prueba de ejecución).
 
 ---
 
 ## 2. Frase para explicar a cualquiera
 
-> “Los agentes IA inventan precios y pueden enviar tokens sin criterio. Casandra les da el estado real y un semáforo; WDK solo mueve USD₮ si el semáforo no está en rojo.”
+> “Los agentes inventan precios y razones. Casandra les da evidencia con fuentes, timestamp y porqués. El agente decide. Si actúa, WDK puede ejecutar bajo esa evidencia — no al revés.”
 
 ---
 
 ## 3. Qué ya está listo (código en GitHub)
 
-Repo: https://github.com/Kenyi001/oraculo-radiohead (`master` y `main` = mismo commit)
+Repo: https://github.com/Kenyi001/oraculo-radiohead (`master` / `main`)
 
-- [x] MCP tools (precio, portafolio, riesgo, guardrail WDK)
-- [x] Demo web con gauge + veredicto + acción WDK
-- [x] Dependencias WDK + docs de pitch/equipo
-- [x] Issues asignados al equipo
+- [x] MCP: Pulse + riesgo + portfolio + guardrail WDK
+- [x] Demo web live: https://casandra-two.vercel.app
+- [x] Docs de pitch/equipo / tracks
+- [x] Issues asignados
 
 ---
 
 ## 4. Qué falta para “terminar” (P0 humano)
 
-Sin esto **no se puede submit**:
+| # | Qué | Quién |
+|---|-----|-------|
+| 6 | Video ≤3 min (70% Pulse · 20% WDK · 10% cierre) | **Augusto** |
+| 10 | Address contrato **Base Sepolia** | **Victor** |
+| 8 | Wallet WDK test unlock | **Dax** |
+| 7 | Submit Hacki General + WDK | **Dax** |
 
-| # | Qué | Quién | Bloqueo típico |
-|---|-----|-------|----------------|
-| 5 | URL Vercel del demo | **Dax** | [docs/VERCEL.md](VERCEL.md) · login Vercel |
-| 6 | Video ≤3 min (pitch) | **Augusto** | Grabar con demo + Cursor |
-| 10 | Address del contrato | **Victor** | Faucet ETH Base Sepolia + private key |
-| 8 | Wallet WDK de prueba unlock | **Dax** | Crear wallet test (no plata real) |
-| 7 | Submit en Hacki | **Dax** | Necesita 5+6 (+10 si se puede) |
-
-**Paralelo (no bloquea submit mínimo):** David #17 Market Pulse.
+**Paralelo:** David #17 calidad Pulse.
 
 ---
 
-## 5. Cómo se ve el avance (orden)
+## 5. Orden
 
 ```
-Hoy código OK
+Código + Vercel OK
     ↓
-Dax: Vercel (#5) — docs/VERCEL.md
-Victor: contrato (#10)
-Dax: unlock WDK (#8)
-    ↓
-Augusto: graba video (#6)  ← usa docs/PITCH_AUGUSTO.md
-    ↓
-Dax: submit Hacki General+WDK (#7)
+Augusto: video (#6) con guion evidencia-first
+Victor: contrato Base (#10)
+Dax: WDK unlock (#8) + submit (#7)
 ```
 
----
-
-## 6. Pitch (resumen)
-
-Augusto dice/muestra:
-
-1. Problema (agentes inventan / envían mal)  
-2. Demo web (gauge + semáforo WDK)  
-3. Cursor (`check_wdk_guardrail` → balance o dry-run)  
-4. Disclaimer + General + WDK  
-
-Guion: [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md) · [SUBMIT.md](SUBMIT.md)
+Guion: [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md) · [SUBMIT.md](SUBMIT.md) · [DIRECTION.md](DIRECTION.md)

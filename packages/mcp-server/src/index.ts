@@ -80,7 +80,7 @@ server.tool(
 
 server.tool(
   "get_risk_level",
-  "Casandra: transparent risk score 0–100 (low/med/high) for a symbol or portfolio. Explainable factors — not financial advice.",
+  "Casandra supporting evidence: transparent risk score 0–100 (low/med/high) with explainable factors. action is an agent decision hint (context), not a trade/send order. Prefer get_market_pulse for full Evidence Pack. Not financial advice.",
   {
     symbol: z.string().optional().describe("Single asset ticker, e.g. btc"),
     positions: z
@@ -112,7 +112,7 @@ server.tool(
 
 server.tool(
   "get_market_pulse",
-  "Consume-only investment pulse for AI agents: market_favor, verdict, risk_pct, Fear&Greed, news headlines, and why{} reasons. Do not reinvent casandra-pulse-v1 — read JSON fields only.",
+  "PRIMARY Casandra tool — consume-only Evidence Pack so the agent can decide on its own: why{}, reasons[], meters (price/F&G/news), headlines, confidence, market_favor, and verdict as a CONTEXT HINT (not a trade order, not a prediction). Do not reinvent casandra-pulse-v1 — read JSON only. Call this before any optional WDK action.",
   {
     symbol: z.string().describe("Ticker, e.g. btc, eth, sol"),
     side: z
@@ -145,7 +145,7 @@ server.tool(
 
 server.tool(
   "check_wdk_guardrail",
-  "Aleph WDK track: BEFORE calling wdk-mcp send_token, call this. Returns allow_wdk_send (false when action=avoid). Pair with wdk-wallet MCP (get_balance / send_token dryRun).",
+  "OPTIONAL sponsor WDK gate: only AFTER get_market_pulse and only if the agent chooses to act. BEFORE wdk-mcp send_token, call this. Returns allow_wdk_send (false when action=avoid). Casandra informs; the agent decides; WDK is not the product.",
   {
     symbol: z.string().optional().describe("Single asset ticker, e.g. eth"),
     positions: z
