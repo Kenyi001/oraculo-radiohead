@@ -1,42 +1,56 @@
 # Casandra (repo: oraculo-radiohead)
 
-**Investment oracle MCP for AI agents — portfolio state, market context, and transparent risk. Not hallucinations.**
+**Investment oracle MCP + WDK-guarded USD₮ wallet for AI agents — not hallucinations.**
 
 > Named after Cassandra, the prophetess. Built for [Aleph Hackathon 2026](https://hacki.crecimiento.build/h/aleph-hackathon-2026) — Santa Cruz (EMI / Ethereum Bolivia).  
-> Spec-driven: [specs/constitution.md](specs/constitution.md) · [TASKS.md](TASKS.md)
+> **General (default) + sponsor [WDK](https://hacki.crecimiento.build/h/aleph-hackathon-2026/tracks/wdk-track).** Specs: [specs/constitution.md](specs/constitution.md) · [docs/WDK.md](docs/WDK.md)
 
 ## Problem / Solution
 
-AI agents invent prices and “risk opinions.” **Casandra** exposes MCP tools that return live quotes, portfolio state, a documented **risk score (0–100)**, and short market-context bullets — with timestamps. Same core powers the **web demo** for judges.
+AI agents invent prices/risk and may send tokens unsafely. **Casandra** returns live portfolio state, a transparent **risk score (0–100)** with `action` (`proceed` / `caution` / `avoid`), and gates **Tether WDK** (`wdk-mcp`) so `send_token` is blocked when risk is `avoid`. Same core powers the **web demo** for judges.
 
 ## Team
 
 | Role | Owner |
 |---|---|
-| MCP + core + risk algorithm | **Dax** ([Kenyi001](https://github.com/Kenyi001)) |
-| Demo web + deploy + video support | **Partner** (name TBD) |
+| MCP + core + risk + submit | **Dax** ([Kenyi001](https://github.com/Kenyi001)) |
+| Market Pulse (mercado a favor / medidores para agentes) | **David** ([arnez69](https://github.com/arnez69)) |
+| Contrato + Web3 (Base Sepolia) | **Vctor11180** ([Vctor11180](https://github.com/Vctor11180)) |
+| Demo web + Vercel + video support | Partner / equipo |
+| Pitch + video (exposición) | **Augusto** ([RonaldGaymer2002](https://github.com/RonaldGaymer2002)) — [docs/PITCH_AUGUSTO.md](docs/PITCH_AUGUSTO.md) |
 
 ## Aleph 2026
 
 | | |
 |---|---|
-| **Challenge track (1)** | **AI** ([docs/TRACK.md](docs/TRACK.md)) |
-| **General judging** | Technicality · Originality · UI/UX/DX · Practicality · Presentation |
+| **General (default)** | [docs/TRACK.md](docs/TRACK.md) — best overall |
+| **Sponsor track** | **WDK** ([docs/WDK.md](docs/WDK.md)) — `wdk-mcp` + Casandra guardrails |
+| **Direction** | [docs/DIRECTION.md](docs/DIRECTION.md) |
 | Chapter | [Santa Cruz EMI](https://aleph-hackathon-2026-santa-cruz.vercel.app/#lugar) |
-| Platform | [Hacki](https://hacki.crecimiento.build/h/aleph-hackathon-2026) · [alephhackathon.crecimiento.build](https://alephhackathon.crecimiento.build/) |
-| Product flavor | USDT ballast in risk score |
-| Framework | [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) · [TASKS.md](TASKS.md) |
+| Platform | [Hacki](https://hacki.crecimiento.build/h/aleph-hackathon-2026) · [WDK track](https://hacki.crecimiento.build/h/aleph-hackathon-2026/tracks/wdk-track) |
+| Product flavor | USDT ballast + WDK-guarded agent wallet |
+| Framework | [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) · [TASKS.md](TASKS.md) · [docs/BOARD.md](docs/BOARD.md) |
 
-## MCP tools
+## MCP tools (Casandra)
 
 | Tool | Purpose |
 |---|---|
 | `get_price` | USD price + 24h change |
 | `get_portfolio_state` | Value, PnL %, weights, USDT share |
-| `get_risk_level` | Score 0–100 + band + factors |
+| `get_risk_level` | Score 0–100 + band + `action` + verdict |
+| `check_wdk_guardrail` | **WDK:** allow/deny `send_token` before wdk-mcp |
 | `get_market_context` | Fast bias bullets (not advice) |
 | `get_market_summary` | Multi-symbol bias |
 | `health` | Version / last fetch |
+
+Pair with **`wdk-mcp`** tools (`get_balance`, `send_token`, …) — see [docs/WDK.md](docs/WDK.md) · [docs/AGENT_WDK_POLICY.md](docs/AGENT_WDK_POLICY.md).
+
+### WDK permalinks (for judges)
+
+- Guardrail: [`packages/market-core/src/index.ts`](packages/market-core/src/index.ts) (`checkWdkGuardrail`)
+- MCP tool: [`packages/mcp-server/src/index.ts`](packages/mcp-server/src/index.ts) (`check_wdk_guardrail`)
+- Dual MCP config: [`docs/mcp-casandra-wdk.example.json`](docs/mcp-casandra-wdk.example.json)
+- Packages: `@tetherto/wdk@1.0.0-beta.16`, `@tetherto/wdk-cli@1.0.0-beta.3`
 
 ## Risk algorithm v1 (`casandra-risk-v1`)
 
@@ -59,20 +73,23 @@ npm run start:mcp    # MCP stdio
 npm run dev:web      # http://localhost:5173
 ```
 
-### Cursor MCP config
+### Cursor MCP config (Casandra + WDK)
 
 ```json
 {
   "mcpServers": {
     "casandra": {
       "command": "node",
-      "args": ["D:/_Dev/Projects/Oraculo-radiohead/packages/mcp-server/dist/index.js"]
+      "args": ["D:/_Dev/Projects/oraculo-radiohead/packages/mcp-server/dist/index.js"]
+    },
+    "wdk-wallet": {
+      "command": "wdk-mcp"
     }
   }
 }
 ```
 
-Ask: *“What’s my portfolio risk? Use Casandra tools.”*
+Full guide: [docs/WDK.md](docs/WDK.md). Ask: *“Run check_wdk_guardrail on the demo portfolio. If allow_wdk_send, dry-run a Sepolia send; if avoid, do not send.”*
 
 **Live demo:** deploy with `npx vercel --prod` (needs `vercel login`) — paste URL here.  
 **Repo:** https://github.com/Kenyi001/oraculo-radiohead
@@ -80,13 +97,14 @@ Ask: *“What’s my portfolio risk? Use Casandra tools.”*
 ## Monorepo
 
 ```
-packages/market-core   # prices, portfolio, risk, context
-packages/mcp-server    # Casandra MCP
+packages/market-core   # prices, portfolio, risk, WDK guardrail
+packages/mcp-server    # Casandra MCP (+ check_wdk_guardrail)
+packages/wdk-bridge    # WDK package manifest (Aleph WDK track)
 packages/demo-web      # judges UI
 contracts/             # CasandraRegistry (Base Sepolia)
+docs/WDK.md            # WDK setup + permalinks for judges
 specs/                 # Speckit
 TASKS.md               # human task board
-docs/REQUIREMENTS.md   # Hacki + product checklist
 ```
 
 ## On-chain (CasandraRegistry)

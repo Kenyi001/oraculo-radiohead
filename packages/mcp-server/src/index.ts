@@ -3,6 +3,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import {
+  checkWdkGuardrail,
   getHealth,
   getMarketContext,
   getMarketSummary,
@@ -104,6 +105,36 @@ server.tool(
     const ctx = await getMarketContext(symbol);
     return {
       content: [{ type: "text" as const, text: JSON.stringify(ctx, null, 2) }],
+    };
+  }
+);
+
+server.tool(
+  "check_wdk_guardrail",
+  "Aleph WDK track: BEFORE calling wdk-mcp send_token, call this. Returns allow_wdk_send (false when action=avoid). Pair with wdk-wallet MCP (get_balance / send_token dryRun).",
+  {
+    symbol: z.string().optional().describe("Single asset ticker, e.g. eth"),
+    positions: z
+      .array(positionSchema)
+      .optional()
+      .describe("Portfolio positions; default demo portfolio if omitted with no symbol"),
+    intended_send: z
+      .boolean()
+      .optional()
+      .describe("Set true when the agent plans to send USD₮ via WDK"),
+  },
+  async ({ symbol, positions, intended_send }) => {
+    const result = await checkWdkGuardrail({
+      symbol,
+      positions:
+        positions ??
+        (symbol ? undefined : []),
+      intended_send,
+    });
+    return {
+      content: [
+        { type: "text" as const, text: JSON.stringify(result, null, 2) },
+      ],
     };
   }
 );

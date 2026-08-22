@@ -12,19 +12,26 @@ Repo codename: `oraculo-radiohead` · GitHub: https://github.com/Kenyi001/oracul
 
 | Role | Owner | Scope |
 |---|---|---|
-| MCP + `market-core` + risk algorithm | **Dax** (Kenyi001) | Tools, formula, data |
-| Demo web + UI polish + video support | **Partner** (name TBD) | Casandra UI, deploy, recording help |
+| MCP + `market-core` + risk + submit | **Dax** (Kenyi001) | Tools, formula, data, Hacki |
+| Market Pulse (favor de mercado + medidores agentes) | **David** (arnez69) | Investigación + aplicación pulse (#17) |
+| Contrato + Web3 deploy | **Vctor11180** | CasandraRegistry Base Sepolia (#10) |
+| Demo web + UI polish + video support | **Partner** / equipo | Casandra UI, Vercel, recording help |
+
+## Direction
+
+**General (default) + sponsor WDK.** Pitch, maintenance, guardrails: [docs/DIRECTION.md](../docs/DIRECTION.md) · [docs/TRACK.md](../docs/TRACK.md) · [docs/WDK.md](../docs/WDK.md).
 
 ## Rules
 
 1. **Hackathon code window** — feature work after official kickoff; disclose reused libraries only.
 2. **Explainable risk** — formula documented in README; never claim prediction or financial advice.
 3. **Single source of truth** — web and MCP call the same `@oraculo/market-core` APIs.
-4. **Demo** — ≤3 min video (EN preferred) + live deploy URL for judges without MCP.
-5. **USDT in product** — happy path includes **USDT** as ballast in risk math (flavor for LATAM stables). Optional bounty only if form allows *with* AI track — never blocks P0.
-6. **One challenge track + General judging** — submit **AI** track; optimize demo/video for Hacki **General** criteria. See [docs/TRACK.md](../docs/TRACK.md). No multi-challenge-track.
+4. **Demo** — ≤3 min video (EN preferred) + live deploy URL for judges without MCP; video must show Casandra→WDK loop.
+5. **USDT in product** — happy path includes **USDT** as ballast; WDK is the sponsor execution path.
+6. **Tracks** — General by default + mark **WDK** on DoraHacks/Hacki. Do not mark QVAC/Pears. See [docs/TRACK.md](../docs/TRACK.md).
 7. **Deadline** — Sun 23 Aug ~11:00 America/La_Paz.
 8. **Work framework** — Constitution → [docs/REQUIREMENTS.md](../docs/REQUIREMENTS.md) → [TASKS.md](../TASKS.md) → GitHub Issues.
+9. **WDK safety** — agent must call Casandra guardrail before `send_token`; `avoid` blocks send. Dedicated test wallet only.
 
 ## Out of constitution (forbidden as P0)
 

@@ -1,26 +1,30 @@
 # Submit Casandra (Sunday before 11:00 BO)
 
-**Challenge track: AI (one only)** · **Optimize for General criteria** — see [TRACK.md](TRACK.md) · [REQUIREMENTS.md](REQUIREMENTS.md).
+**General (default) + sponsor WDK** · ver [TRACK.md](TRACK.md) · [WDK.md](WDK.md) · [REQUIREMENTS.md](REQUIREMENTS.md).
 
-## Pitch script (~2:30–3:00 EN) — maps to Hacki General criteria
+**Owner pitch + video:** **Augusto** (@RonaldGaymer2002) — guion y checklist de demo: [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md).
 
-> Hi — I'm Dax from Santa Cruz, Bolivia. AI agents invent prices and risk takes when you ask about a portfolio. Casandra is an investment oracle MCP: live portfolio state, market context, and a transparent risk score with factor breakdown — named after the prophetess. Demo: web gauge for judges, same engine as Cursor tools — get_portfolio_state, get_risk_level, get_market_context. Optional on-chain CasandraRegistry anchors a risk snapshot hash on Base Sepolia. USDT as ballast lowers risk in our formula. One product, open source, Aleph AI track, judged on General criteria. Not financial advice. Thanks.
+## Pitch script (~2:30–3:00 EN) — Augusto presenta
 
-| Second | Criterion | Show |
+> Hi — I'm Augusto from the Casandra team, Santa Cruz, Bolivia. AI agents invent prices and risk, and unsafe agents might send tokens anyway. Casandra is an investment oracle MCP: live portfolio state, transparent risk score with factors, and a clear verdict — proceed, caution, or avoid. Demo: web gauge for judges shows the score, Spanish verdict, and WDK guardrail. Same engine powers Cursor: check_wdk_guardrail first — if avoid, no send; if allowed, wdk-mcp can read balance or dry-run a USD₮ send. Optional CasandraRegistry on Base Sepolia anchors a risk snapshot. Submitted under Aleph General plus WDK track. Not financial advice. Thanks.
+
+| Second | Criterion / track | Augusto muestra |
 |---|---|---|
-| 0–20s | Originality / pain | Agents hallucinate → Casandra |
-| 20–70s | Technicality | MCP tools + risk formula + registry address |
-| 70–110s | UI/UX/DX | Web gauge + portfolio + README config |
-| 110–150s | Practicality | Live prices / USDT share / timestamps |
-| 150–180s | Presentation | One-liner + disclaimer + repo URL |
+| 0–20s | Originality | Problema: alucinaciones / send inseguro |
+| 20–70s | Technicality | Gauge + `action` + mención fórmula |
+| 70–110s | UI/UX/DX | Demo web portfolio + USDT share |
+| 110–150s | Practicality + WDK | Cursor: guardrail → balance / dry-run |
+| 150–180s | Presentation | Repo + disclaimer + General+WDK |
+
+Full direction: [DIRECTION.md](DIRECTION.md).
 
 ## Steps
 
-1. Record Loom/YouTube ≤3 min using the table above.
-2. Paste video URL into README.
-3. `npx vercel --prod` → paste live URL into README.
-4. Deploy CasandraRegistry (Base Sepolia) → paste contract address into README + demo.
-5. Submit Hacki/DoraHacks — select **AI** (one challenge track); pitch for General criteria.
+1. **Augusto:** grabar Loom/YouTube ≤3 min con [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md) (demo web + Cursor).
+2. Pegar video URL en README + comentar en #6.
+3. **Augusto:** `npx vercel --prod` → pegar live URL en README (#5).
+4. Victor: deploy CasandraRegistry → address (#10) — Augusto lo menciona si ya está.
+5. Dax: submit Hacki/DoraHacks — **General** + **WDK**; adjuntar repo/video/deploy/contract (#7).
 6. Confirm apply Aleph + Luma SCZ done.
 
-Links: https://hacki.crecimiento.build/h/aleph-hackathon-2026 · https://alephhackathon.crecimiento.build/ · https://github.com/Kenyi001/oraculo-radiohead
+Links: https://hacki.crecimiento.build/h/aleph-hackathon-2026 · https://hacki.crecimiento.build/h/aleph-hackathon-2026/tracks/wdk-track · https://github.com/Kenyi001/oraculo-radiohead

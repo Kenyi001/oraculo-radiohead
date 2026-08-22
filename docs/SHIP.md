@@ -1,42 +1,48 @@
 # Ship checklist — Casandra (human blockers)
 
-Deadline: **Sun 23 Aug ~11:00 BO**
+Deadline: **Sun 23 Aug ~11:00 BO**  
+Tracks: **General (default) + WDK sponsor** — [TRACK.md](TRACK.md) · [WDK.md](WDK.md)
 
-## Done in repo (this marco)
+## Done in repo
 
-- [x] Track: **AI** + General criteria ([TRACK.md](TRACK.md))
+- [x] Track lock: General + WDK ([TRACK.md](TRACK.md))
+- [x] WDK deps + `check_wdk_guardrail` + dual MCP docs ([WDK.md](WDK.md))
 - [x] Requirements board ([REQUIREMENTS.md](REQUIREMENTS.md) · [TASKS.md](../TASKS.md))
-- [x] Issues #5–#10 mapped
+- [x] Issues mapped (#5–#11, #17)
 - [x] CasandraRegistry compiled + local deploy smoke
 - [x] Demo footer ready for registry address (`VITE_CASANDRA_*`)
+- [x] Demo shows WDK `action` (proceed/caution/avoid)
 
-## You must do (cannot automate without your login / faucet / mic)
+## You must do (login / faucet / mic)
 
-### 1) Base Sepolia deploy (#10)
+### 1) WDK wallet unlock for demo video (#8 remainder)
 
-1. Fund `deployWallet` in `contracts/deployments/baseSepolia.json` (or put your key in root `.env` as `PRIVATE_KEY`).
-2. `BASE_SEPOLIA_RPC=https://base-sepolia-rpc.publicnode.com npm run contracts:deploy:base`
-3. Paste address into README + `packages/demo-web/.env` (`VITE_CASANDRA_REGISTRY_ADDRESS` + explorer URL).
-4. Rebuild demo.
+1. `npm install` (pulls `@tetherto/wdk` + `@tetherto/wdk-cli`)
+2. `npx wdk wallet create --name casandra-dev --words 12` (test wallet only)
+3. Unlock short TTL; configure Cursor with [mcp-casandra-wdk.example.json](mcp-casandra-wdk.example.json)
+4. Show `check_wdk_guardrail` → `get_balance` / `send_token` dryRun in video
 
-### 2) Vercel (#5)
+### 2) Base Sepolia deploy (#10 — @Vctor11180)
+
+1. Fund wallet / set `PRIVATE_KEY` in root `.env`
+2. `npm run contracts:deploy:base`
+3. Paste address into README + `packages/demo-web/.env`
+
+### 3) Vercel (#5)
 
 ```bash
 npx vercel login
 npx vercel --prod
 ```
 
-Paste live URL into README.
+### 4) Video (#6)
 
-### 3) Video (#6)
+≤3 min using [SUBMIT.md](SUBMIT.md) — **must show Casandra → WDK loop**.
 
-Record ≤3 min using [SUBMIT.md](SUBMIT.md) pitch table.
-
-### 4) Hacki submit (#7)
+### 5) Hacki submit (#7)
 
 1. Create BUIDL on DoraHacks / Hacki.
-2. Select **AI** challenge track (one only).
-3. Attach: repo · video · deploy URL · contract address.
-4. Pitch for General criteria.
+2. **General** (default) + mark **WDK**.
+3. Attach: repo · video · deploy URL · contract address · WDK package list ([WDK.md](WDK.md)).
 
-Links: https://hacki.crecimiento.build/h/aleph-hackathon-2026 · https://alephhackathon.crecimiento.build/
+Links: https://hacki.crecimiento.build/h/aleph-hackathon-2026 · https://hacki.crecimiento.build/h/aleph-hackathon-2026/tracks/wdk-track

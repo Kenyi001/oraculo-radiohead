@@ -2,15 +2,17 @@
 
 **Responsable:** Victor  
 **Proyecto:** Oráculo de Inversión Casandra ([oraculo-radiohead](https://github.com/Kenyi001/oraculo-radiohead))  
-**Track:** AI (Aleph Hackathon 2026 - Santa Cruz EMI)  
+**Track:** AI (Aleph) → **General (default) + WDK sponsor**  
 
 ---
 
-## 🎯 Tarea Seleccionada
+## Tarea Seleccionada
 
 - [x] **Sincronizar cambios de GitHub en la rama local (`master`)**
 - [x] **Verificar y preparar el Contrato Inteligente (`CasandraRegistry.sol`)**
-- [ ] **Despliegue a Base Sepolia y actualización de dirección en README + Demo**
+- [ ] **Despliegue a Base Sepolia y actualización de dirección en README + Demo** (#10)
+
+Tracks: see [docs/TRACK.md](../TRACK.md) · WDK: [docs/WDK.md](../WDK.md)
 
 ---
 

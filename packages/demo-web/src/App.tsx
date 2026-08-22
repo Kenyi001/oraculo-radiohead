@@ -59,11 +59,11 @@ export function App() {
   return (
     <main className="page">
       <header>
-        <p className="eyebrow">Aleph Hackathon 2026 · Santa Cruz · AI track · General criteria</p>
+        <p className="eyebrow">Aleph 2026 · Santa Cruz · General + WDK sponsor</p>
         <h1>Casandra</h1>
         <p className="tagline">
-          Investment oracle for AI agents — portfolio state, market context, and
-          transparent risk. Not hallucinations.
+          Investment oracle for AI agents — risk verdict gates Tether WDK
+          wallet sends. Not hallucinations. Not financial advice.
         </p>
       </header>
 
@@ -86,7 +86,15 @@ export function App() {
               <span className="gauge-band">{risk.band}</span>
             </div>
             <p className="verdict" style={{ marginTop: "1rem", fontWeight: 600, fontSize: "1.05rem" }}>
-              💬 {risk.verdict_es}
+              {risk.verdict_es}
+            </p>
+            <p className={`wdk-action action-${risk.action}`}>
+              WDK guardrail: <strong>{risk.action}</strong>
+              {risk.action === "avoid"
+                ? " — block send_token"
+                : risk.action === "caution"
+                  ? " — dryRun only / smaller size"
+                  : " — send allowed after confirm"}
             </p>
             <p className="muted">
               Algorithm <code>{risk.algorithm}</code> · scope {risk.scope}

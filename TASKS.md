@@ -1,59 +1,50 @@
 # Casandra — Task board (human panel)
 
 > Spec: [specs/001-casandra-investment-oracle/spec.md](specs/001-casandra-investment-oracle/spec.md) · Constitution: [specs/constitution.md](specs/constitution.md)  
-> Requirements: [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) · Track: [docs/TRACK.md](docs/TRACK.md) · **Board:** [docs/BOARD.md](docs/BOARD.md)  
+> Requirements: [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) · Track: [docs/TRACK.md](docs/TRACK.md) · WDK: [docs/WDK.md](docs/WDK.md) · **Board:** [docs/BOARD.md](docs/BOARD.md)  
 > Issues: https://github.com/Kenyi001/oraculo-radiohead/issues  
-> Deadline: **Sun 23 Aug ~11:00 BO**
+> Deadline: **Sun 23 Aug ~11:00 BO** · **General (default) + WDK sponsor**
 
 ## Roles
 
 | Who | Owns |
 |---|---|
-| Dax | MCP, market-core, risk, contracts, specs, submit |
-| Partner | Demo web polish, deploy, video support |
+| Dax | MCP, market-core, WDK guardrail, submit |
+| David (@arnez69) | Market Pulse (#17) |
+| Vctor11180 | Contrato Base Sepolia (#10) |
+| Partner | Demo polish, Vercel, video support |
 
 ## Work order (remaining)
 
-1. Framing AI + General → docs
-2. Requirements checklist → this board
-3. Vercel live URL (#5)
-4. CasandraRegistry Base Sepolia (#10)
-5. Video ≤3 min (#6)
-6. Hacki submit AI + General criteria (#7)
-7. WDK / polish only if 1–6 green (#8)
+1. WDK wallet unlock + demo loop (#8 human steps) — [docs/WDK.md](docs/WDK.md)
+2. Vercel live URL (#5)
+3. CasandraRegistry Base Sepolia (#10)
+4. Video ≤3 min with Casandra→WDK (#6)
+5. Hacki submit **General + WDK** (#7)
+6. Market Pulse / UI polish if time (#17 / #11)
 
 ## Now / P0
 
 | ID | Task | Owner | Status |
 |---|---|---|---|
-| T1 | Speckit docs | Dax | **done** (#1) |
-| T2 | Rebrand README/SUBMIT | Dax | **done** |
-| T3 | GitHub Issues + labels | Dax | **done** |
-| T4 | portfolio + risk + context in core | Dax | **done** (#2) |
-| T5 | MCP tools R2–R4 | Dax | **done** (#3) |
-| T6 | Casandra UI (gauge + portfolio) | Partner / Dax fallback | **done** (#4) |
-| T7 | Requirements checklist + TRACK AI+General | Dax | **done** (#9) |
-| T8 | Vercel live URL | Partner | open (#5) — `vercel login` · [docs/SHIP.md](docs/SHIP.md) |
-| T9 | CasandraRegistry + address in demo | Dax | **code done** · Base Sepolia pending faucet (#10) |
-| T10 | Video 3 min | Partner+Dax | open (#6) |
-| T11 | Hacki submit **AI** + General criteria | Dax | open (#7) · [docs/SHIP.md](docs/SHIP.md) |
+| T1–T7 | Specs / core / MCP / UI / requirements | Dax | **done** |
+| T8 | Vercel live URL | Partner | open (#5) |
+| T9 | CasandraRegistry Base Sepolia | Vctor11180 | local smoke done · faucet (#10) |
+| T10 | Video 3 min (incl. WDK) | Partner+Dax | open (#6) |
+| T11 | Hacki submit General + WDK | Dax | open (#7) |
+| T12 | WDK CLI/`wdk-mcp` + guardrail | Dax | **code done** · human unlock for video (#8) |
 
 ## Later / P1
 
 | ID | Task | Owner | Status |
 |---|---|---|---|
-| T12 | WDK USDT hook | Dax | open (#8) |
 | T13 | UI polish | Partner | open (#11) |
+| T14 | Market Pulse | David | open (#17) |
 
 ## Definition of done (Sunday)
 
-- [x] MCP answers portfolio + risk + context in Cursor
-- [x] Web demo Casandra with USDT in happy path (local / build)
-- [x] Requirements + track framing published
-- [x] CasandraRegistry compiled + local smoke (+ demo footer wired)
-- [ ] Live deploy URL
-- [ ] Contract address (Base Sepolia) in README + demo
-- [ ] Video shows risk gauge + tool call (+ registry)
-- [ ] Submitted on Hacki (**AI** track — [docs/TRACK.md](docs/TRACK.md))
-
-Human ship steps: [docs/SHIP.md](docs/SHIP.md)
+- [x] MCP answers portfolio + risk + `check_wdk_guardrail`
+- [x] WDK packages declared (`@tetherto/wdk`, `@tetherto/wdk-cli`)
+- [ ] Live URL + video + contract address in README
+- [ ] Hacki BUIDL: General + WDK
+- [ ] Disclaimer spoken/shown

@@ -145,6 +145,29 @@ button:disabled {
   color: var(--muted);
 }
 
+.wdk-action {
+  margin: 0.75rem 0 0;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: #0f1729;
+}
+
+.action-proceed {
+  border-color: #34d399;
+  color: #a7f3d0;
+}
+
+.action-caution {
+  border-color: var(--warn);
+  color: var(--warn);
+}
+
+.action-avoid {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
 .muted {
   color: var(--muted);
   font-size: 0.9rem;

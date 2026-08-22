@@ -1,5 +1,7 @@
 export type MarketBias = "bullish" | "bearish" | "sideways";
 export type RiskBand = "low" | "med" | "high";
+/** Structured action for agents + WDK guardrails (Aleph WDK track). */
+export type WdkAction = "proceed" | "caution" | "avoid";
 
 export interface PriceQuote {
   symbol: string;
@@ -64,6 +66,8 @@ export interface RiskAssessment {
   score: number;
   risk_pct: number;
   band: RiskBand;
+  /** proceed | caution | avoid — agents must gate WDK send_token on this */
+  action: WdkAction;
   verdict: string;
   verdict_es: string;
   factors: RiskFactor[];
@@ -72,6 +76,25 @@ export interface RiskAssessment {
   fetched_at: string;
   algorithm: string;
   disclaimer: string;
+}
+
+export interface WdkGuardrailResult {
+  allow_wdk_send: boolean;
+  allow_wdk_balance: boolean;
+  action: WdkAction;
+  risk_pct: number;
+  band: RiskBand;
+  reasons: string[];
+  next_steps: string[];
+  wdk_mcp_tools: {
+    before_send: "check_wdk_guardrail";
+    balance: "get_balance";
+    send_preview: "send_token (dryRun: true)";
+    send_execute: "send_token (dryRun: false) only if allow_wdk_send";
+  };
+  algorithm: string;
+  disclaimer: string;
+  risk: RiskAssessment;
 }
 
 export interface MarketContext {
@@ -145,6 +168,12 @@ function bandFromScore(score: number): RiskBand {
   if (score <= 33) return "low";
   if (score <= 66) return "med";
   return "high";
+}
+
+export function actionFromBand(band: RiskBand): WdkAction {
+  if (band === "low") return "proceed";
+  if (band === "med") return "caution";
+  return "avoid";
 }
 
 function mockQuote(coinId: string, symbol: string): PriceQuote {
@@ -352,13 +381,15 @@ export async function getRiskLevel(input: {
       portfolio.usdt_share_pct
     );
     const band = bandFromScore(score);
-    const verdict = `Portfolio risk: ${band.toUpperCase()} (${score}/100). ${portfolio.usdt_share_pct.toFixed(1)}% USDT allocation reduces overall volatility.`;
-    const verdict_es = `Riesgo del portafolio: ${band === "low" ? "BAJO" : band === "med" ? "MEDIO" : "ALTO"} (${score}/100). ${portfolio.usdt_share_pct.toFixed(1)}% asignado a USDT reduce la volatilidad general.`;
+    const action = actionFromBand(band);
+    const verdict = `Portfolio risk: ${band.toUpperCase()} (${score}/100). ${portfolio.usdt_share_pct.toFixed(1)}% USDT allocation reduces overall volatility. WDK action: ${action}.`;
+    const verdict_es = `Riesgo del portafolio: ${band === "low" ? "BAJO" : band === "med" ? "MEDIO" : "ALTO"} (${score}/100). ${portfolio.usdt_share_pct.toFixed(1)}% asignado a USDT reduce la volatilidad general. Acción WDK: ${action}.`;
 
     return {
       score,
       risk_pct: score,
       band,
+      action,
       verdict,
       verdict_es,
       factors,
@@ -378,13 +409,15 @@ export async function getRiskLevel(input: {
     usdtShare
   );
   const band = bandFromScore(score);
-  const verdict = `${symbol.toUpperCase()} risk level: ${band.toUpperCase()} (${score}/100). 24h change ${quote.change_24h_pct == null ? "n/a" : `${quote.change_24h_pct >= 0 ? "+" : ""}${quote.change_24h_pct.toFixed(2)}%`}.`;
-  const verdict_es = `Nivel de riesgo de ${symbol.toUpperCase()}: ${band === "low" ? "BAJO" : band === "med" ? "MEDIO" : "ALTO"} (${score}/100). Cambio 24h ${quote.change_24h_pct == null ? "n/a" : `${quote.change_24h_pct >= 0 ? "+" : ""}${quote.change_24h_pct.toFixed(2)}%`}.`;
+  const action = actionFromBand(band);
+  const verdict = `${symbol.toUpperCase()} risk level: ${band.toUpperCase()} (${score}/100). 24h change ${quote.change_24h_pct == null ? "n/a" : `${quote.change_24h_pct >= 0 ? "+" : ""}${quote.change_24h_pct.toFixed(2)}%`}. WDK action: ${action}.`;
+  const verdict_es = `Nivel de riesgo de ${symbol.toUpperCase()}: ${band === "low" ? "BAJO" : band === "med" ? "MEDIO" : "ALTO"} (${score}/100). Cambio 24h ${quote.change_24h_pct == null ? "n/a" : `${quote.change_24h_pct >= 0 ? "+" : ""}${quote.change_24h_pct.toFixed(2)}%`}. Acción WDK: ${action}.`;
 
   return {
     score,
     risk_pct: score,
     band,
+    action,
     verdict,
     verdict_es,
     factors,
@@ -393,6 +426,65 @@ export async function getRiskLevel(input: {
     fetched_at,
     algorithm: ALGORITHM_ID,
     disclaimer: DISCLAIMER,
+  };
+}
+
+/**
+ * WDK Track 1 guardrail: agents must call this before wdk-mcp `send_token`.
+ * - avoid → block send
+ * - caution → allow only dryRun / reduced size (agent policy)
+ * - proceed → allow send after human-confirm dryRun flow
+ */
+export async function checkWdkGuardrail(input: {
+  symbol?: string;
+  positions?: PositionInput[];
+  intended_send?: boolean;
+}): Promise<WdkGuardrailResult> {
+  const risk = await getRiskLevel({
+    symbol: input.symbol,
+    positions: input.positions,
+  });
+  const action = risk.action;
+  const allow_wdk_balance = true;
+  const allow_wdk_send = action !== "avoid";
+  const reasons: string[] = [
+    `Casandra action=${action} (band=${risk.band}, risk_pct=${risk.risk_pct})`,
+    risk.verdict,
+  ];
+  const next_steps: string[] = [];
+  if (!allow_wdk_send) {
+    next_steps.push(
+      "Do NOT call wdk-mcp send_token. Re-check market later or reduce exposure."
+    );
+  } else if (action === "caution") {
+    next_steps.push(
+      "You may call wdk-mcp get_balance. For send_token use dryRun:true first; prefer smaller size; require user confirm before dryRun:false."
+    );
+  } else {
+    next_steps.push(
+      "You may call wdk-mcp get_balance and send_token with dryRun:true, then dryRun:false only after explicit user confirmation."
+    );
+  }
+  if (input.intended_send && !allow_wdk_send) {
+    reasons.push("intended_send blocked by Casandra WDK guardrail");
+  }
+  return {
+    allow_wdk_send,
+    allow_wdk_balance,
+    action,
+    risk_pct: risk.risk_pct,
+    band: risk.band,
+    reasons,
+    next_steps,
+    wdk_mcp_tools: {
+      before_send: "check_wdk_guardrail",
+      balance: "get_balance",
+      send_preview: "send_token (dryRun: true)",
+      send_execute: "send_token (dryRun: false) only if allow_wdk_send",
+    },
+    algorithm: "casandra-wdk-guard-v1",
+    disclaimer: DISCLAIMER,
+    risk,
   };
 }
 
