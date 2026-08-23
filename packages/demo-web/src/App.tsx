@@ -16,6 +16,12 @@ import {
   type ApiHealth,
   type AuditTransport,
 } from "./casandraApi";
+import {
+  PITCH_TRANSCRIPT_BEATS,
+  PITCH_TRANSCRIPT_FOR,
+  PITCH_TRANSCRIPT_HEADING,
+  PITCH_TRANSCRIPT_NOTE,
+} from "./pitchTranscript";
 import { youtubeEmbedUrl, youtubeWatchUrl } from "./youtube";
 
 const DEMO_WALLET = {
@@ -379,6 +385,24 @@ export function App() {
               </div>
             )}
           </div>
+
+          <details className="pitch-transcript" open>
+            <summary className="transcript-summary">
+              <span className="transcript-title">
+                {PITCH_TRANSCRIPT_HEADING}
+              </span>
+              <span className="transcript-badge">{PITCH_TRANSCRIPT_FOR}</span>
+            </summary>
+            <p className="transcript-note">{PITCH_TRANSCRIPT_NOTE}</p>
+            <ol className="transcript-beats">
+              {PITCH_TRANSCRIPT_BEATS.map((beat) => (
+                <li key={beat.id} className="transcript-beat">
+                  <span className="transcript-beat-label">{beat.label}</span>
+                  <p className="transcript-beat-text">{beat.text}</p>
+                </li>
+              ))}
+            </ol>
+          </details>
         </section>
 
         <nav className="story-rail" aria-label="Demo story">
