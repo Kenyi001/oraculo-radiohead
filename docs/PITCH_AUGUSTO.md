@@ -67,9 +67,14 @@
 
 ---
 
-## Entregables
+## Entregables (orden)
 
-1. **[#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6)** — Video ≤3 min + URL en README  
-2. Avisar a Dax para submit (#7)
+1. **Grabar** ≤3 min (guion arriba · 70/20/10).
+2. **Subir** a YouTube Unlisted: https://www.youtube.com/upload  
+3. **Pegar** la URL `youtube.com/watch?v=...` en:
+   - [#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6)
+   - README (`Demo video:`)
+   - Hacki **Demo link\***
+4. **Submit Hacki** (#7) con [HACKI_SUBMIT_PACK.md](HACKI_SUBMIT_PACK.md) — General + WDK.
 
-Vercel (#5) ya está live. Dax ayuda con wallet/MCP. Victor con contrato si alcanza.
+Vercel (#5) ya está live. Dax ayuda con wallet/MCP (#8). Contrato Sepolia (#10) listo.

@@ -82,7 +82,9 @@ Agents **must not** reinvent the formula. Call `get_market_pulse` and read JSON:
 Product requirements: [docs/david/REQUISITOS_PULSE.md](docs/david/REQUISITOS_PULSE.md).
 
 **Live demo:** https://casandra-two.vercel.app  
-**Repo:** https://github.com/Kenyi001/oraculo-radiohead
+**Demo video:** _pending — Ronald pega URL YouTube Unlisted de [#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6)_ (upload: https://www.youtube.com/upload)  
+**Repo:** https://github.com/Kenyi001/oraculo-radiohead  
+**Hacki pack:** [docs/HACKI_SUBMIT_PACK.md](docs/HACKI_SUBMIT_PACK.md)
 
 ### Sponsor track proof (WDK) — secondary
 
