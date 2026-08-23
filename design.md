@@ -6,6 +6,7 @@ Patrón [getdesign.md](https://youtube.com/shorts/ba8XFsjpRvQ) + extracción ví
 
 - **Producto:** Casandra — lie detector for AI agents that talk about money (Aleph 2026)
 - **Mood:** ink & wax forensic ledger — warm charcoal, brass, blood-wax seal
+- **Forma:** geometría **cuadrada** (`border-radius: 0`) — paneles, inputs, botones; el sello wax sigue circular (metáfora)
 - **No:** purple SaaS glow, glassmorphism spam, pill badges, marquesinas, métricas en cajas de a 3–4 (ver skill `anti-ai-web-look`)
 
 ## Tokens (demo-web)
@@ -18,24 +19,35 @@ Patrón [getdesign.md](https://youtube.com/shorts/ba8XFsjpRvQ) + extracción ví
 --accent: #d4a84b; /* brass */
 --true: #4faf78;
 --false: #c94a3a; /* wax */
---mixed: #d4a84b;
+--radius: 0;
 ```
 
-- Display: **Fraunces** (brand, balance, seal, BLOCKED)
-- Body: **IBM Plex Sans**
-- Mono: **IBM Plex Mono**
-- Radius: ~2px (ledger, not soft SaaS cards)
-- Max width: ~760px
+### Tipografías (4)
+
+| Rol | Familia | Uso |
+|-----|---------|-----|
+| Display | **Fraunces** | h1, balance, seal, BLOCKED |
+| UI | **Syne** | botones, labels, story rail |
+| Body | **IBM Plex Sans** | párrafos, claim |
+| Mono | **IBM Plex Mono** | address, hash, code |
+
+### Botones
+
+- `btn btn-primary` — Seal / CTAs
+- `btn btn-ghost` — Demo lie / Pitch script
+- `btn btn-danger` — Send USDT on FALSE
+- Estados: hover / focus-visible (brass ring) / active / disabled
 
 ## Secciones (un trabajo cada una)
 
 1. Hero — brand Casandra + custody promise
-2. Story rail — your money → seal → spend
-3. Wallet ledger — USDT in WDK (self-custody)
-4. Agent claim — seal contradiction / demo lie
-5. Seal board — claim vs world + wax verdict
-6. WDK gate — Send USDT → BLOCKED on FALSE
-7. Footer — MCP tools + Sepolia registry
+2. Pitch video — embed `VITE_DEMO_VIDEO_URL` o placeholder CTA
+3. Story rail — your money → seal → spend
+4. Wallet ledger — USDT in WDK (self-custody)
+5. Agent claim — seal contradiction / demo lie
+6. Seal board — claim vs world + wax verdict
+7. WDK gate — Send USDT → BLOCKED on FALSE
+8. Footer — MCP tools + Sepolia registry
 
 ## Motion (2–3, purposeful)
 

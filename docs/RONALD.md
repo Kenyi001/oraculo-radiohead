@@ -23,10 +23,11 @@
 https://www.youtube.com/upload → **Unlisted**  
 Quemá captions EN antes o en Studio.
 
-### 3) Pegar URL YouTube en 3 sitios
+### 3) Pegar URL YouTube en 4 sitios
 1. Comentario en [#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6)  
 2. README línea `Demo video:`  
-3. Hacki campo **Demo link\***
+3. Hacki campo **Demo link\***  
+4. **Embed en la demo:** setear `VITE_DEMO_VIDEO_URL` (Vercel env del proyecto `casandra-two` o `packages/demo-web/.env.production`) y redeploy — la home muestra el iframe en `#pitch-video`
 
 ### 4) Hacki Submit
 - Pegá one-liner + About de [HACKI_PASTE.md](HACKI_PASTE.md)  

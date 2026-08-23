@@ -7,6 +7,7 @@ import {
   type AuditResult,
   type SpendGuardResult,
 } from "@oraculo/market-core";
+import { youtubeEmbedUrl, youtubeWatchUrl } from "./youtube";
 
 const DEMO_WALLET = {
   label: "Your WDK wallet",
@@ -14,6 +15,15 @@ const DEMO_WALLET = {
   balanceUsdt: 500,
   sendAmount: 200,
 };
+
+const PITCH_SCRIPT_URL =
+  "https://github.com/Kenyi001/oraculo-radiohead/blob/master/docs/RONALD_PITCH.md";
+
+const DEMO_VIDEO_RAW = import.meta.env.VITE_DEMO_VIDEO_URL as
+  | string
+  | undefined;
+const EMBED_SRC = youtubeEmbedUrl(DEMO_VIDEO_RAW);
+const WATCH_HREF = youtubeWatchUrl(DEMO_VIDEO_RAW);
 
 export function App() {
   const [claim, setClaim] = useState(DEMO_LIE_CLAIM);
@@ -78,6 +88,13 @@ export function App() {
     });
   }
 
+  function scrollToLiveDemo() {
+    document.getElementById("wallet")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+
   const verdict = audit?.verdict ?? null;
   const blocked = guard?.status === "blocked";
 
@@ -100,6 +117,63 @@ export function App() {
           </p>
         </header>
 
+        <section
+          className="pitch-video"
+          id="pitch-video"
+          aria-label="Pitch video"
+        >
+          <div className="video-frame">
+            <div className="video-frame-bar">
+              <span className="video-label">Pitch · ≤3 min</span>
+              {WATCH_HREF && (
+                <a
+                  className="video-open"
+                  href={WATCH_HREF}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Open on YouTube
+                </a>
+              )}
+            </div>
+            {EMBED_SRC ? (
+              <div className="video-embed">
+                <iframe
+                  src={EMBED_SRC}
+                  title="Casandra pitch demo"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            ) : (
+              <div className="video-pending">
+                <p className="video-pending-title">Pitch video pending</p>
+                <p className="muted">
+                  Ronald records next — script ready. Meanwhile run the live
+                  loop below.
+                </p>
+                <div className="row">
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={scrollToLiveDemo}
+                  >
+                    Watch live demo
+                  </button>
+                  <a
+                    className="btn btn-ghost"
+                    href={PITCH_SCRIPT_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Pitch script
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+
         <nav className="story-rail" aria-label="Demo story">
           <ol>
             <li className={step >= 1 ? "active" : ""} data-n="01">
@@ -120,7 +194,11 @@ export function App() {
           </div>
         </nav>
 
-        <section className="wallet-ledger" aria-label="Your WDK wallet">
+        <section
+          className="wallet-ledger"
+          id="wallet"
+          aria-label="Your WDK wallet"
+        >
           <div className="wallet-top">
             <div>
               <p className="wallet-eyebrow">{DEMO_WALLET.label}</p>
@@ -160,12 +238,16 @@ export function App() {
               aria-labelledby={claimId}
             />
             <div className="row">
-              <button type="submit" disabled={loading}>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={loading}
+              >
                 {loading ? "Sealing…" : "Seal contradiction"}
               </button>
               <button
                 type="button"
-                className="ghost"
+                className="btn btn-ghost"
                 disabled={loading}
                 onClick={() => {
                   setClaim(DEMO_LIE_CLAIM);
@@ -272,7 +354,9 @@ export function App() {
             type="button"
             onClick={onTrySend}
             disabled={!audit || loading}
-            className={verdict === "FALSE" ? "danger" : undefined}
+            className={
+              verdict === "FALSE" ? "btn btn-danger" : "btn btn-primary"
+            }
           >
             Send {DEMO_WALLET.sendAmount} USDT
           </button>

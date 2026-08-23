@@ -16,7 +16,7 @@ Dax **no** hace el click de Submit.
 1. Grabá ≤3 min con [RONALD_PITCH.md](RONALD_PITCH.md) (wallet → FALSE → BLOCKED).
 2. Quemá [captions.en.srt](captions.en.srt).
 3. Subí → visibilidad **Unlisted**.
-4. Pegá `https://www.youtube.com/watch?v=...` en [#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6), README, Hacki **Demo link\***.
+4. Pegá `https://www.youtube.com/watch?v=...` en [#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6), README, Hacki **Demo link\***. También setiá `VITE_DEMO_VIDEO_URL` en Vercel (`casandra-two`) y redeploy para el embed en https://casandra-two.vercel.app/#pitch-video.
 5. Submit General + WDK.
 
 ---
