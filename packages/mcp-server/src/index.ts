@@ -6,6 +6,7 @@ import {
   checkWdkGuardrail,
   getHealth,
   getMarketContext,
+  getMarketNews,
   getMarketPulse,
   getMarketSummary,
   getPortfolioState,
@@ -139,6 +140,20 @@ server.tool(
       content: [
         { type: "text" as const, text: JSON.stringify(pulse, null, 2) },
       ],
+    };
+  }
+);
+
+server.tool(
+  "get_market_news",
+  "SECONDARY: headlines + casandra-news-v1 analysis for a symbol. Prefer get_market_pulse for the full Evidence Pack. NOT financial advice.",
+  {
+    symbol: z.string().describe("Ticker, e.g. btc or eth"),
+  },
+  async ({ symbol }) => {
+    const news = await getMarketNews(symbol);
+    return {
+      content: [{ type: "text" as const, text: JSON.stringify(news, null, 2) }],
     };
   }
 );

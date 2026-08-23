@@ -2,6 +2,18 @@ export type MarketBias = "bullish" | "bearish" | "sideways";
 export type RiskBand = "low" | "med" | "high";
 /** Structured context hint for agents (also used by optional WDK guardrail). Not a trade order. */
 export type WdkAction = "proceed" | "caution" | "avoid";
+import type { MarketNews, MarketNewsArticle, MarketNewsSource } from "./news.js";
+import { fetchMarketNews } from "./news.js";
+import {
+  canonicalPortfolioPayload,
+  bandToUint8,
+  CASANDRA_REGISTRY_ABI,
+  BASE_SEPOLIA_CHAIN,
+  BASE_SEPOLIA_CHAIN_ID,
+  SEPOLIA_CHAIN,
+  SEPOLIA_CHAIN_ID,
+  type OnChainRiskSnapshot,
+} from "./onchain.js";
 
 export interface PriceQuote {
   symbol: string;
@@ -28,13 +40,8 @@ export interface HealthStatus {
 }
 
 /** Position input for portfolio / risk tools */
-export interface PositionInput {
-  symbol: string;
-  /** Quantity of the asset */
-  quantity: number;
-  /** Optional cost basis per unit in USD */
-  cost_basis_usd?: number;
-}
+export type { PositionInput } from "./types.js";
+import type { PositionInput } from "./types.js";
 
 export interface PositionState {
   symbol: string;
@@ -55,28 +62,8 @@ export interface PortfolioState {
   disclaimer: string;
 }
 
-export interface RiskFactor {
-  name: string;
-  value: number;
-  weight: number;
-  note: string;
-}
-
-export interface RiskAssessment {
-  score: number;
-  risk_pct: number;
-  band: RiskBand;
-  /** proceed | caution | avoid — agents must gate WDK send_token on this */
-  action: WdkAction;
-  verdict: string;
-  verdict_es: string;
-  factors: RiskFactor[];
-  scope: "symbol" | "portfolio";
-  symbol?: string;
-  fetched_at: string;
-  algorithm: string;
-  disclaimer: string;
-}
+export type { RiskFactor, RiskAssessment } from "./types.js";
+import type { RiskFactor, RiskAssessment } from "./types.js";
 
 export interface WdkGuardrailResult {
   allow_wdk_send: boolean;
@@ -221,7 +208,7 @@ function clamp(n: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, n));
 }
 
-function bandFromScore(score: number): RiskBand {
+export function bandFromScore(score: number): RiskBand {
   if (score <= 33) return "low";
   if (score <= 66) return "med";
   return "high";
@@ -746,51 +733,23 @@ function mockHeadlines(symbol: string): PulseHeadline[] {
   ];
 }
 
-/** Free RSS (CoinTelegraph). Keyword-filter by symbol; fallback mock. */
+/** Symbol-specific RSS feeds (same source as get_market_news). Mock only if fetch fails. */
 export async function fetchHeadlines(
   symbol: string,
   _lookbackHours = 24
 ): Promise<PulseHeadline[]> {
   const key = normalizeSymbol(symbol);
-  const aliases = [key, key.toUpperCase()];
-  if (key === "btc") aliases.push("bitcoin");
-  if (key === "eth") aliases.push("ethereum");
   try {
-    const res = await fetch("https://cointelegraph.com/rss", {
-      signal: AbortSignal.timeout(8000),
-      headers: { Accept: "application/rss+xml, application/xml, text/xml" },
-    });
-    if (!res.ok) return mockHeadlines(key);
-    const xml = await res.text();
-    const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)].slice(0, 20);
-    const headlines: PulseHeadline[] = [];
-    for (const m of items) {
-      const block = m[1];
-      const title =
-        block.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/i)?.[1] ??
-        block.match(/<title>(.*?)<\/title>/i)?.[1] ??
-        "";
-      const link =
-        block.match(/<link>(.*?)<\/link>/i)?.[1]?.trim() ??
-        "https://cointelegraph.com";
-      const pub =
-        block.match(/<pubDate>(.*?)<\/pubDate>/i)?.[1] ??
-        new Date().toISOString();
-      if (!title) continue;
-      const hit = aliases.some((a) => title.toLowerCase().includes(a.toLowerCase()));
-      if (!hit && headlines.length >= 3) continue;
-      if (!hit && aliases.every((a) => a.length < 4)) continue;
-      headlines.push({
-        title: title.trim(),
-        source: "cointelegraph-rss",
-        published_at: new Date(pub).toISOString(),
-        url: link,
-        score: scoreHeadlineTitle(title),
-      });
-      if (headlines.length >= 5) break;
-    }
-    if (headlines.length === 0) return mockHeadlines(key);
-    return headlines;
+    const { fetchMarketNewsFromRss, getRssFeedMeta } = await import("./news-rss.js");
+    const feed = getRssFeedMeta(key);
+    const raw = await fetchMarketNewsFromRss(key);
+    return raw.articles.map((a) => ({
+      title: a.title,
+      source: feed.label,
+      published_at: a.posted_at,
+      url: a.url,
+      score: scoreHeadlineTitle(a.title),
+    }));
   } catch {
     return mockHeadlines(key);
   }
@@ -815,6 +774,82 @@ function worsenVerdict(a: WdkAction, b: WdkAction): WdkAction {
   return rank[a] >= rank[b] ? a : b;
 }
 
+function matchedNewsKeywords(title: string): { pos: string[]; neg: string[] } {
+  const t = title.toLowerCase();
+  return {
+    pos: NEWS_POS.filter((w) => t.includes(w)),
+    neg: NEWS_NEG.filter((w) => t.includes(w)),
+  };
+}
+
+/** Spec-shaped `why.news` — counts scored headlines + keyword samples. */
+export function summarizeHeadlinesForWhy(headlines: PulseHeadline[]): string {
+  if (headlines.length === 0) {
+    return "news_score 0.00 (neutral); 0 headlines";
+  }
+  const newsScore =
+    headlines.reduce((a, h) => a + h.score, 0) / headlines.length;
+  const nBias = newsBiasFromScore(newsScore);
+  const posCount = headlines.filter((h) => h.score > 0).length;
+  const negCount = headlines.filter((h) => h.score < 0).length;
+  const negKeywords = new Set<string>();
+  const posKeywords = new Set<string>();
+  for (const h of headlines) {
+    const { pos, neg } = matchedNewsKeywords(h.title);
+    pos.forEach((k) => posKeywords.add(k));
+    neg.forEach((k) => negKeywords.add(k));
+  }
+
+  let detail: string;
+  if (negCount > 0) {
+    const kw = [...negKeywords].slice(0, 4).join(", ");
+    detail = `${negCount}/${headlines.length} titulares negativos${kw ? `: ${kw}` : ""}`;
+  } else if (posCount > 0) {
+    const kw = [...posKeywords].slice(0, 4).join(", ");
+    detail = `${posCount}/${headlines.length} titulares positivos${kw ? `: ${kw}` : ""}`;
+  } else {
+    detail = `${headlines.length} titulares neutros`;
+  }
+
+  return `news_score ${newsScore.toFixed(2)} (${nBias}) (${detail})`;
+}
+
+export function buildPulseWhySentiment(
+  fng: FearGreedSnapshot,
+  side?: "buy" | "sell"
+): string {
+  let base = `Fear&Greed=${fng.value} ${fng.label}`;
+  if (fng.mock) base += " [mock]";
+  if (fng.value > 75 && side === "buy") return `${base} → no FOMO buy`;
+  if (fng.value < 25 && side === "sell") return `${base} → caution capitulation sell`;
+  return base;
+}
+
+export function buildPulseWhyAlignment(
+  side: "buy" | "sell" | undefined,
+  bias: MarketBias,
+  favor: MarketFavor
+): string {
+  if (side) return `side=${side} vs bias=${bias} → market_favor=${favor}`;
+  return `no side → market_favor=${favor}`;
+}
+
+export function assertMarketPulseContract(pulse: MarketPulse): void {
+  if (pulse.algorithm !== PULSE_ALGORITHM) {
+    throw new Error(`algorithm must be ${PULSE_ALGORITHM}`);
+  }
+  if (pulse.consume_only !== true) throw new Error("consume_only must be true");
+  if (!pulse.disclaimer) throw new Error("disclaimer required");
+  if (!pulse.fetched_at) throw new Error("fetched_at required");
+  if (pulse.reasons.length < 3) throw new Error("reasons must have >= 3 entries");
+  if (!pulse.why.market || !pulse.why.news || !pulse.why.sentiment || !pulse.why.alignment) {
+    throw new Error("why must include market, news, sentiment, alignment");
+  }
+  if (pulse.confidence < 0 || pulse.confidence > 1) {
+    throw new Error("confidence must be 0–1");
+  }
+}
+
 /**
  * Product pulse for AI agents: price + Fear&Greed + news + why.
  * Consume-only — agents must not reinvent casandra-pulse-v1.
@@ -829,7 +864,7 @@ export async function getMarketPulse(input: {
   const includeNews = input.include_news !== false;
   const lookback = input.lookback_hours ?? 24;
 
-  const [{ quote, change_1h_pct }, risk, fng, headlinesRaw] = await Promise.all([
+  const [{ quote, change_1h_pct }, risk, fng, headlinesFetched] = await Promise.all([
     getExtendedQuote(symbol),
     getRiskLevel({ symbol }),
     getFearGreed(),
@@ -837,6 +872,11 @@ export async function getMarketPulse(input: {
       ? fetchHeadlines(symbol, lookback)
       : Promise.resolve([] as PulseHeadline[]),
   ]);
+
+  const headlinesRaw =
+    includeNews && headlinesFetched.length === 0
+      ? mockHeadlines(symbol)
+      : headlinesFetched;
 
   const change24 = quote.change_24h_pct;
   const bias = biasFromChange(change24);
@@ -908,21 +948,17 @@ export async function getMarketPulse(input: {
       change24 == null ? "n/a" : `${change24 >= 0 ? "+" : ""}${change24.toFixed(2)}%`
     } → bias ${bias}`,
     news: includeNews
-      ? `news_score ${newsScore.toFixed(2)} (${nBias}); sample: ${
-          headlinesRaw[0]?.title ?? "n/a"
-        }`
+      ? summarizeHeadlinesForWhy(headlinesRaw)
       : "news omitted (include_news=false)",
-    sentiment: `Fear&Greed=${fng.value} ${fng.label}`,
-    alignment: input.side
-      ? `side=${input.side} → market_favor=${favor}; verdict=${verdict}`
-      : `no side → market_favor=${favor}; verdict=${verdict}`,
+    sentiment: buildPulseWhySentiment(fng, input.side),
+    alignment: buildPulseWhyAlignment(input.side, bias, favor),
   };
 
   while (reasons.length < 3) {
     reasons.push(`Pulse algorithm ${PULSE_ALGORITHM} consume_only=true`);
   }
 
-  return {
+  const pulse: MarketPulse = {
     symbol,
     fetched_at: new Date().toISOString(),
     market_favor: favor,
@@ -948,7 +984,121 @@ export async function getMarketPulse(input: {
     algorithm: PULSE_ALGORITHM,
     disclaimer: DISCLAIMER,
   };
+
+  assertMarketPulseContract(pulse);
+  return pulse;
 }
+
+export async function getMarketNews(symbol: string): Promise<MarketNews> {
+  const normalized = normalizeSymbol(symbol);
+  const { fetchMarketNewsFromRss, getRssFeedMeta } = await import("./news-rss.js");
+  const { analyzeNewsHeadlines } = await import("./news-analysis.js");
+
+  const [raw, quote, btc, risk, pulse] = await Promise.all([
+    fetchMarketNewsFromRss(normalized),
+    getPrice(normalized),
+    getPrice("btc"),
+    getRiskLevel({ symbol: normalized }),
+    getMarketPulse({ symbol: normalized, include_news: false }),
+  ]);
+
+  const feed = getRssFeedMeta(normalized);
+  const analysis = analyzeNewsHeadlines(normalized, raw.articles);
+  const fetched_at = new Date().toISOString();
+
+  const sources: MarketNewsSource[] = [
+    {
+      id: 1,
+      name: feed.label,
+      url: feed.url,
+      type: "news",
+    },
+    {
+      id: 2,
+      name: quote.source,
+      url: "https://www.coingecko.com",
+      type: "price",
+    },
+    {
+      id: 3,
+      name: "Fear & Greed Index",
+      url: "https://alternative.me/crypto/fear-and-greed-index/",
+      type: "index",
+    },
+    ...raw.articles.map((a, i) => ({
+      id: i + 4,
+      name: a.source,
+      url: a.url,
+      type: "news" as const,
+    })),
+  ];
+
+  return {
+    symbol: normalized,
+    articles: raw.articles,
+    summary: raw.summary,
+    summary_es: raw.summary_es,
+    analysis,
+    market_state: {
+      bias: pulse.meters.bias,
+      market_favor: analysis.news_favor,
+      fear_greed_index: pulse.meters.fear_greed_value,
+      fear_greed_label: pulse.meters.fear_greed_label,
+      state_summary_es: `Estado: sesgo ${pulse.meters.bias}, noticias ${analysis.news_favor}, Fear&Greed ${pulse.meters.fear_greed_value} (${pulse.meters.fear_greed_label}).`,
+    },
+    market_numbers: {
+      symbol: normalized,
+      price_usd: quote.price_usd,
+      change_24h_pct: quote.change_24h_pct,
+      btc_change_24h_pct: btc.change_24h_pct,
+      risk_pct: risk.risk_pct,
+      risk_band: risk.band,
+      fear_greed_index: pulse.meters.fear_greed_value,
+      price_source: quote.source,
+      fetched_at,
+    },
+    sources,
+    fetched_at,
+    source: raw.source,
+    disclaimer:
+      "Headline + market data for context only — NOT investment advice. Verify sources.",
+  };
+}
+
+/** Off-chain snapshot ready for `publishRiskSnapshot` (hash: ethers.id(portfolioPayload)). */
+export async function prepareOnChainRiskSnapshot(
+  positions?: PositionInput[]
+): Promise<OnChainRiskSnapshot> {
+  const list = positions?.length ? positions : DEFAULT_DEMO_POSITIONS;
+  const risk = await getRiskLevel({ positions: list });
+  const portfolioPayload = canonicalPortfolioPayload(list);
+  return {
+    portfolioPayload,
+    band: bandToUint8(risk.band),
+    score: Math.round(risk.score),
+    timestamp: Math.floor(Date.now() / 1000),
+    risk,
+  };
+}
+
+export {
+  fetchMarketNews,
+  canonicalPortfolioPayload,
+  bandToUint8,
+  CASANDRA_REGISTRY_ABI,
+  BASE_SEPOLIA_CHAIN,
+  BASE_SEPOLIA_CHAIN_ID,
+  SEPOLIA_CHAIN,
+  SEPOLIA_CHAIN_ID,
+};
+export { analyzeNewsHeadlines } from "./news-analysis.js";
+export type { NewsAnalysis } from "./news-analysis.js";
+export type {
+  MarketNews,
+  MarketNewsArticle,
+  MarketNewsSource,
+  OnChainRiskSnapshot,
+};
 
 export function getHealth(): HealthStatus {
   return {
