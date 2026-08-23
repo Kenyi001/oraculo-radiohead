@@ -66,6 +66,13 @@ export function App() {
   const gaugePct = risk ? Math.min(100, Math.max(0, risk.score)) : 0;
   const hint = pulse?.verdict ?? risk?.action;
 
+  const registryAddress =
+    import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS ||
+    "0x27544Fe45b81C09fC91f99c0A7374970839eC4FF";
+  const registryExplorer =
+    import.meta.env.VITE_CASANDRA_REGISTRY_EXPLORER ||
+    `https://sepolia.etherscan.io/address/${registryAddress}`;
+
   return (
     <main className="page">
       <header>
@@ -292,22 +299,9 @@ export function App() {
         </p>
         <p className="onchain muted">
           On-chain registry (Ethereum Sepolia):{" "}
-          {import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS ? (
-            <a
-              href={
-                import.meta.env.VITE_CASANDRA_REGISTRY_EXPLORER ||
-                `https://sepolia.etherscan.io/address/${import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS}`
-              }
-              target="_blank"
-              rel="noreferrer"
-            >
-              {String(import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS).slice(0, 10)}…
-            </a>
-          ) : (
-            <span>
-              pending — see <code>contracts/README.md</code>
-            </span>
-          )}
+          <a href={registryExplorer} target="_blank" rel="noreferrer">
+            {registryAddress.slice(0, 10)}…
+          </a>
         </p>
       </footer>
     </main>
