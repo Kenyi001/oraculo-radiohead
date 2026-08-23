@@ -8,7 +8,7 @@ They can speak. They cannot seal a lie — and they cannot spend USDT on one.
 
 ## One-liner
 
-Agents invent prices and risk takes, then ask to move USDT. **Casandra** audits the claim against live market evidence, seals a contradiction receipt (hash), and **blocks WDK USDT send** when the verdict is `FALSE`.
+Agents invent prices and risk takes, then ask to move USDT. **Your USDT stays in your WDK wallet** — Casandra never custodies. It audits the claim against live market evidence, seals a contradiction receipt (hash), and **blocks WDK USDT dry-run** when the verdict is `FALSE`.
 
 ## Problem / Solution
 

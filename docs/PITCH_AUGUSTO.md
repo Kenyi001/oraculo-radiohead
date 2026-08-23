@@ -1,10 +1,13 @@
 # Pitch + video — Augusto (@RonaldGaymer2002)
 
-**Tu rol:** exponer y grabar el demo ≤3 min.  
-**Tracks:** General (producto = evidencia) + sponsor WDK (prueba opcional).  
-**Tesis:** [DIRECTION.md](DIRECTION.md) · script: [SUBMIT.md](SUBMIT.md) · WDK setup: [WDK.md](WDK.md)
+> **OBSOLETO para grabar.** Usá el kit actualizado: **[RONALD_PITCH.md](RONALD_PITCH.md)**  
+> Historia nueva: wallet custody → lie → FALSE → Send USDT → BLOCKED (no Market Pulse).
 
-**Reparto del video: 70% Pulse/evidencia · 20% WDK dry-run · 10% cierre.**
+**Tu rol:** exponer y grabar el demo ≤3 min.  
+**Tracks:** General + WDK Track 1 (WDK es core, no opcional).  
+**Tesis:** [JUDGE_ONEPAGER.md](JUDGE_ONEPAGER.md) · script: [RONALD_PITCH.md](RONALD_PITCH.md) · [SUBMIT.md](SUBMIT.md)
+
+**Reparto del video: wallet+claim → seal FALSE → WDK BLOCKED → cierre.**
 
 ---
 

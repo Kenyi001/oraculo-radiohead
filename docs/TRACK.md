@@ -17,7 +17,7 @@
 | Layer | Selection |
 |---|---|
 | **General** | Main judging framework (5 criteria). Pitch + demo optimized for these. |
-| **WDK Track 1** | Best project with WDK CLI / bundled MCP — agent wallet + **guardrails**. Casandra seals lies and blocks USDT send on `FALSE`. |
+| **WDK Track 1** | Best project with WDK CLI / bundled MCP — agent wallet + **guardrails**. Casandra seals lies and blocks USDT dry-run on `FALSE`. Vs WWall: they gate spend *policy*; we gate claim *truth* ([JUDGE_ONEPAGER.md](JUDGE_ONEPAGER.md)). |
 | **Not selected** | Pears, QVAC, WDK Track 2 (gasless) |
 
 Tether rule: WDK must be a **core** dependency, not bolted beside another wallet stack. Our core loop is `audit_claim` → `check_spend_guard` → WDK dry-run.

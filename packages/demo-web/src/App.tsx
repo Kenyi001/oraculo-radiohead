@@ -3,26 +3,25 @@ import {
   DEMO_LIE_CLAIM,
   auditClaim,
   checkSpendGuard,
-  getHealth,
-  getPortfolioState,
-  getRiskLevel,
   rememberReceipt,
   type AuditResult,
-  type HealthStatus,
-  type PortfolioState,
-  type RiskAssessment,
   type SpendGuardResult,
 } from "@oraculo/market-core";
+
+const DEMO_WALLET = {
+  label: "Your WDK wallet",
+  address: "0x4f30…71f4",
+  balanceUsdt: 500,
+  sendAmount: 200,
+};
 
 export function App() {
   const [claim, setClaim] = useState(DEMO_LIE_CLAIM);
   const [audit, setAudit] = useState<AuditResult | null>(null);
   const [guard, setGuard] = useState<SpendGuardResult | null>(null);
-  const [portfolio, setPortfolio] = useState<PortfolioState | null>(null);
-  const [risk, setRisk] = useState<RiskAssessment | null>(null);
-  const [health, setHealth] = useState<HealthStatus | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
 
   async function runAudit(text = claim) {
     setLoading(true);
@@ -32,12 +31,7 @@ export function App() {
       const result = await auditClaim({ text });
       rememberReceipt(result.receipt);
       setAudit(result);
-      const [p, r] = await Promise.all([
-        getPortfolioState([]),
-        getRiskLevel({ positions: [] }),
-      ]);
-      setPortfolio(p);
-      setRisk(r);
+      setStep(2);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -58,9 +52,17 @@ export function App() {
     if (!audit) return;
     rememberReceipt(audit.receipt);
     setGuard(checkSpendGuard(audit.receipt.id));
+    setStep(3);
+    requestAnimationFrame(() => {
+      document.getElementById("wdk-gate")?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    });
   }
 
   const verdict = audit?.verdict ?? null;
+  const blocked = guard?.status === "blocked";
 
   return (
     <main className="page">
@@ -70,13 +72,47 @@ export function App() {
         </p>
         <h1>Casandra</h1>
         <p className="tagline">
-          A lie detector for AI agents that talk about money. They can speak.
-          They cannot seal a lie — and they cannot spend USDT on one.
+          Your USDT stays in <em>your</em> WDK wallet. Casandra only opens or
+          closes the door — and it never opens on a lie.
         </p>
       </header>
 
-      <section className="card hero-audit">
-        <h2>Audit a claim</h2>
+      <ol className="story-steps" aria-label="Demo story">
+        <li className={step >= 1 ? "active" : ""}>1 · Your money</li>
+        <li className={step >= 2 ? "active" : ""}>2 · Seal the claim</li>
+        <li className={step >= 3 ? "active" : ""}>3 · Try to spend</li>
+      </ol>
+
+      <section className="wallet-strip" aria-label="Your WDK wallet">
+        <div className="wallet-top">
+          <div>
+            <p className="wallet-eyebrow">{DEMO_WALLET.label}</p>
+            <p className="wallet-addr">{DEMO_WALLET.address}</p>
+          </div>
+          <p className="wallet-note">Self-custody · not Casandra</p>
+        </div>
+        <div className="wallet-balance-row">
+          <div>
+            <p className="balance-label">USDT available</p>
+            <p className="balance-value">
+              {DEMO_WALLET.balanceUsdt.toFixed(2)}
+              <span> USDT</span>
+            </p>
+          </div>
+          <div className="send-intent">
+            <p className="balance-label">Agent wants to send</p>
+            <p className="send-amount">{DEMO_WALLET.sendAmount} USDT</p>
+          </div>
+        </div>
+        {blocked && (
+          <p className="wallet-locked" role="status">
+            Balance unchanged — send blocked by sealed FALSE receipt.
+          </p>
+        )}
+      </section>
+
+      <section className="card agent-bubble">
+        <p className="panel-label">What the agent said</p>
         <form onSubmit={onAudit} className="claim-form">
           <textarea
             value={claim}
@@ -166,17 +202,16 @@ export function App() {
             Receipt <code>{audit.receipt.id}</code>
             <br />
             Hash <code>{audit.receipt.hash_bytes32}</code>
-            <br />
-            {audit.receipt.fetched_at}
           </p>
         </section>
       )}
 
-      <section className="card wdk-gate">
-        <h2>WDK spend gate</h2>
-        <p className="muted">
-          Core loop: sealed FALSE → USDT does not move. Uses{" "}
-          <code>@tetherto/wdk</code> dry-run (no live broadcast).
+      <section className="card wdk-gate" id="wdk-gate">
+        <h2>Spend through WDK</h2>
+        <p className="muted gate-copy">
+          Same USDT · same wallet · door closed if verdict is FALSE. Dry-run via{" "}
+          <code>@tetherto/wdk</code> — no live broadcast. Casandra never holds
+          the funds.
         </p>
         <button
           type="button"
@@ -184,80 +219,39 @@ export function App() {
           disabled={!audit || loading}
           className={verdict === "FALSE" ? "danger" : undefined}
         >
-          Try send USDT
+          Send {DEMO_WALLET.sendAmount} USDT
         </button>
         {guard && (
           <div
             className={`guard-result guard-${guard.status}`}
             role="status"
           >
-            <p className="guard-status">{guard.status.toUpperCase()}</p>
+            <p className="guard-status">
+              {blocked ? "BLOCKED — money stays" : guard.status.toUpperCase()}
+            </p>
             <p>{guard.reason}</p>
             <pre>{JSON.stringify(guard.wdk, null, 2)}</pre>
           </div>
         )}
       </section>
 
-      <section className="card sources">
-        <h2>Evidence sources</h2>
-        <p className="muted">
-          Same quotes + risk engine the audit uses — supporting, not the product.
-        </p>
-        {portfolio && (
-          <p>
-            Portfolio $
-            {portfolio.total_value_usd.toLocaleString("en-US", {
-              maximumFractionDigits: 0,
-            })}{" "}
-            · USDT share {portfolio.usdt_share_pct.toFixed(1)}%
-            {risk && (
-              <>
-                {" "}
-                · risk {risk.band} ({risk.score})
-              </>
-            )}
-          </p>
-        )}
-      </section>
-
-      <section className="card">
-        <h2>health</h2>
-        <button type="button" onClick={() => setHealth(getHealth())}>
-          Check
-        </button>
-        {health && <pre>{JSON.stringify(health, null, 2)}</pre>}
-      </section>
-
       {error && <p className="error">{error}</p>}
 
       <footer>
         <p>
-          Same engine as MCP (<code>audit_claim</code>,{" "}
-          <code>check_spend_guard</code>). <strong>Not financial advice.</strong>
+          Casandra does not hold funds. It seals claims (
+          <code>audit_claim</code>) and gates WDK spend (
+          <code>check_spend_guard</code>). Not financial advice.
         </p>
         <p className="onchain muted">
           On-chain registry (Ethereum Sepolia):{" "}
-          {import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS ? (
-            <a
-              href={
-                import.meta.env.VITE_CASANDRA_REGISTRY_EXPLORER ||
-                `https://sepolia.etherscan.io/address/${import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS}`
-              }
-              target="_blank"
-              rel="noreferrer"
-            >
-              {String(import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS).slice(0, 10)}
-              …
-            </a>
-          ) : (
-            <a
-              href="https://sepolia.etherscan.io/address/0xc9fcDEC150C8903b51F299dcBa308F453C4AB975"
-              target="_blank"
-              rel="noreferrer"
-            >
-              0xc9fcDEC1…
-            </a>
-          )}
+          <a
+            href="https://sepolia.etherscan.io/address/0xc9fcDEC150C8903b51F299dcBa308F453C4AB975"
+            target="_blank"
+            rel="noreferrer"
+          >
+            0xc9fcDEC1…
+          </a>
         </p>
       </footer>
     </main>

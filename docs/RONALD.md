@@ -1,35 +1,40 @@
-# Ronald — qué hacer (Casandra / Aleph)
+# Ronald — qué hacer AHORA (Casandra / Aleph)
 
 **Vos:** @RonaldGaymer2002 · Issues [#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6) (video) + [#7](https://github.com/Kenyi001/oraculo-radiohead/issues/7) (Hacki)  
-**Deadline:** Sun 23 Aug ~**11:00 America/La_Paz**  
-**Pack completo (copy-paste Hacki):** [HACKI_SUBMIT_PACK.md](HACKI_SUBMIT_PACK.md)  
-**Guion:** [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md)
+**Deadline:** Dom 23 Ago ~**11:00 America/La_Paz**
+
+## Empezá acá
+
+1. **Guion + clicks + timing:** [RONALD_PITCH.md](RONALD_PITCH.md) ← **único archivo para grabar**
+2. **Paste Hacki:** [HACKI_PASTE.md](HACKI_PASTE.md)
+3. **Captions EN:** [captions.en.srt](captions.en.srt)
+4. **Vs WWall (jueces):** [JUDGE_ONEPAGER.md](JUDGE_ONEPAGER.md)
 
 ---
 
 ## Orden (hacé esto)
 
-### 1) Grabar el video ≤3 min
-- Abrí live: https://casandra-two.vercel.app  
-- 70% Market Pulse (why / reasons / headlines) · 20% WDK dry-run · 10% tracks + disclaimer  
-- Guion hablado en [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md)
+### 1) Grabar ≤3 min
+- Live: https://casandra-two.vercel.app  
+- Historia: **wallet → mentira → FALSE → Send 200 USDT → BLOCKED**  
+- Guion verbatim + click path: [RONALD_PITCH.md](RONALD_PITCH.md)
 
-### 2) Subir el video (link de upload)
-**https://www.youtube.com/upload** → visibilidad **Unlisted**
+### 2) Subir video
+https://www.youtube.com/upload → **Unlisted**  
+Quemá captions EN antes o en Studio.
 
-### 3) Pegar la URL `youtube.com/watch?v=...` en 3 sitios
+### 3) Pegar URL YouTube en 3 sitios
 1. Comentario en [#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6)  
 2. README línea `Demo video:`  
 3. Hacki campo **Demo link\***
 
-### 4) Completar Hacki y Submit
-- Formulario: [HACKI_SUBMIT_PACK.md](HACKI_SUBMIT_PACK.md) §2 (campos exactos + Details)  
+### 4) Hacki Submit
+- Pegá one-liner + About de [HACKI_PASTE.md](HACKI_PASTE.md)  
 - Tracks: **General** + **WDK** only (no Pears, no QVAC)  
 - Repo: `https://github.com/Kenyi001/oraculo-radiohead`  
-- Live (en Details): `https://casandra-two.vercel.app`  
-- Contract: `0x27544Fe45b81C09fC91f99c0A7374970839eC4FF`  
-- Draft OK sin video; **Submit** con YouTube  
-- Comentá el link del BUIDL en [#7](https://github.com/Kenyi001/oraculo-radiohead/issues/7) y cerrá #7
+- Live (Details): `https://casandra-two.vercel.app`  
+- Contract: `0xc9fcDEC150C8903b51F299dcBa308F453C4AB975`  
+- Comentá BUIDL en [#7](https://github.com/Kenyi001/oraculo-radiohead/issues/7)
 
 ---
 
@@ -39,7 +44,8 @@
 |------|------|
 | Demo live | https://casandra-two.vercel.app |
 | Repo | https://github.com/Kenyi001/oraculo-radiohead |
-| Contract Sepolia | https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF |
-| Pack Hacki | [HACKI_SUBMIT_PACK.md](HACKI_SUBMIT_PACK.md) |
+| Contract Sepolia | https://sepolia.etherscan.io/address/0xc9fcDEC150C8903b51F299dcBa308F453C4AB975 |
+| Pitch kit | [RONALD_PITCH.md](RONALD_PITCH.md) |
+| Hacki paste | [HACKI_PASTE.md](HACKI_PASTE.md) |
 
-Dax (#8) unlock WDK para el tramo 20% del video — pedile si falta antes de grabar.
+No esperés a Dax: la demo ya muestra custody + sello + BLOCKED.

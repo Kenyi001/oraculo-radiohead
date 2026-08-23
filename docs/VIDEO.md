@@ -1,30 +1,32 @@
 # Casandra demo video — 3 minutes
 
 Async judging: **English or Spanish with English captions**.  
-Burn [`captions.en.srt`](captions.en.srt) in CapCut / YouTube Studio before submit.
+Burn [`captions.en.srt`](captions.en.srt) in CapCut / YouTube Studio before submit.  
+**Full Ronald kit (ES script + clicks):** [RONALD_PITCH.md](RONALD_PITCH.md)
 
 ## Setup before record
 
-1. Open https://casandra-two.vercel.app (or `npm run dev:web`)
-2. Optional: Cursor with Casandra MCP — tool `audit_claim`
-3. Large font / zoom 125%. No jargony overlays (`consume_only`, pulse-v1).
+1. Open https://casandra-two.vercel.app (reload once — demo auto-seals the lie)
+2. Zoom 125%. Show wallet strip first (500 USDT · Self-custody)
+3. No old jargon (`Market Pulse`, `consume_only`, `pulse-v1`)
 
 ## Beat sheet
 
 | Time | On screen | Spoken idea | Caption EN |
 |---|---|---|---|
-| 0:00–0:20 | Face / SCZ + one-liner | Agents invent prices | Agents invent prices. Casandra seals the lie. |
-| 0:20–0:50 | Demo lie in textarea | ETH $8000 + low risk | The agent claims ETH is $8,000 and risk is low. |
-| 0:50–1:10 | Seal FALSE | Contradictions list | Live market disagrees. Verdict: FALSE. |
-| 1:10–1:30 | Receipt id + hash | Same engine as MCP | Timestamped. Hashed. Same engine as the MCP. |
-| 1:30–1:50 | MCP or web refresh | Judges / agents | Judges open the URL. Agents call audit_claim. |
-| 1:50–2:20 | Try send USDT → BLOCKED | WDK gate | USDT does not move on a false claim. |
-| 2:20–2:40 | Explorer link | On-chain | Receipt hash can be anchored on Sepolia. |
-| 2:40–3:00 | Repo + disclaimer | Close | Not financial advice. Repo. Live demo. |
+| 0:00–0:20 | Face / URL + tagline | Agents invent prices; we never custody | Agents invent prices. Your USDT stays in your wallet. |
+| 0:20–0:50 | Wallet 500 USDT + claim | ETH $8000 + send 200 | The agent claims ETH is $8,000 and wants to send now. |
+| 0:50–1:15 | Seal FALSE | Contradictions | Live market disagrees. Verdict: FALSE. |
+| 1:15–1:35 | Receipt id + hash | Same engine as MCP | Timestamped. Hashed. Same engine as the MCP. |
+| 1:35–2:05 | Send 200 USDT → BLOCKED | WDK gate | Blocked. Money stays — dry-run, no broadcast. |
+| 2:05–2:25 | Balance unchanged | Custody story | Casandra never held the funds. |
+| 2:25–2:40 | Vs WWall one line | Truth vs policy | We gate on claim truth — not just spend limits. |
+| 2:40–3:00 | Explorer + repo | Close | Sepolia registry. Not financial advice. |
 
 ## Do not
 
 - Rush voice or stack three ideas in one sentence
 - Call WDK “optional”
-- Pitch “another market oracle MCP”
+- Pitch “another market oracle MCP” or Market Pulse
 - Skip English captions
+- Imply live USDT transfer (dry-run only)
