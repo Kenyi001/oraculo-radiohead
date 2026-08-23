@@ -40,7 +40,7 @@ Casandra attacks the link *“the agent lied about the market and still wants to
 **Live:** https://casandra-two.vercel.app  
 **Logo:** https://casandra-two.vercel.app/casandra-icon.jpg  
 **Repo:** https://github.com/Kenyi001/oraculo-radiohead  
-**Video:** https://youtu.be/qXajugSdLak (also embedded at `#pitch-video` on the live demo)  
+**Video:** https://youtu.be/qXajugSdLak (embedded at `#pitch-video` on the live demo; **English transcript for judges** below the player)  
 **BUIDL:** https://hacki.crecimiento.build/h/aleph-hackathon-2026/buidls/96a0e616-5b7e-4577-84a0-6deb3d0d0a28
 
 Open the demo → badge **Live API** → wallet **500 USDT** → default lie (`ETH is $8,000…`) → seal **FALSE** (`POST /api/audit-claim`) → **Send 200 USDT** → **BLOCKED** (`POST /api/check-spend-guard`).  
@@ -156,7 +156,7 @@ See [contracts/README.md](contracts/README.md).
 
 Pitch script + English SRT: [docs/SUBMIT.md](docs/SUBMIT.md) · [docs/VIDEO.md](docs/VIDEO.md) · [docs/captions.en.srt](docs/captions.en.srt)
 
-Judging is async in **English or Spanish with English captions**. Burn `captions.en.srt` into the video.
+Judging is async in **English or Spanish with English captions**. Burn `captions.en.srt` into the video. The live demo also ships a static **English transcript** under `#pitch-video` for judges when the pitch audio is Spanish.
 
 ## Disclaimer
 

@@ -28,7 +28,7 @@
 | # | Acción | Qué debe verse |
 |---|--------|----------------|
 | 1 | Abrir live | Icon **CAS** + brand **Casandra** + tagline custody |
-| 2 | (Ignorar o 2s) `#pitch-video` | “Pitch video pending” hasta que subas YouTube (sin URL falsa) |
+| 2 | `#pitch-video` | YouTube embed (Victor: `qXajugSdLak`) + **English transcript · For judges** debajo (video en español, lectura EN abierta) |
 | 3 | Señalar `#wallet` | **Your WDK wallet** · **500.00 USDT** · “Self-custody · not Casandra” · Agent wants **200 USDT** |
 | 4 | Señalar claim | Texto: ETH $8,000 + low risk + send now |
 | 5 | (Si no hay sello) **Demo lie** → **Seal contradiction** | Split claim vs world + sello rojo **FALSE** · Network: `POST /api/audit-claim` · quotes `coingecko` (o aviso mock) |

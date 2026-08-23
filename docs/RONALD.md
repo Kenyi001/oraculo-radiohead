@@ -48,6 +48,7 @@
 - [ ] 9. Hacki → campo **Enlace de demostración\*** = URL YouTube Unlisted  
   *(mientras no haya video: dejá `https://casandra-two.vercel.app/` — la live también va en Detalles)*
 - [x] 10. **Embed live:** `VITE_DEMO_VIDEO_URL=https://youtu.be/qXajugSdLak` → `#pitch-video` on https://casandra-two.vercel.app *(Dax redeployed)*
+- [x] 11. **English transcript** on demo under `#pitch-video` — judges read EN while video is Spanish *(source: `packages/demo-web/src/pitchTranscript.ts`)*
 
 ### D) Hacki BUIDL (~10–15 min) — OBLIGATORIO actualizar copy
 
