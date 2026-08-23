@@ -5,7 +5,6 @@ import {
   getHealth,
   getMarketContext,
   fetchMarketNews,
-  getMarketPulse,
   getPortfolioState,
   getRiskLevel,
   type HealthStatus,
@@ -17,6 +16,7 @@ import {
   type WdkGuardrailResult,
 } from "@oraculo/market-core";
 import { connectMetaMask, publishRiskViaMetaMask } from "./metamask";
+import { fetchMarketPulse } from "./pulse-api";
 
 const REGISTRY =
   import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS?.trim() || "";
@@ -121,7 +121,7 @@ export function App() {
         getPortfolioState(DEFAULT_DEMO_POSITIONS),
         getRiskLevel({ positions: DEFAULT_DEMO_POSITIONS }),
         checkWdkGuardrail({ positions: DEFAULT_DEMO_POSITIONS, intended_send: true }),
-        getMarketPulse({ symbol: pulseSymbol, side: "buy", include_news: true }),
+        fetchMarketPulse({ symbol: pulseSymbol, side: "buy", include_news: true }),
       ]);
       setPortfolio(p);
       setRisk(r);
@@ -145,7 +145,7 @@ export function App() {
     setError(null);
     try {
       setPulse(
-        await getMarketPulse({
+        await fetchMarketPulse({
           symbol: pulseSymbol,
           side: "buy",
           include_news: true,

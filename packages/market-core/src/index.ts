@@ -731,53 +731,23 @@ function mockHeadlines(symbol: string): PulseHeadline[] {
   ];
 }
 
-/** Free RSS (CoinTelegraph). Keyword-filter by symbol; fallback mock. */
+/** Symbol-specific RSS feeds (same source as get_market_news). Mock only if fetch fails. */
 export async function fetchHeadlines(
   symbol: string,
   _lookbackHours = 24
 ): Promise<PulseHeadline[]> {
   const key = normalizeSymbol(symbol);
-  const aliases = [key, key.toUpperCase()];
-  if (key === "btc") aliases.push("bitcoin");
-  if (key === "eth") aliases.push("ethereum");
   try {
-    const res = await fetch("https://cointelegraph.com/rss", {
-      signal: AbortSignal.timeout(8000),
-      headers: { Accept: "application/rss+xml, application/xml, text/xml" },
-    });
-    if (!res.ok) return mockHeadlines(key);
-    const xml = await res.text();
-    const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)].slice(0, 20);
-    const headlines: PulseHeadline[] = [];
-    for (const m of items) {
-      const block = m[1];
-      const title =
-        block.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/i)?.[1] ??
-        block.match(/<title>(.*?)<\/title>/i)?.[1] ??
-        "";
-      const linkRaw =
-        block.match(/<link><!\[CDATA\[([\s\S]*?)\]\]><\/link>/i)?.[1] ??
-        block.match(/<link>([^<]+)<\/link>/i)?.[1] ??
-        "";
-      const link = linkRaw.trim() || "https://cointelegraph.com";
-      const pub =
-        block.match(/<pubDate>(.*?)<\/pubDate>/i)?.[1] ??
-        new Date().toISOString();
-      if (!title) continue;
-      const hit = aliases.some((a) => title.toLowerCase().includes(a.toLowerCase()));
-      if (!hit && headlines.length >= 3) continue;
-      if (!hit && aliases.every((a) => a.length < 4)) continue;
-      headlines.push({
-        title: title.trim(),
-        source: "cointelegraph-rss",
-        published_at: new Date(pub).toISOString(),
-        url: link,
-        score: scoreHeadlineTitle(title),
-      });
-      if (headlines.length >= 5) break;
-    }
-    if (headlines.length === 0) return mockHeadlines(key);
-    return headlines;
+    const { fetchMarketNewsFromRss, getRssFeedMeta } = await import("./news-rss.js");
+    const feed = getRssFeedMeta(key);
+    const raw = await fetchMarketNewsFromRss(key);
+    return raw.articles.map((a) => ({
+      title: a.title,
+      source: feed.label,
+      published_at: a.posted_at,
+      url: a.url,
+      score: scoreHeadlineTitle(a.title),
+    }));
   } catch {
     return mockHeadlines(key);
   }
