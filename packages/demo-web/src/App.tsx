@@ -18,12 +18,16 @@ const DEMO_WALLET = {
 
 const PITCH_SCRIPT_URL =
   "https://github.com/Kenyi001/oraculo-radiohead/blob/master/docs/RONALD_PITCH.md";
+const MCP_README_URL =
+  "https://github.com/Kenyi001/oraculo-radiohead/blob/master/packages/mcp-server/README.md";
 
 const DEMO_VIDEO_RAW = import.meta.env.VITE_DEMO_VIDEO_URL as
   | string
   | undefined;
 const EMBED_SRC = youtubeEmbedUrl(DEMO_VIDEO_RAW);
 const WATCH_HREF = youtubeWatchUrl(DEMO_VIDEO_RAW);
+
+type ApiHealth = { ok?: boolean; version?: string; error?: string };
 
 export function App() {
   const [claim, setClaim] = useState(DEMO_LIE_CLAIM);
@@ -33,6 +37,7 @@ export function App() {
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [sealPulse, setSealPulse] = useState(0);
+  const [apiHealth, setApiHealth] = useState<ApiHealth | null>(null);
   const sendBtnRef = useRef<HTMLButtonElement>(null);
   const bootstrapped = useRef(false);
   const claimId = useId();
@@ -67,6 +72,29 @@ export function App() {
     bootstrapped.current = true;
     void runAudit(DEMO_LIE_CLAIM, { scrollToSeal: false });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- auto-demo once on mount
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetch("/api/health")
+      .then(async (res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return (await res.json()) as ApiHealth;
+      })
+      .then((data) => {
+        if (!cancelled) setApiHealth({ ok: data.ok !== false, version: data.version });
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setApiHealth({
+            ok: false,
+            error: "API offline in local Vite — live deploy serves /api/*",
+          });
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   function onAudit(e: FormEvent) {
@@ -375,6 +403,70 @@ export function App() {
         </section>
 
         {error && <p className="error">{error}</p>}
+
+        <section className="section agent-path" id="agent-path" aria-label="Agent and API">
+          <div className="agent-path-head">
+            <p className="panel-label">Agent path</p>
+            <p
+              className={`path-pill${apiHealth?.ok ? " is-live" : " is-local"}`}
+              role="status"
+            >
+              {apiHealth?.ok
+                ? `Live API · v${apiHealth.version ?? "?"}`
+                : "Interactive demo · API on deploy"}
+            </p>
+          </div>
+          <p className="muted gate-copy">
+            Same loop judges sell:{" "}
+            <code>audit_claim</code> → <code>seal_receipt</code> →{" "}
+            <code>check_spend_guard</code> → WDK dry-run. Wire it in Cursor via
+            MCP, or hit the HTTP twin on this host.
+          </p>
+          <div className="agent-grid">
+            <div className="agent-col">
+              <h3>MCP (Cursor)</h3>
+              <pre className="agent-snippet" tabIndex={0}>{`{
+  "mcpServers": {
+    "casandra": {
+      "command": "node",
+      "args": [
+        "…/packages/mcp-server/dist/index.js"
+      ]
+    }
+  }
+}`}</pre>
+              <p className="muted agent-note">
+                Build first: <code>npm run build -w @oraculo/mcp-server</code>.{" "}
+                <a href={MCP_README_URL} target="_blank" rel="noreferrer">
+                  Full setup
+                </a>
+              </p>
+            </div>
+            <div className="agent-col">
+              <h3>HTTP API</h3>
+              <ul className="api-list">
+                <li>
+                  <code>POST /api/audit-claim</code>
+                </li>
+                <li>
+                  <code>POST /api/seal-receipt</code>
+                </li>
+                <li>
+                  <code>POST /api/check-spend-guard</code>
+                </li>
+                <li>
+                  <a href="/api/health">
+                    <code>GET /api/health</code>
+                  </a>
+                </li>
+              </ul>
+              <p className="muted agent-note">
+                Pass <code>receipt</code> with <code>receipt_id</code> on spend
+                guard so serverless stays consistent. Dry-run only — no custody.
+              </p>
+            </div>
+          </div>
+        </section>
 
         <footer>
           <p>

@@ -46,8 +46,8 @@ In Vercel → Project → Settings → Environment Variables (Production):
 
 | Name | Example |
 |---|---|
-| `VITE_CASANDRA_REGISTRY_ADDRESS` | `0x27544Fe45b81C09fC91f99c0A7374970839eC4FF` |
-| `VITE_CASANDRA_REGISTRY_EXPLORER` | `https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF` |
+| `VITE_CASANDRA_REGISTRY_ADDRESS` | `0xc9fcDEC150C8903b51F299dcBa308F453C4AB975` |
+| `VITE_CASANDRA_REGISTRY_EXPLORER` | `https://sepolia.etherscan.io/address/0xc9fcDEC150C8903b51F299dcBa308F453C4AB975` |
 
 Already baked in `packages/demo-web/.env.production` for Vercel builds.
 
@@ -62,6 +62,7 @@ Redeploy after setting them so Vite bakes them into the bundle.
 
 ## Smoke check
 
-- [ ] HTTPS opens Casandra (gauge + portfolio + WDK `action`)
-- [ ] Refresh demo works (CoinGecko or mock fallback)
-- [ ] Footer shows registry pending or BaseScan link
+- [ ] HTTPS opens Casandra (wallet → seal FALSE → Send → BLOCKED)
+- [ ] `GET /api/health` returns JSON; `POST /api/audit-claim` seals FALSE on demo lie
+- [ ] Footer shows Sepolia registry `0xc9fcDEC1…`
+- [ ] Agent path section shows Live API when functions are up

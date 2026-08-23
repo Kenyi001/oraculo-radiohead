@@ -3,7 +3,7 @@
     "casandra": {
       "command": "node",
       "args": ["packages/mcp-server/dist/index.js"],
-      "cwd": "D:/_Dev/Projects/oraculo-radiohead"
+      "cwd": "D:/_Dev/Projects/Oraculo-radiohead"
     },
     "wdk-wallet": {
       "command": "wdk-mcp"

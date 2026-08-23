@@ -56,6 +56,21 @@ Open the demo → default claim is a lie (`ETH is $8,000…`) → seal shows **F
 
 `get_price` · `get_portfolio_state` · `get_risk_level` · `get_market_context` · `get_market_summary` · `health`
 
+Package docs: [packages/mcp-server/README.md](packages/mcp-server/README.md)
+
+## HTTP API (same loop)
+
+Live base: https://casandra-two.vercel.app
+
+| Method | Path | Body |
+|---|---|---|
+| `POST` | `/api/audit-claim` | `{ "text"?: string }` |
+| `POST` | `/api/seal-receipt` | `{ "text"?: string }` |
+| `POST` | `/api/check-spend-guard` | `{ "receipt_id": string, "receipt"?: SealedReceipt }` |
+| `GET` | `/api/health` | — |
+
+Pass the full `receipt` from audit when calling spend-guard across serverless instances. Dry-run only.
+
 ## WDK integration (permalinks for Tether)
 
 Judges: start here.
@@ -100,6 +115,9 @@ npm run dev:web      # http://localhost:5173
   }
 }
 ```
+
+Replace the path with your clone. Build: `npm run build -w @oraculo/mcp-server`.  
+See [packages/mcp-server/README.md](packages/mcp-server/README.md) and [docs/mcp-casandra-wdk.example.json](docs/mcp-casandra-wdk.example.json).
 
 Ask: *“Audit this claim with Casandra, then check_spend_guard on the receipt.”*
 
