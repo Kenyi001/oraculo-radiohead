@@ -1,8 +1,7 @@
 {
-  "address": "0x27544Fe45b81C09fC91f99c0A7374970839eC4FF",
+  "address": "0xc9fcDEC150C8903b51F299dcBa308F453C4AB975",
   "chainId": 11155111,
   "network": "sepolia",
-  "explorer": "https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF",
-  "deployedAt": "2026-08-22T22:20:27.052Z",
-  "note": "Official CasandraRegistry for Aleph demo — Ethereum Sepolia (team has SepoliaETH; Base faucet unavailable)."
+  "explorer": "https://sepolia.etherscan.io/address/0xc9fcDEC150C8903b51F299dcBa308F453C4AB975",
+  "deployedAt": "2026-08-23T04:06:25.379Z"
 }

@@ -1,6 +1,9 @@
 # Brief del equipo — qué queremos y quién hace qué
 
-**Deadline:** Sun 23 Aug ~11:00 America/La_Paz  
+> **Pitch/submit canónico:** [RONALD.md](RONALD.md) · [HACKI_PASTE.md](HACKI_PASTE.md).  
+> Producto: lie detector + WDK spend gate (no “solo Evidence Pack”).
+
+**Deadline:** Sun 23 Ago ~11:00 America/La_Paz  
 **Tracks:** **General** (por defecto) + sponsor **WDK**  
 **Repo:** https://github.com/Kenyi001/oraculo-radiohead
 
@@ -8,7 +11,7 @@
 
 ## Objetivo (una frase)
 
-Que un **agente IA** consulte Casandra (precios, portafolio, riesgo con `action`) y solo use **WDK** (`wdk-mcp`) para USD₮ si el guardrail lo permite — demo web + video + submit Hacki.
+Que un **agente IA** pase por Casandra (`audit_claim` → sello → `check_spend_guard`) y **no pueda** dry-run USDT vía WDK si el claim es `FALSE` — demo web + video + submit Hacki.
 
 **No es:** exchange, predicción ML, QVAC ni Pears.
 

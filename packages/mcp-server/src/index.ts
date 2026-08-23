@@ -3,19 +3,21 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import {
-  checkWdkGuardrail,
+  DEMO_LIE_CLAIM,
+  auditClaim,
   getHealth,
   getMarketContext,
-  getMarketPulse,
   getMarketSummary,
   getPortfolioState,
   getPrice,
   getRiskLevel,
+  sealReceipt,
 } from "@oraculo/market-core";
+import { runWdkSpendGuard, WDK_PACKAGES } from "./wdkGuard.js";
 
 const server = new McpServer({
   name: "casandra",
-  version: "0.2.0",
+  version: "0.3.0",
 });
 
 const positionSchema = z.object({
@@ -24,9 +26,86 @@ const positionSchema = z.object({
   cost_basis_usd: z.number().optional(),
 });
 
+// —— Hero tools (lie detector) ————————————————————————————————
+
+server.tool(
+  "audit_claim",
+  "Casandra lie detector: compare an agent money claim to live market + risk. Returns verdict TRUE|MIXED|FALSE, contradictions, and a sealed receipt. Default demo claim is an obvious lie.",
+  {
+    text: z
+      .string()
+      .optional()
+      .describe(
+        `Agent claim to audit. Default: "${DEMO_LIE_CLAIM}"`
+      ),
+    positions: z
+      .array(positionSchema)
+      .optional()
+      .describe("Optional portfolio for risk-band checks. Default demo portfolio."),
+  },
+  async ({ text, positions }) => {
+    const result = await auditClaim({
+      text: text ?? DEMO_LIE_CLAIM,
+      positions,
+    });
+    return {
+      content: [
+        { type: "text" as const, text: JSON.stringify(result, null, 2) },
+      ],
+    };
+  }
+);
+
+server.tool(
+  "seal_receipt",
+  "Seal a Casandra contradiction receipt (hash + verdict). Same engine as audit_claim; use the receipt_id with check_spend_guard before any USDT send.",
+  {
+    text: z.string().optional().describe("Claim text to seal"),
+    positions: z.array(positionSchema).optional(),
+  },
+  async ({ text, positions }) => {
+    const receipt = await sealReceipt({
+      text: text ?? DEMO_LIE_CLAIM,
+      positions,
+    });
+    return {
+      content: [
+        { type: "text" as const, text: JSON.stringify(receipt, null, 2) },
+      ],
+    };
+  }
+);
+
+server.tool(
+  "check_spend_guard",
+  "WDK spend gate: if Casandra sealed FALSE, USDT send is blocked. Otherwise returns dry-run preview via @tetherto/wdk (no live broadcast). Core product loop — not optional.",
+  {
+    receipt_id: z
+      .string()
+      .describe("Receipt id from audit_claim / seal_receipt (rcpt_…)"),
+  },
+  async ({ receipt_id }) => {
+    const result = runWdkSpendGuard(receipt_id);
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: JSON.stringify(
+            { ...result, wdk_packages: WDK_PACKAGES },
+            null,
+            2
+          ),
+        },
+      ],
+    };
+  }
+);
+
+// —— Evidence sources (supporting; not the pitch) ——————————————
+
 server.tool(
   "get_price",
-  "Get current USD price and 24h change for a crypto symbol (e.g. btc, eth, usdt).",
+  "Evidence source: USD price + 24h change for a crypto symbol.",
   {
     symbol: z
       .string()
@@ -42,7 +121,7 @@ server.tool(
 
 server.tool(
   "get_market_summary",
-  "Summarize market state (bullish/bearish/sideways) for one or more symbols using 24h % change.",
+  "Evidence source: bullish/bearish/sideways summary for symbols.",
   {
     symbols: z
       .array(z.string())
@@ -61,7 +140,7 @@ server.tool(
 
 server.tool(
   "get_portfolio_state",
-  "Casandra: current investment/portfolio state (value, PnL %, weights, USDT share). Omit positions to use the demo portfolio.",
+  "Evidence source: portfolio value, PnL, weights, USDT share.",
   {
     positions: z
       .array(positionSchema)
@@ -80,7 +159,7 @@ server.tool(
 
 server.tool(
   "get_risk_level",
-  "Casandra supporting evidence: transparent risk score 0–100 (low/med/high) with explainable factors. action is an agent decision hint (context), not a trade/send order. Prefer get_market_pulse for full Evidence Pack. Not financial advice.",
+  "Evidence source: transparent risk score 0–100 (casandra-risk-v1). Used by audit_claim for band checks.",
   {
     symbol: z.string().optional().describe("Single asset ticker, e.g. btc"),
     positions: z
@@ -98,7 +177,7 @@ server.tool(
 
 server.tool(
   "get_market_context",
-  "Casandra: fast market context bullets for a symbol (bias + BTC reference). Context only — not an entry recommendation.",
+  "Evidence source: short market context bullets for a symbol.",
   {
     symbol: z.string().describe("Ticker, e.g. eth or usdt"),
   },
@@ -111,69 +190,6 @@ server.tool(
 );
 
 server.tool(
-  "get_market_pulse",
-  "PRIMARY Casandra tool — consume-only Evidence Pack so the agent can decide on its own: why{}, reasons[], meters (price/F&G/news), headlines, confidence, market_favor, and verdict as a CONTEXT HINT (not a trade order, not a prediction). Do not reinvent casandra-pulse-v1 — read JSON only. Call this before any optional WDK action.",
-  {
-    symbol: z.string().describe("Ticker, e.g. btc, eth, sol"),
-    side: z
-      .enum(["buy", "sell"])
-      .optional()
-      .describe("Optional trade side to align market_favor"),
-    lookback_hours: z
-      .number()
-      .optional()
-      .describe("News/context window hours (default 24)"),
-    include_news: z
-      .boolean()
-      .optional()
-      .describe("Include headlines + news_score (default true)"),
-  },
-  async ({ symbol, side, lookback_hours, include_news }) => {
-    const pulse = await getMarketPulse({
-      symbol,
-      side,
-      lookback_hours,
-      include_news,
-    });
-    return {
-      content: [
-        { type: "text" as const, text: JSON.stringify(pulse, null, 2) },
-      ],
-    };
-  }
-);
-
-server.tool(
-  "check_wdk_guardrail",
-  "OPTIONAL sponsor WDK gate: only AFTER get_market_pulse and only if the agent chooses to act. BEFORE wdk-mcp send_token, call this. Returns allow_wdk_send (false when action=avoid). Casandra informs; the agent decides; WDK is not the product.",
-  {
-    symbol: z.string().optional().describe("Single asset ticker, e.g. eth"),
-    positions: z
-      .array(positionSchema)
-      .optional()
-      .describe("Portfolio positions; default demo portfolio if omitted with no symbol"),
-    intended_send: z
-      .boolean()
-      .optional()
-      .describe("Set true when the agent plans to send USD₮ via WDK"),
-  },
-  async ({ symbol, positions, intended_send }) => {
-    const result = await checkWdkGuardrail({
-      symbol,
-      positions:
-        positions ??
-        (symbol ? undefined : []),
-      intended_send,
-    });
-    return {
-      content: [
-        { type: "text" as const, text: JSON.stringify(result, null, 2) },
-      ],
-    };
-  }
-);
-
-server.tool(
   "health",
   "Health check for the Casandra MCP server.",
   {},
@@ -181,7 +197,14 @@ server.tool(
     const status = getHealth();
     return {
       content: [
-        { type: "text" as const, text: JSON.stringify(status, null, 2) },
+        {
+          type: "text" as const,
+          text: JSON.stringify(
+            { ...status, wdk_packages: WDK_PACKAGES },
+            null,
+            2
+          ),
+        },
       ],
     };
   }

@@ -1,10 +1,14 @@
 # Pitch + video — Augusto (@RonaldGaymer2002)
 
-**Tu rol:** exponer y grabar el demo ≤3 min.  
-**Tracks:** General (producto = evidencia) + sponsor WDK (prueba opcional).  
-**Tesis:** [DIRECTION.md](DIRECTION.md) · script: [SUBMIT.md](SUBMIT.md) · WDK setup: [WDK.md](WDK.md)
+> **OBSOLETO para grabar.** Usá el kit actualizado: **[RONALD_PITCH.md](RONALD_PITCH.md)** + checklist **[RONALD.md](RONALD.md)**.  
+> Historia: wallet custody → lie → FALSE → Send USDT → BLOCKED (no Market Pulse).  
+> Contrato canónico: `0xc9fcDEC150C8903b51F299dcBa308F453C4AB975` (**no** `0x27544…`).
 
-**Reparto del video: 70% Pulse/evidencia · 20% WDK dry-run · 10% cierre.**
+**Tu rol:** exponer y grabar el demo ≤3 min.  
+**Tracks:** General + WDK Track 1 (WDK es core, no opcional).  
+**Tesis:** [JUDGE_ONEPAGER.md](JUDGE_ONEPAGER.md) · script: [RONALD_PITCH.md](RONALD_PITCH.md) · [SUBMIT.md](SUBMIT.md)
+
+**Reparto del video: wallet+claim → seal FALSE → WDK BLOCKED → cierre.**
 
 ---
 
@@ -12,11 +16,11 @@
 
 | # | Qué | Quién | Check |
 |---|-----|-------|-------|
-| 1 | Live demo https://casandra-two.vercel.app | Dax (#5 done) | [ ] |
-| 2 | Panel **Market Pulse** (why / reasons / headlines) | Ya en master | [ ] |
-| 3 | Cursor dual MCP (Casandra + wdk-wallet) | Dax (#8) | [ ] |
-| 4 | Wallet test unlock | Dax | [ ] |
-| 5 | Address contrato Ethereum Sepolia | Victor (#10) — `0x27544Fe4…` | [x] |
+| 1 | Live demo https://casandra-two.vercel.app | Dax | [x] |
+| 2 | Loop wallet → FALSE → BLOCKED | Ya en master | [x] |
+| 3 | MCP + API agent path | Dax | [x] |
+| 4 | Guion + checklist | [RONALD.md](RONALD.md) | [ ] |
+| 5 | Address contrato Ethereum Sepolia | `0xc9fcDEC1…` | [x] |
 
 ---
 
@@ -67,9 +71,14 @@
 
 ---
 
-## Entregables
+## Entregables (orden)
 
-1. **[#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6)** — Video ≤3 min + URL en README  
-2. Avisar a Dax para submit (#7)
+1. **Grabar** ≤3 min (guion arriba · 70/20/10).
+2. **Subir** a YouTube Unlisted: https://www.youtube.com/upload  
+3. **Pegar** la URL `youtube.com/watch?v=...` en:
+   - [#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6)
+   - README (`Demo video:`)
+   - Hacki **Demo link\***
+4. **Submit Hacki** (#7) con [HACKI_SUBMIT_PACK.md](HACKI_SUBMIT_PACK.md) — General + WDK.
 
-Vercel (#5) ya está live. Dax ayuda con wallet/MCP. Victor con contrato si alcanza.
+Vercel (#5) ya está live. Dax ayuda con wallet/MCP (#8). Contrato Sepolia (#10) listo.

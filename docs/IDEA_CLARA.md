@@ -1,6 +1,9 @@
 # Casandra — Idea clara (para no perderse)
 
-Léelo en 2 minutos. Esto es **todo** lo que importa para terminar.
+> **OBSOLETO para pitch/submit.** Usá **[RONALD.md](RONALD.md)** + **[RONALD_PITCH.md](RONALD_PITCH.md)**.  
+> Producto actual: lie detector (claim → FALSE → WDK BLOCKED). No digas Evidence Pack / `get_market_pulse` en el video.
+
+Léelo en 2 minutos — solo contexto histórico del pivot Pulse.
 
 ---
 

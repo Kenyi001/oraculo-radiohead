@@ -1,53 +1,36 @@
 # Ship checklist — Casandra (human blockers)
 
-Deadline: **Sun 23 Aug ~11:00 BO**  
-Tracks: **General (default) + WDK sponsor** — evidencia-first — [TRACK.md](TRACK.md) · [DIRECTION.md](DIRECTION.md) · [WDK.md](WDK.md)
+Deadline: **Sun 23 Aug ~11:00 BO**
 
 ## Done in repo
 
-- [x] Track lock: General + WDK
-- [x] Evidence Pack / Pulse + demo Pulse-first + live Vercel
-- [x] WDK deps + `check_wdk_guardrail` + dual MCP docs
-- [x] CasandraRegistry Solidity + local smoke
-- [x] Demo footer `VITE_CASANDRA_*`
-- [x] Reposicionamiento: agente decide; WDK opcional
+- [x] Tracks: **General** + **WDK Track 1** ([TRACK.md](TRACK.md))
+- [x] Lie detector core: `audit_claim` / `seal_receipt` / `check_spend_guard`
+- [x] Demo UI: **Your WDK wallet** → lie → FALSE → Send → BLOCKED
+- [x] Ronald pitch kit: [RONALD_PITCH.md](RONALD_PITCH.md) · [RONALD.md](RONALD.md)
+- [x] Pitch + EN captions: [SUBMIT.md](SUBMIT.md) · [VIDEO.md](VIDEO.md) · [captions.en.srt](captions.en.srt)
+- [x] Judge vs WWall: [JUDGE_ONEPAGER.md](JUDGE_ONEPAGER.md)
+- [x] Hacki paste (custody clarified): [HACKI_PASTE.md](HACKI_PASTE.md)
+- [x] Registry address on Sepolia in README
 
-**Live demo:** https://casandra-two.vercel.app (#5)
+## Why Casandra beats WWall (Track 1)
 
-## You must do (login / faucet / mic)
+WWall = spend **policy**. Casandra = claim **truth** seal + WDK dry-run block on `FALSE`.  
+Custody stays with the user. Full table: [JUDGE_ONEPAGER.md](JUDGE_ONEPAGER.md).
 
-### 1) WDK wallet unlock (#8 — Dax) — antes del video
+## You must do (Ronald)
 
-1. `npm install`
-2. `npx wdk wallet create --name casandra-dev --words 12` (test only)
-3. Unlock short TTL; Cursor dual MCP: [mcp-casandra-wdk.example.json](mcp-casandra-wdk.example.json)
-4. Listo para mostrar en video: Pulse → (si actúa) guardrail → dry-run
+### 1) Video (#6)
 
-### 2) Ethereum Sepolia deploy (#10 — Victor)
+1. Record ≤3 min using [RONALD_PITCH.md](RONALD_PITCH.md).
+2. Burn [captions.en.srt](captions.en.srt) (CapCut / YouTube).
+3. Paste URL into README + Hacki.
 
-**Official network = Ethereum Sepolia** (team has SepoliaETH; Base faucet unavailable).
+### 2) Hacki BUIDL
 
-Address: [`0x27544Fe45b81C09fC91f99c0A7374970839eC4FF`](https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF)
+1. Paste one-liner + About from [HACKI_PASTE.md](HACKI_PASTE.md).
+2. Confirm tracks: **General** + **WDK**.
+3. Attach video + repo + demo + contract `0xc9fcDEC150C8903b51F299dcBa308F453C4AB975` + WDK packages.
 
-Victor: confirm snapshot id=0 + checklist in #10. Docs/README already updated on master.
-
-```bash
-npm run contracts:deploy:sepolia   # chainId must be 11155111
-```
-
-### 3) Vercel (#5)
-
-**DONE** — https://casandra-two.vercel.app
-
-### 4) Video (#6 — Augusto)
-
-≤3 min · **70% Pulse** · **20% WDK dry-run** · **10% tracks/disclaimer**  
-Guion: [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md) · [SUBMIT.md](SUBMIT.md)
-
-### 5) Hacki submit (#7 — Dax)
-
-1. BUIDL en Hacki/DoraHacks  
-2. Tracks: **General** + marcar **WDK** (no “AI only”)  
-3. Adjuntar: repo · video · https://casandra-two.vercel.app · contract Sepolia si #10 · packages WDK ([WDK.md](WDK.md))
-
-Links: https://hacki.crecimiento.build/h/aleph-hackathon-2026 · https://hacki.crecimiento.build/h/aleph-hackathon-2026/tracks/wdk-track
+Links: https://hacki.crecimiento.build/h/aleph-hackathon-2026/buidls/96a0e616-5b7e-4577-84a0-6deb3d0d0a28
+

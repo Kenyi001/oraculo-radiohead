@@ -1,7 +1,11 @@
 # Casandra — Dirección del proyecto
 
-Documento canónico: **qué somos**, **tracks**, **pitch**, **mantenimiento**.  
-Complementa: [TRACK.md](TRACK.md) · [SUBMIT.md](SUBMIT.md) · [WDK.md](WDK.md) · [BOARD.md](BOARD.md) · [david/REQUISITOS_PULSE.md](david/REQUISITOS_PULSE.md)
+> **OBSOLETO para pitch/submit.** Producto actual = lie detector + WDK spend gate.  
+> Usá: [RONALD.md](RONALD.md) · [RONALD_PITCH.md](RONALD_PITCH.md) · [HACKI_PASTE.md](HACKI_PASTE.md) · [JUDGE_ONEPAGER.md](JUDGE_ONEPAGER.md).  
+> Este archivo describe el pivot viejo (Market Pulse / Evidence Pack) y puede confundir a jueces.
+
+Documento histórico: **qué éramos**, tracks, pitch antiguo.  
+Complementa: [TRACK.md](TRACK.md) · [SUBMIT.md](SUBMIT.md) · [WDK.md](WDK.md) · [BOARD.md](BOARD.md)
 
 ---
 

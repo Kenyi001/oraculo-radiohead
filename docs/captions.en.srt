@@ -1,0 +1,51 @@
+1
+00:00:00,000 --> 00:00:08,000
+Agents invent prices. Your USDT stays in your wallet.
+
+2
+00:00:08,000 --> 00:00:18,000
+Casandra never custodies. It only opens or closes the door.
+
+3
+00:00:18,000 --> 00:00:32,000
+The agent claims ETH is $8,000 and risk is low — send 200 USDT now.
+
+4
+00:00:32,000 --> 00:00:48,000
+Casandra compares the claim to the live market.
+
+5
+00:00:48,000 --> 00:01:02,000
+Verdict: FALSE. The contradictions are sealed.
+
+6
+00:01:02,000 --> 00:01:18,000
+Timestamped. Hashed. Same engine as the MCP.
+
+7
+00:01:18,000 --> 00:01:32,000
+Try to send USDT through the WDK gate.
+
+8
+00:01:32,000 --> 00:01:48,000
+Blocked. Money stays. Dry-run — no live broadcast.
+
+9
+00:01:48,000 --> 00:02:02,000
+We gate on claim truth — not just spend limits.
+
+10
+00:02:02,000 --> 00:02:16,000
+Receipt hash can be anchored on Ethereum Sepolia.
+
+11
+00:02:16,000 --> 00:02:30,000
+General track plus WDK Track 1 — guardrails for agents.
+
+12
+00:02:30,000 --> 00:02:45,000
+Not financial advice. Repo and live demo in the description.
+
+13
+00:02:45,000 --> 00:03:00,000
+Casandra. They can speak. They cannot seal a lie.

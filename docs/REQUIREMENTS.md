@@ -2,65 +2,55 @@
 
 Work framework: **Constitution** → **this file** → [TASKS.md](../TASKS.md) → [GitHub Issues](https://github.com/Kenyi001/oraculo-radiohead/issues) → DoD Sunday.
 
-Track lock: [TRACK.md](TRACK.md) (General default + **WDK** sponsor) · WDK: [WDK.md](WDK.md) · Submit: [SUBMIT.md](SUBMIT.md)
+Track lock: [TRACK.md](TRACK.md) · Submit script: [SUBMIT.md](SUBMIT.md)
 
 ---
 
 ## A. Mínimo Hacki
 
 - [x] Open-source repo + README
-- [ ] Demo video ≤3 min (EN or ES + English captions) — include Casandra→WDK
-- [ ] DoraHacks/Hacki: **General** (default) + mark **WDK**
-- [ ] Pitch / demo optimized for **General** criteria (5 below)
-- [ ] Contract address provided **if** contract deployed
+- [ ] Demo video ≤3 min (EN or ES + English captions)
+- [ ] DoraHacks/Hacki: **General** + **WDK Track 1**
+- [ ] Pitch / demo optimized for **General** criteria
+- [x] Contract address provided (Sepolia registry)
 - [ ] Feature code committed in hackathon window (post-kickoff)
 - [ ] Team 1–4; each member registered on Aleph / Luma SCZ
 
-## B. Producto Casandra
+## B. Producto Casandra (lie detector)
 
-- [x] R1 `get_price`
-- [x] R2 `get_portfolio_state`
-- [x] R3 `get_risk_level` (`casandra-risk-v1` + factors + `action`)
-- [x] R4 `get_market_context`
-- [x] R5 `health`
-- [x] R-WDK `check_wdk_guardrail` + `@tetherto/wdk` / `@tetherto/wdk-cli` deps
+- [x] `audit_claim` — verdict + contradictions + receipt
+- [x] `seal_receipt`
+- [x] `check_spend_guard` — WDK dry-run gate (FALSE blocks USDT)
+- [x] Evidence sources: price / portfolio / risk / context
 - [x] Shared `@oraculo/market-core` for MCP + web
-- [x] Demo UI: gauge + portfolio with USDT ballast + WDK action
-- [x] Formula + disclaimer in README
+- [x] Demo UI: THE CLAIM vs THE WORLD + seal
+- [x] Formula + disclaimer + WDK permalinks in README
 
 ## C. Entrega demo (General criteria)
 
 | Criterion | Proof | Status |
 |---|---|---|
-| Technicality | MCP + core + risk + WDK guardrail (+ registry) | core+WDK done · registry pending faucet |
-| Originality | Hallucinations + unsafe send → gated JSON | done in pitch |
-| UI/UX/DX | Web gauge + dual MCP config | UI done · polish open |
-| Practicality | Live CoinGecko / WDK test wallet | done / human unlock |
-| Presentation | ≤3 min video with WDK loop | open (#6) |
+| Technicality | Audit + hash + WDK gate | done |
+| Originality | Lie detector (not price MCP) | done in pitch |
+| UI/UX/DX | Split seal UI + MCP config | done |
+| Practicality | FALSE blocks USDT send | done |
+| Presentation | ≤3 min video + EN captions | open |
 
-- [ ] Live Vercel URL in README (#5)
-- [ ] Video URL in README (#6)
-- [ ] Demo shows MCP tool **or** JSON + gauge
-- [ ] On-chain address visible in demo footer (#10)
+- [x] Live Vercel URL in README
+- [ ] Video URL in README
+- [x] Demo shows seal + spend gate
+- [x] On-chain address visible in demo footer
 
-## D. On-chain (alcance fijo)
+## D. WDK (Track 1)
 
-- [x] `CasandraRegistry` — `publishRiskSnapshot(bytes32 portfolioHash, uint8 band, uint256 score, uint256 timestamp)`
-- [x] Compile + local Hardhat smoke deploy
-- [x] Deploy **Ethereum Sepolia** — [`0x27544Fe45b81C09fC91f99c0A7374970839eC4FF`](https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF)
-- [x] Address + explorer in README + demo `.env.production`
-- [ ] Victor confirms snapshot checklist on #10
-- [x] Out of P0: trading, custody, real USDT transfer, multi-chain
+- [x] `@tetherto/wdk` + `@tetherto/wdk-cli` in package.json
+- [x] Permalinks to `wdkGuard.ts` + `check_spend_guard`
+- [x] Dry-run only — no live custody
+- [ ] Video shows BLOCKED send
 
 ## E. Submit DoD (dom ~11:00 BO)
 
 - [ ] `npm run build` OK
-- [ ] README: live URL + video URL + contract address
-- [ ] Hacki/DoraHacks BUIDL submitted — **General + WDK**
-- [ ] Issue #7 closed
-- [ ] WDK packages + permalinks listed in README / [WDK.md](WDK.md)
-
-## Optional / P1 (only if A–E green)
-
-- [ ] Market Pulse (#17)
-- [ ] UI polish (#11)
+- [ ] README: live URL + video URL + contract + WDK versions
+- [ ] Hacki BUIDL updated (one-liner + About)
+- [ ] Captions burned into video

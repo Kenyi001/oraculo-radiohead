@@ -2,6 +2,18 @@ export type MarketBias = "bullish" | "bearish" | "sideways";
 export type RiskBand = "low" | "med" | "high";
 /** Structured context hint for agents (also used by optional WDK guardrail). Not a trade order. */
 export type WdkAction = "proceed" | "caution" | "avoid";
+import type { MarketNews, MarketNewsArticle, MarketNewsSource } from "./news.js";
+import { fetchMarketNews } from "./news.js";
+import {
+  canonicalPortfolioPayload,
+  bandToUint8,
+  CASANDRA_REGISTRY_ABI,
+  BASE_SEPOLIA_CHAIN,
+  BASE_SEPOLIA_CHAIN_ID,
+  SEPOLIA_CHAIN,
+  SEPOLIA_CHAIN_ID,
+  type OnChainRiskSnapshot,
+} from "./onchain.js";
 
 export interface PriceQuote {
   symbol: string;
@@ -28,13 +40,8 @@ export interface HealthStatus {
 }
 
 /** Position input for portfolio / risk tools */
-export interface PositionInput {
-  symbol: string;
-  /** Quantity of the asset */
-  quantity: number;
-  /** Optional cost basis per unit in USD */
-  cost_basis_usd?: number;
-}
+export type { PositionInput } from "./types.js";
+import type { PositionInput } from "./types.js";
 
 export interface PositionState {
   symbol: string;
@@ -55,28 +62,8 @@ export interface PortfolioState {
   disclaimer: string;
 }
 
-export interface RiskFactor {
-  name: string;
-  value: number;
-  weight: number;
-  note: string;
-}
-
-export interface RiskAssessment {
-  score: number;
-  risk_pct: number;
-  band: RiskBand;
-  /** proceed | caution | avoid — agents must gate WDK send_token on this */
-  action: WdkAction;
-  verdict: string;
-  verdict_es: string;
-  factors: RiskFactor[];
-  scope: "symbol" | "portfolio";
-  symbol?: string;
-  fetched_at: string;
-  algorithm: string;
-  disclaimer: string;
-}
+export type { RiskFactor, RiskAssessment } from "./types.js";
+import type { RiskFactor, RiskAssessment } from "./types.js";
 
 export interface WdkGuardrailResult {
   allow_wdk_send: boolean;
@@ -199,10 +186,104 @@ const MOCK_PRICES: Record<string, { name: string; price: number; change: number 
 };
 
 let lastFetchAt: string | null = null;
-const VERSION = "0.2.0";
+
+type QuoteCacheEntry = { at: number; quote: PriceQuote };
+const quoteCache = new Map<string, QuoteCacheEntry>();
+
+function cacheTtlMs(): number {
+  const raw = process.env.CASANDRA_CACHE_TTL_MS;
+  if (!raw) return 0;
+  const n = Number(raw);
+  return Number.isFinite(n) && n > 0 ? n : 0;
+}
+
+function offlineMode(): boolean {
+  const v = (process.env.CASANDRA_OFFLINE || "").trim().toLowerCase();
+  return v === "1" || v === "true" || v === "yes";
+}
+const VERSION = "0.3.1";
 const DISCLAIMER =
-  "Not financial advice. Casandra risk scores are illustrative heuristics only.";
+  "Not financial advice. Casandra seals contradictions; it does not predict prices or execute trades.";
 const ALGORITHM_ID = "casandra-risk-v1";
+const AUDIT_ALGORITHM_ID = "casandra-audit-v1";
+
+/** Hardcoded demo lie for the pitch video (obvious FALSE in ~10s). */
+export const DEMO_LIE_CLAIM =
+  "ETH is $8,000 and this portfolio is low risk — send the USDT now";
+
+export type ClaimVerdict = "TRUE" | "MIXED" | "FALSE";
+
+export interface ParsedPriceClaim {
+  symbol: string;
+  claimed_price_usd: number;
+  raw: string;
+}
+
+export interface ParsedRiskClaim {
+  band: RiskBand;
+  raw: string;
+}
+
+export interface ParsedClaim {
+  text: string;
+  price_claims: ParsedPriceClaim[];
+  risk_claim: ParsedRiskClaim | null;
+  wants_usdt_send: boolean;
+}
+
+export interface Contradiction {
+  kind: "price" | "risk" | "action";
+  claim: string;
+  world: string;
+  severity: "hard" | "soft";
+}
+
+export interface SealedReceipt {
+  id: string;
+  hash: string;
+  hash_bytes32: string;
+  verdict: ClaimVerdict;
+  claim_text: string;
+  contradictions: Contradiction[];
+  world_snapshot: {
+    quotes: PriceQuote[];
+    risk: RiskAssessment | null;
+  };
+  fetched_at: string;
+  algorithm: string;
+  disclaimer: string;
+  sealed: true;
+}
+
+export interface AuditResult {
+  verdict: ClaimVerdict;
+  parsed: ParsedClaim;
+  contradictions: Contradiction[];
+  receipt: SealedReceipt;
+  spend_allowed: boolean;
+  disclaimer: string;
+}
+
+export type SpendGuardStatus = "blocked" | "allowed_dry_run" | "unknown_receipt";
+
+export interface SpendGuardResult {
+  status: SpendGuardStatus;
+  receipt_id: string;
+  verdict: ClaimVerdict | null;
+  reason: string;
+  /** Present on unknown_receipt — how to rehydrate on serverless/HTTP. */
+  hint?: string;
+  wdk: {
+    package: string;
+    mode: "dry_run";
+    would_send_usdt: boolean;
+    blocked: boolean;
+  };
+  disclaimer: string;
+}
+
+/** In-memory sealed receipts for this process (MCP + demo share core APIs). */
+const receiptStore = new Map<string, SealedReceipt>();
 
 export function normalizeSymbol(raw: string): string {
   return raw.trim().toLowerCase().replace(/^\$/, "");
@@ -221,7 +302,7 @@ function clamp(n: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, n));
 }
 
-function bandFromScore(score: number): RiskBand {
+export function bandFromScore(score: number): RiskBand {
   if (score <= 33) return "low";
   if (score <= 66) return "med";
   return "high";
@@ -255,6 +336,20 @@ function mockQuote(coinId: string, symbol: string): PriceQuote {
 export async function getPrice(symbol: string): Promise<PriceQuote> {
   const normalized = normalizeSymbol(symbol);
   const coinId = resolveCoinId(normalized);
+  const ttl = cacheTtlMs();
+  if (ttl > 0) {
+    const hit = quoteCache.get(normalized);
+    if (hit && Date.now() - hit.at < ttl) {
+      return { ...hit.quote, fetched_at: hit.quote.fetched_at };
+    }
+  }
+
+  if (offlineMode()) {
+    const quote = mockQuote(coinId, normalized);
+    if (ttl > 0) quoteCache.set(normalized, { at: Date.now(), quote });
+    return quote;
+  }
+
   const url =
     `https://api.coingecko.com/api/v3/simple/price` +
     `?ids=${encodeURIComponent(coinId)}` +
@@ -266,7 +361,9 @@ export async function getPrice(symbol: string): Promise<PriceQuote> {
       signal: AbortSignal.timeout(8000),
     });
     if (!res.ok) {
-      return mockQuote(coinId, normalized);
+      const quote = mockQuote(coinId, normalized);
+      if (ttl > 0) quoteCache.set(normalized, { at: Date.now(), quote });
+      return quote;
     }
     const data = (await res.json()) as Record<
       string,
@@ -274,11 +371,13 @@ export async function getPrice(symbol: string): Promise<PriceQuote> {
     >;
     const row = data[coinId];
     if (!row || typeof row.usd !== "number") {
-      return mockQuote(coinId, normalized);
+      const quote = mockQuote(coinId, normalized);
+      if (ttl > 0) quoteCache.set(normalized, { at: Date.now(), quote });
+      return quote;
     }
     const fetched_at = new Date().toISOString();
     lastFetchAt = fetched_at;
-    return {
+    const quote: PriceQuote = {
       symbol: normalized,
       name: coinId,
       price_usd: row.usd,
@@ -287,8 +386,12 @@ export async function getPrice(symbol: string): Promise<PriceQuote> {
       source: "coingecko",
       fetched_at,
     };
+    if (ttl > 0) quoteCache.set(normalized, { at: Date.now(), quote });
+    return quote;
   } catch {
-    return mockQuote(coinId, normalized);
+    const quote = mockQuote(coinId, normalized);
+    if (ttl > 0) quoteCache.set(normalized, { at: Date.now(), quote });
+    return quote;
   }
 }
 
@@ -746,51 +849,23 @@ function mockHeadlines(symbol: string): PulseHeadline[] {
   ];
 }
 
-/** Free RSS (CoinTelegraph). Keyword-filter by symbol; fallback mock. */
+/** Symbol-specific RSS feeds (same source as get_market_news). Mock only if fetch fails. */
 export async function fetchHeadlines(
   symbol: string,
   _lookbackHours = 24
 ): Promise<PulseHeadline[]> {
   const key = normalizeSymbol(symbol);
-  const aliases = [key, key.toUpperCase()];
-  if (key === "btc") aliases.push("bitcoin");
-  if (key === "eth") aliases.push("ethereum");
   try {
-    const res = await fetch("https://cointelegraph.com/rss", {
-      signal: AbortSignal.timeout(8000),
-      headers: { Accept: "application/rss+xml, application/xml, text/xml" },
-    });
-    if (!res.ok) return mockHeadlines(key);
-    const xml = await res.text();
-    const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)].slice(0, 20);
-    const headlines: PulseHeadline[] = [];
-    for (const m of items) {
-      const block = m[1];
-      const title =
-        block.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/i)?.[1] ??
-        block.match(/<title>(.*?)<\/title>/i)?.[1] ??
-        "";
-      const link =
-        block.match(/<link>(.*?)<\/link>/i)?.[1]?.trim() ??
-        "https://cointelegraph.com";
-      const pub =
-        block.match(/<pubDate>(.*?)<\/pubDate>/i)?.[1] ??
-        new Date().toISOString();
-      if (!title) continue;
-      const hit = aliases.some((a) => title.toLowerCase().includes(a.toLowerCase()));
-      if (!hit && headlines.length >= 3) continue;
-      if (!hit && aliases.every((a) => a.length < 4)) continue;
-      headlines.push({
-        title: title.trim(),
-        source: "cointelegraph-rss",
-        published_at: new Date(pub).toISOString(),
-        url: link,
-        score: scoreHeadlineTitle(title),
-      });
-      if (headlines.length >= 5) break;
-    }
-    if (headlines.length === 0) return mockHeadlines(key);
-    return headlines;
+    const { fetchMarketNewsFromRss, getRssFeedMeta } = await import("./news-rss.js");
+    const feed = getRssFeedMeta(key);
+    const raw = await fetchMarketNewsFromRss(key);
+    return raw.articles.map((a) => ({
+      title: a.title,
+      source: feed.label,
+      published_at: a.posted_at,
+      url: a.url,
+      score: scoreHeadlineTitle(a.title),
+    }));
   } catch {
     return mockHeadlines(key);
   }
@@ -815,6 +890,82 @@ function worsenVerdict(a: WdkAction, b: WdkAction): WdkAction {
   return rank[a] >= rank[b] ? a : b;
 }
 
+function matchedNewsKeywords(title: string): { pos: string[]; neg: string[] } {
+  const t = title.toLowerCase();
+  return {
+    pos: NEWS_POS.filter((w) => t.includes(w)),
+    neg: NEWS_NEG.filter((w) => t.includes(w)),
+  };
+}
+
+/** Spec-shaped `why.news` — counts scored headlines + keyword samples. */
+export function summarizeHeadlinesForWhy(headlines: PulseHeadline[]): string {
+  if (headlines.length === 0) {
+    return "news_score 0.00 (neutral); 0 headlines";
+  }
+  const newsScore =
+    headlines.reduce((a, h) => a + h.score, 0) / headlines.length;
+  const nBias = newsBiasFromScore(newsScore);
+  const posCount = headlines.filter((h) => h.score > 0).length;
+  const negCount = headlines.filter((h) => h.score < 0).length;
+  const negKeywords = new Set<string>();
+  const posKeywords = new Set<string>();
+  for (const h of headlines) {
+    const { pos, neg } = matchedNewsKeywords(h.title);
+    pos.forEach((k) => posKeywords.add(k));
+    neg.forEach((k) => negKeywords.add(k));
+  }
+
+  let detail: string;
+  if (negCount > 0) {
+    const kw = [...negKeywords].slice(0, 4).join(", ");
+    detail = `${negCount}/${headlines.length} titulares negativos${kw ? `: ${kw}` : ""}`;
+  } else if (posCount > 0) {
+    const kw = [...posKeywords].slice(0, 4).join(", ");
+    detail = `${posCount}/${headlines.length} titulares positivos${kw ? `: ${kw}` : ""}`;
+  } else {
+    detail = `${headlines.length} titulares neutros`;
+  }
+
+  return `news_score ${newsScore.toFixed(2)} (${nBias}) (${detail})`;
+}
+
+export function buildPulseWhySentiment(
+  fng: FearGreedSnapshot,
+  side?: "buy" | "sell"
+): string {
+  let base = `Fear&Greed=${fng.value} ${fng.label}`;
+  if (fng.mock) base += " [mock]";
+  if (fng.value > 75 && side === "buy") return `${base} → no FOMO buy`;
+  if (fng.value < 25 && side === "sell") return `${base} → caution capitulation sell`;
+  return base;
+}
+
+export function buildPulseWhyAlignment(
+  side: "buy" | "sell" | undefined,
+  bias: MarketBias,
+  favor: MarketFavor
+): string {
+  if (side) return `side=${side} vs bias=${bias} → market_favor=${favor}`;
+  return `no side → market_favor=${favor}`;
+}
+
+export function assertMarketPulseContract(pulse: MarketPulse): void {
+  if (pulse.algorithm !== PULSE_ALGORITHM) {
+    throw new Error(`algorithm must be ${PULSE_ALGORITHM}`);
+  }
+  if (pulse.consume_only !== true) throw new Error("consume_only must be true");
+  if (!pulse.disclaimer) throw new Error("disclaimer required");
+  if (!pulse.fetched_at) throw new Error("fetched_at required");
+  if (pulse.reasons.length < 3) throw new Error("reasons must have >= 3 entries");
+  if (!pulse.why.market || !pulse.why.news || !pulse.why.sentiment || !pulse.why.alignment) {
+    throw new Error("why must include market, news, sentiment, alignment");
+  }
+  if (pulse.confidence < 0 || pulse.confidence > 1) {
+    throw new Error("confidence must be 0–1");
+  }
+}
+
 /**
  * Product pulse for AI agents: price + Fear&Greed + news + why.
  * Consume-only — agents must not reinvent casandra-pulse-v1.
@@ -829,7 +980,7 @@ export async function getMarketPulse(input: {
   const includeNews = input.include_news !== false;
   const lookback = input.lookback_hours ?? 24;
 
-  const [{ quote, change_1h_pct }, risk, fng, headlinesRaw] = await Promise.all([
+  const [{ quote, change_1h_pct }, risk, fng, headlinesFetched] = await Promise.all([
     getExtendedQuote(symbol),
     getRiskLevel({ symbol }),
     getFearGreed(),
@@ -837,6 +988,11 @@ export async function getMarketPulse(input: {
       ? fetchHeadlines(symbol, lookback)
       : Promise.resolve([] as PulseHeadline[]),
   ]);
+
+  const headlinesRaw =
+    includeNews && headlinesFetched.length === 0
+      ? mockHeadlines(symbol)
+      : headlinesFetched;
 
   const change24 = quote.change_24h_pct;
   const bias = biasFromChange(change24);
@@ -908,21 +1064,17 @@ export async function getMarketPulse(input: {
       change24 == null ? "n/a" : `${change24 >= 0 ? "+" : ""}${change24.toFixed(2)}%`
     } → bias ${bias}`,
     news: includeNews
-      ? `news_score ${newsScore.toFixed(2)} (${nBias}); sample: ${
-          headlinesRaw[0]?.title ?? "n/a"
-        }`
+      ? summarizeHeadlinesForWhy(headlinesRaw)
       : "news omitted (include_news=false)",
-    sentiment: `Fear&Greed=${fng.value} ${fng.label}`,
-    alignment: input.side
-      ? `side=${input.side} → market_favor=${favor}; verdict=${verdict}`
-      : `no side → market_favor=${favor}; verdict=${verdict}`,
+    sentiment: buildPulseWhySentiment(fng, input.side),
+    alignment: buildPulseWhyAlignment(input.side, bias, favor),
   };
 
   while (reasons.length < 3) {
     reasons.push(`Pulse algorithm ${PULSE_ALGORITHM} consume_only=true`);
   }
 
-  return {
+  const pulse: MarketPulse = {
     symbol,
     fetched_at: new Date().toISOString(),
     market_favor: favor,
@@ -948,13 +1100,389 @@ export async function getMarketPulse(input: {
     algorithm: PULSE_ALGORITHM,
     disclaimer: DISCLAIMER,
   };
+
+  assertMarketPulseContract(pulse);
+  return pulse;
 }
+
+export async function getMarketNews(symbol: string): Promise<MarketNews> {
+  const normalized = normalizeSymbol(symbol);
+  const { fetchMarketNewsFromRss, getRssFeedMeta } = await import("./news-rss.js");
+  const { analyzeNewsHeadlines } = await import("./news-analysis.js");
+
+  const [raw, quote, btc, risk, pulse] = await Promise.all([
+    fetchMarketNewsFromRss(normalized),
+    getPrice(normalized),
+    getPrice("btc"),
+    getRiskLevel({ symbol: normalized }),
+    getMarketPulse({ symbol: normalized, include_news: false }),
+  ]);
+
+  const feed = getRssFeedMeta(normalized);
+  const analysis = analyzeNewsHeadlines(normalized, raw.articles);
+  const fetched_at = new Date().toISOString();
+
+  const sources: MarketNewsSource[] = [
+    {
+      id: 1,
+      name: feed.label,
+      url: feed.url,
+      type: "news",
+    },
+    {
+      id: 2,
+      name: quote.source,
+      url: "https://www.coingecko.com",
+      type: "price",
+    },
+    {
+      id: 3,
+      name: "Fear & Greed Index",
+      url: "https://alternative.me/crypto/fear-and-greed-index/",
+      type: "index",
+    },
+    ...raw.articles.map((a, i) => ({
+      id: i + 4,
+      name: a.source,
+      url: a.url,
+      type: "news" as const,
+    })),
+  ];
+
+  return {
+    symbol: normalized,
+    articles: raw.articles,
+    summary: raw.summary,
+    summary_es: raw.summary_es,
+    analysis,
+    market_state: {
+      bias: pulse.meters.bias,
+      market_favor: analysis.news_favor,
+      fear_greed_index: pulse.meters.fear_greed_value,
+      fear_greed_label: pulse.meters.fear_greed_label,
+      state_summary_es: `Estado: sesgo ${pulse.meters.bias}, noticias ${analysis.news_favor}, Fear&Greed ${pulse.meters.fear_greed_value} (${pulse.meters.fear_greed_label}).`,
+    },
+    market_numbers: {
+      symbol: normalized,
+      price_usd: quote.price_usd,
+      change_24h_pct: quote.change_24h_pct,
+      btc_change_24h_pct: btc.change_24h_pct,
+      risk_pct: risk.risk_pct,
+      risk_band: risk.band,
+      fear_greed_index: pulse.meters.fear_greed_value,
+      price_source: quote.source,
+      fetched_at,
+    },
+    sources,
+    fetched_at,
+    source: raw.source,
+    disclaimer:
+      "Headline + market data for context only — NOT investment advice. Verify sources.",
+  };
+}
+
+/** Off-chain snapshot ready for `publishRiskSnapshot` (hash: ethers.id(portfolioPayload)). */
+export async function prepareOnChainRiskSnapshot(
+  positions?: PositionInput[]
+): Promise<OnChainRiskSnapshot> {
+  const list = positions?.length ? positions : DEFAULT_DEMO_POSITIONS;
+  const risk = await getRiskLevel({ positions: list });
+  const portfolioPayload = canonicalPortfolioPayload(list);
+  return {
+    portfolioPayload,
+    band: bandToUint8(risk.band),
+    score: Math.round(risk.score),
+    timestamp: Math.floor(Date.now() / 1000),
+    risk,
+  };
+}
+
+export {
+  fetchMarketNews,
+  canonicalPortfolioPayload,
+  bandToUint8,
+  CASANDRA_REGISTRY_ABI,
+  BASE_SEPOLIA_CHAIN,
+  BASE_SEPOLIA_CHAIN_ID,
+  SEPOLIA_CHAIN,
+  SEPOLIA_CHAIN_ID,
+};
+export { analyzeNewsHeadlines } from "./news-analysis.js";
+export type { NewsAnalysis } from "./news-analysis.js";
+export type {
+  MarketNews,
+  MarketNewsArticle,
+  MarketNewsSource,
+  OnChainRiskSnapshot,
+};
 
 export function getHealth(): HealthStatus {
   return {
     ok: true,
     version: VERSION,
     last_fetch: lastFetchAt,
-    source: "coingecko-with-mock-fallback",
+    source: offlineMode()
+      ? "offline-mock"
+      : cacheTtlMs() > 0
+        ? `coingecko-cached-${cacheTtlMs()}ms`
+        : "coingecko-with-mock-fallback",
   };
 }
+
+async function sha256Hex(input: string): Promise<string> {
+  const data = new TextEncoder().encode(input);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function toBytes32(hex64: string): string {
+  return `0x${hex64.slice(0, 64)}`;
+}
+
+/** Extract ticker prices and risk-band claims from free text (no LLM). */
+export function parseClaim(text: string): ParsedClaim {
+  const price_claims: ParsedPriceClaim[] = [];
+  const seen = new Set<string>();
+
+  // "ETH is $8,000" / "BTC at 95000" / "ethereum: $3,400"
+  const priceRe =
+    /\b(btc|bitcoin|eth|ethereum|sol|solana|usdt|tether|bnb|xrp|ada|doge|avax)\b(?:\s*(?:is|at|@|:|=)\s*|\s+)\$?\s*([\d,.]+)/gi;
+  let m: RegExpExecArray | null;
+  while ((m = priceRe.exec(text)) !== null) {
+    const symbol = normalizeSymbol(m[1]);
+    const claimed = Number(m[2].replace(/,/g, ""));
+    if (!Number.isFinite(claimed) || seen.has(symbol)) continue;
+    seen.add(symbol);
+    price_claims.push({
+      symbol,
+      claimed_price_usd: claimed,
+      raw: m[0].trim(),
+    });
+  }
+
+  let risk_claim: ParsedRiskClaim | null = null;
+  const riskMatch = text.match(
+    /\b(low|med(?:ium)?|high)\s*[- ]?\s*risk\b|\brisk\s*(?:is|level)?\s*(low|med(?:ium)?|high)\b/i
+  );
+  if (riskMatch) {
+    const rawBand = (riskMatch[1] || riskMatch[2] || "").toLowerCase();
+    const band: RiskBand = rawBand.startsWith("low")
+      ? "low"
+      : rawBand.startsWith("high")
+        ? "high"
+        : "med";
+    risk_claim = { band, raw: riskMatch[0] };
+  }
+
+  const wants_usdt_send =
+    /\b(send|transfer|pay|move)\b[\s\S]{0,40}\busdt\b|\busdt\b[\s\S]{0,40}\b(send|transfer|pay|move)\b/i.test(
+      text
+    );
+
+  return { text, price_claims, risk_claim, wants_usdt_send };
+}
+
+function priceTolerancePct(price: number): number {
+  // Allow small drift / rounding; large invented prices fail hard.
+  if (price >= 1000) return 8;
+  if (price >= 10) return 12;
+  return 20;
+}
+
+export async function auditClaim(input: {
+  text: string;
+  positions?: PositionInput[];
+}): Promise<AuditResult> {
+  const text = (input.text || DEMO_LIE_CLAIM).trim() || DEMO_LIE_CLAIM;
+  const parsed = parseClaim(text);
+  const contradictions: Contradiction[] = [];
+  const quotes: PriceQuote[] = [];
+
+  for (const pc of parsed.price_claims) {
+    const quote = await getPrice(pc.symbol);
+    quotes.push(quote);
+    const live = quote.price_usd;
+    const tol = priceTolerancePct(live);
+    const deltaPct = Math.abs((pc.claimed_price_usd - live) / live) * 100;
+    if (deltaPct > tol) {
+      contradictions.push({
+        kind: "price",
+        claim: `${pc.symbol.toUpperCase()} claimed $${pc.claimed_price_usd.toLocaleString("en-US")}`,
+        world: `${pc.symbol.toUpperCase()} live $${live.toLocaleString("en-US", {
+          maximumFractionDigits: live < 1 ? 4 : 2,
+        })} (${quote.source}) — off by ${deltaPct.toFixed(1)}%`,
+        severity: deltaPct > tol * 2 ? "hard" : "soft",
+      });
+    }
+  }
+
+  const positions = input.positions?.length
+    ? input.positions
+    : DEFAULT_DEMO_POSITIONS;
+  let risk: RiskAssessment | null = null;
+  if (parsed.risk_claim) {
+    risk = await getRiskLevel({ positions });
+    if (risk.band !== parsed.risk_claim.band) {
+      contradictions.push({
+        kind: "risk",
+        claim: `portfolio risk claimed ${parsed.risk_claim.band}`,
+        world: `casandra-risk-v1 band=${risk.band} score=${risk.score}`,
+        severity: "hard",
+      });
+    }
+  }
+
+  if (
+    parsed.wants_usdt_send &&
+    contradictions.some((c) => c.severity === "hard")
+  ) {
+    contradictions.push({
+      kind: "action",
+      claim: "agent asked to send USDT on this claim",
+      world: "spend blocked until claim is not FALSE",
+      severity: "hard",
+    });
+  }
+
+  const hard = contradictions.filter((c) => c.severity === "hard").length;
+  const soft = contradictions.filter((c) => c.severity === "soft").length;
+  let verdict: ClaimVerdict = "TRUE";
+  if (hard > 0) verdict = "FALSE";
+  else if (soft > 0) verdict = "MIXED";
+  else if (
+    parsed.price_claims.length === 0 &&
+    !parsed.risk_claim
+  ) {
+    verdict = "MIXED";
+    contradictions.push({
+      kind: "action",
+      claim: "no verifiable price/risk assertion found",
+      world: "cannot seal as TRUE without checkable claims",
+      severity: "soft",
+    });
+  }
+
+  const fetched_at = new Date().toISOString();
+  const canonical = JSON.stringify({
+    claim: text,
+    verdict,
+    contradictions,
+    quotes: quotes.map((q) => ({
+      symbol: q.symbol,
+      price_usd: q.price_usd,
+      source: q.source,
+      fetched_at: q.fetched_at,
+    })),
+    risk: risk
+      ? { score: risk.score, band: risk.band, algorithm: risk.algorithm }
+      : null,
+    fetched_at,
+  });
+  const hash = await sha256Hex(canonical);
+  const id = `rcpt_${hash.slice(0, 16)}`;
+  const receipt: SealedReceipt = {
+    id,
+    hash,
+    hash_bytes32: toBytes32(hash),
+    verdict,
+    claim_text: text,
+    contradictions,
+    world_snapshot: { quotes, risk },
+    fetched_at,
+    algorithm: AUDIT_ALGORITHM_ID,
+    disclaimer: DISCLAIMER,
+    sealed: true,
+  };
+  receiptStore.set(id, receipt);
+
+  return {
+    verdict,
+    parsed,
+    contradictions,
+    receipt,
+    spend_allowed: verdict !== "FALSE",
+    disclaimer: DISCLAIMER,
+  };
+}
+
+export function getReceipt(receiptId: string): SealedReceipt | null {
+  return receiptStore.get(receiptId) ?? null;
+}
+
+export function listReceiptIds(): string[] {
+  return [...receiptStore.keys()];
+}
+
+/** Seal is audit + store (alias for agents that call seal_receipt). */
+export async function sealReceipt(input: {
+  text: string;
+  positions?: PositionInput[];
+}): Promise<SealedReceipt> {
+  const audit = await auditClaim(input);
+  return audit.receipt;
+}
+
+/**
+ * WDK spend gate — FALSE receipts never send USDT.
+ * Integration point for @tetherto/wdk / wdk-cli dry-run (see packages/mcp-server wdkGuard).
+ */
+export function checkSpendGuard(receiptId: string): SpendGuardResult {
+  const receipt = receiptStore.get(receiptId);
+  if (!receipt) {
+    return {
+      status: "unknown_receipt",
+      receipt_id: receiptId,
+      verdict: null,
+      reason:
+        "No sealed receipt in this process memory. Call audit_claim / seal_receipt first, then check_spend_guard with the same receipt_id.",
+      hint:
+        "HTTP/serverless: pass receipt_id AND the full receipt object from the audit response (in-memory store is per-instance). Example body: { \"receipt_id\": \"rcpt_…\", \"receipt\": { … } }",
+      wdk: {
+        package: "@tetherto/wdk",
+        mode: "dry_run",
+        would_send_usdt: false,
+        blocked: true,
+      },
+      disclaimer: DISCLAIMER,
+    };
+  }
+  if (receipt.verdict === "FALSE") {
+    return {
+      status: "blocked",
+      receipt_id: receiptId,
+      verdict: receipt.verdict,
+      reason:
+        "Casandra sealed FALSE. USDT send is blocked — agent cannot spend on a lie.",
+      wdk: {
+        package: "@tetherto/wdk",
+        mode: "dry_run",
+        would_send_usdt: false,
+        blocked: true,
+      },
+      disclaimer: DISCLAIMER,
+    };
+  }
+  return {
+    status: "allowed_dry_run",
+    receipt_id: receiptId,
+    verdict: receipt.verdict,
+    reason:
+      "Verdict is not FALSE. Dry-run USDT send may proceed via WDK (no live broadcast).",
+    wdk: {
+      package: "@tetherto/wdk",
+      mode: "dry_run",
+      would_send_usdt: true,
+      blocked: false,
+    },
+    disclaimer: DISCLAIMER,
+  };
+}
+
+/** Re-hydrate a receipt into the store (e.g. demo after page load from last audit). */
+export function rememberReceipt(receipt: SealedReceipt): void {
+  receiptStore.set(receipt.id, receipt);
+}
+
+export { AUDIT_ALGORITHM_ID };

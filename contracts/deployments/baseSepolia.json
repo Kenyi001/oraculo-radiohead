@@ -2,7 +2,9 @@
   "address": null,
   "chainId": 84532,
   "network": "baseSepolia",
-  "status": "optional",
-  "note": "Official demo uses Ethereum Sepolia (see sepolia.json). Base Sepolia kept for a future faucet-funded deploy.",
-  "instructions": "Optional: fund wallet, set BASE_SEPOLIA_RPC, then npm run contracts:deploy:base"
+  "explorer": null,
+  "status": "pending_faucet",
+  "deployWallet": "0x4f30B06F8884F8632532A8fdDAd5C8CEc34f71f4",
+  "note": "Wallet has 0 ETH on Base Sepolia. Alchemy faucet requires 0.001 ETH mainnet. Live registry deployed on Ethereum Sepolia — see sepolia.json. After faucet: npm run contracts:deploy:base",
+  "instructions": "Fund 0x4f30B06F8884F8632532A8fdDAd5C8CEc34f71f4 on Base Sepolia, then: npm run contracts:deploy:base"
 }

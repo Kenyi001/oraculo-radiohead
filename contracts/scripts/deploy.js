@@ -13,18 +13,16 @@ async function main() {
   console.log(`CasandraRegistry deployed: ${address}`);
   console.log(`chainId: ${chainId}`);
 
-  const explorer =
-    chainId === 11155111
-      ? `https://sepolia.etherscan.io/address/${address}`
-      : chainId === 84532
-        ? `https://sepolia.basescan.org/address/${address}`
-        : null;
-
   const out = {
     address,
     chainId,
     network: hre.network.name,
-    explorer,
+    explorer:
+      chainId === 84532
+        ? `https://sepolia.basescan.org/address/${address}`
+        : chainId === 11155111
+          ? `https://sepolia.etherscan.io/address/${address}`
+          : null,
     deployedAt: new Date().toISOString(),
   };
 
@@ -32,7 +30,6 @@ async function main() {
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   fs.writeFileSync(outPath, JSON.stringify(out, null, 2) + "\n");
   console.log(`Wrote ${outPath}`);
-  if (explorer) console.log(`Explorer: ${explorer}`);
 
   // Demo publish so judges see a non-empty registry
   const hash = hre.ethers.id("casandra-demo-portfolio-v1");
