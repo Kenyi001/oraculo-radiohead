@@ -47,7 +47,7 @@
 - [ ] 8. README del repo → línea `**Video:**` (reemplazá el placeholder)
 - [ ] 9. Hacki → campo **Enlace de demostración\*** = URL YouTube Unlisted  
   *(mientras no haya video: dejá `https://casandra-two.vercel.app/` — la live también va en Detalles)*
-- [ ] 10. **Avisá a Dax** (chat/Telegram) con la misma URL → setea `VITE_DEMO_VIDEO_URL` + redeploy en **&lt;15 min** para que el iframe aparezca en `#pitch-video`
+- [x] 10. **Embed live:** `VITE_DEMO_VIDEO_URL=https://youtu.be/qXajugSdLak` → `#pitch-video` on https://casandra-two.vercel.app *(Dax redeployed)*
 
 ### D) Hacki BUIDL (~10–15 min) — OBLIGATORIO actualizar copy
 
