@@ -14,7 +14,7 @@ Repo codename: `oraculo-radiohead` · GitHub: https://github.com/Kenyi001/oracul
 |---|---|---|
 | MCP + `market-core` + risk + submit | **Dax** (Kenyi001) | Tools, formula, data, Hacki |
 | Market Pulse (favor de mercado + medidores agentes) | **David** (arnez69) | Investigación + aplicación pulse (#17) |
-| Contrato + Web3 deploy | **Vctor11180** | CasandraRegistry Base Sepolia (#10) |
+| Contrato + Web3 deploy | **Vctor11180** | CasandraRegistry Ethereum Sepolia (#10) |
 | Demo web + UI polish + video support | **Partner** / equipo | Casandra UI, Vercel, recording help |
 
 ## Direction

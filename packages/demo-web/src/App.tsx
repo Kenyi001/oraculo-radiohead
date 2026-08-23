@@ -2,11 +2,11 @@ import { FormEvent, useEffect, useState } from "react";
 import {
   DEFAULT_DEMO_POSITIONS,
   getHealth,
-  getMarketContext,
+  getMarketPulse,
   getPortfolioState,
   getRiskLevel,
   type HealthStatus,
-  type MarketContext,
+  type MarketPulse,
   type PortfolioState,
   type RiskAssessment,
 } from "@oraculo/market-core";
@@ -14,22 +14,24 @@ import {
 export function App() {
   const [portfolio, setPortfolio] = useState<PortfolioState | null>(null);
   const [risk, setRisk] = useState<RiskAssessment | null>(null);
-  const [contextSymbol, setContextSymbol] = useState("btc");
-  const [context, setContext] = useState<MarketContext | null>(null);
-  const [health, setHealth] = useState<HealthStatus | null>(null);
+  const [pulse, setPulse] = useState<MarketPulse | null>(null);
+  const [pulseSymbol, setPulseSymbol] = useState("eth");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [health, setHealth] = useState<HealthStatus | null>(null);
 
   async function loadDemo() {
     setLoading(true);
     setError(null);
     try {
-      const [p, r] = await Promise.all([
+      const [p, r, pul] = await Promise.all([
         getPortfolioState(DEFAULT_DEMO_POSITIONS),
         getRiskLevel({ positions: DEFAULT_DEMO_POSITIONS }),
+        getMarketPulse({ symbol: pulseSymbol, side: "buy", include_news: true }),
       ]);
       setPortfolio(p);
       setRisk(r);
+      setPulse(pul);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -39,14 +41,21 @@ export function App() {
 
   useEffect(() => {
     void loadDemo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- initial load only
   }, []);
 
-  async function onContext(e: FormEvent) {
+  async function onPulse(e: FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
     try {
-      setContext(await getMarketContext(contextSymbol));
+      setPulse(
+        await getMarketPulse({
+          symbol: pulseSymbol,
+          side: "buy",
+          include_news: true,
+        })
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -55,6 +64,7 @@ export function App() {
   }
 
   const gaugePct = risk ? Math.min(100, Math.max(0, risk.score)) : 0;
+  const hint = pulse?.verdict ?? risk?.action;
 
   return (
     <main className="page">
@@ -62,17 +72,126 @@ export function App() {
         <p className="eyebrow">Aleph 2026 · Santa Cruz · General + WDK sponsor</p>
         <h1>Casandra</h1>
         <p className="tagline">
-          Investment oracle for AI agents — risk verdict gates Tether WDK
-          wallet sends. Not hallucinations. Not financial advice.
+          One call → Evidence Pack (price, risk, news, why). The agent decides —
+          we don&apos;t invent numbers or move money for you. Not predictions. Not
+          financial advice.
         </p>
       </header>
 
-      <section className="card hero-risk">
+      <section className="card hero-pulse">
         <div className="hero-top">
-          <h2>Risk level</h2>
+          <h2>Market Pulse — Evidence Pack</h2>
           <button type="button" onClick={() => void loadDemo()} disabled={loading}>
-            Refresh demo
+            Refresh
           </button>
+        </div>
+        <form onSubmit={onPulse} className="row">
+          <input
+            value={pulseSymbol}
+            onChange={(e) => setPulseSymbol(e.target.value)}
+            placeholder="eth"
+            aria-label="symbol"
+          />
+          <button type="submit" disabled={loading}>
+            Pulse
+          </button>
+        </form>
+
+        {pulse && (
+          <>
+            <p className={`decision-hint action-${pulse.verdict}`}>
+              Agent decision hint: <strong>{pulse.verdict}</strong>
+              {" · "}
+              favor <strong>{pulse.market_favor}</strong>
+              {" · "}
+              confidence {(pulse.confidence * 100).toFixed(0)}%
+            </p>
+            <p className="muted tip">
+              Hint is context for the agent — not a trade order and not a send
+              command. WDK execution is optional after the agent decides.
+            </p>
+
+            <h3 className="subhead">Why</h3>
+            <dl className="why-grid">
+              <div>
+                <dt>Market</dt>
+                <dd>{pulse.why.market}</dd>
+              </div>
+              <div>
+                <dt>News</dt>
+                <dd>{pulse.why.news}</dd>
+              </div>
+              <div>
+                <dt>Sentiment</dt>
+                <dd>{pulse.why.sentiment}</dd>
+              </div>
+              <div>
+                <dt>Alignment</dt>
+                <dd>{pulse.why.alignment}</dd>
+              </div>
+            </dl>
+
+            <h3 className="subhead">Reasons</h3>
+            <ul className="reasons">
+              {pulse.reasons.map((r) => (
+                <li key={r}>{r}</li>
+              ))}
+            </ul>
+
+            <h3 className="subhead">Meters</h3>
+            <ul className="meters">
+              <li>
+                Price ${pulse.meters.price_usd.toLocaleString("en-US", {
+                  maximumFractionDigits: 2,
+                })}{" "}
+                · 24h{" "}
+                {pulse.meters.change_24h_pct == null
+                  ? "n/a"
+                  : `${pulse.meters.change_24h_pct >= 0 ? "+" : ""}${pulse.meters.change_24h_pct.toFixed(2)}%`}
+              </li>
+              <li>
+                Fear&amp;Greed {pulse.meters.fear_greed_value} (
+                {pulse.meters.fear_greed_label})
+              </li>
+              <li>
+                News score {pulse.meters.news_score.toFixed(2)} · bias{" "}
+                {pulse.meters.news_bias}
+              </li>
+            </ul>
+
+            {pulse.headlines.length > 0 && (
+              <>
+                <h3 className="subhead">Headlines</h3>
+                <ul className="headlines">
+                  {pulse.headlines.slice(0, 5).map((h) => (
+                    <li key={h.url || h.title}>
+                      {h.url ? (
+                        <a href={h.url} target="_blank" rel="noreferrer">
+                          {h.title}
+                        </a>
+                      ) : (
+                        h.title
+                      )}
+                      {h.source ? (
+                        <span className="muted"> · {h.source}</span>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+
+            <p className="muted">
+              <code>{pulse.algorithm}</code> · consume_only=
+              {String(pulse.consume_only)} · {pulse.fetched_at}
+            </p>
+          </>
+        )}
+      </section>
+
+      <section className="card">
+        <div className="hero-top">
+          <h2>Risk level (supporting)</h2>
         </div>
         {risk && (
           <>
@@ -85,17 +204,12 @@ export function App() {
               <span className="gauge-score">{risk.score}</span>
               <span className="gauge-band">{risk.band}</span>
             </div>
-            <p className="verdict" style={{ marginTop: "1rem", fontWeight: 600, fontSize: "1.05rem" }}>
-              {risk.verdict_es}
-            </p>
-            <p className={`wdk-action action-${risk.action}`}>
-              WDK guardrail: <strong>{risk.action}</strong>
-              {risk.action === "avoid"
-                ? " — block send_token"
-                : risk.action === "caution"
-                  ? " — dryRun only / smaller size"
-                  : " — send allowed after confirm"}
-            </p>
+            <p className="verdict">{risk.verdict_es}</p>
+            {hint && (
+              <p className={`decision-hint action-${hint}`}>
+                Context signal: <strong>{hint}</strong>
+              </p>
+            )}
             <p className="muted">
               Algorithm <code>{risk.algorithm}</code> · scope {risk.scope}
             </p>
@@ -162,33 +276,6 @@ export function App() {
       </section>
 
       <section className="card">
-        <h2>Market context</h2>
-        <form onSubmit={onContext} className="row">
-          <input
-            value={contextSymbol}
-            onChange={(e) => setContextSymbol(e.target.value)}
-            placeholder="btc"
-            aria-label="symbol"
-          />
-          <button type="submit" disabled={loading}>
-            Analyze
-          </button>
-        </form>
-        {context && (
-          <>
-            <p className={`bias bias-${context.bias}`}>
-              Bias: <strong>{context.bias}</strong>
-            </p>
-            <ul>
-              {context.bullets.map((b) => (
-                <li key={b}>{b}</li>
-              ))}
-            </ul>
-          </>
-        )}
-      </section>
-
-      <section className="card">
         <h2>health</h2>
         <button type="button" onClick={() => setHealth(getHealth())}>
           Check
@@ -200,16 +287,16 @@ export function App() {
 
       <footer>
         <p>
-          Same engine as MCP (<code>packages/mcp-server</code>).{" "}
-          <strong>Not financial advice.</strong>
+          Same evidence engine as MCP <code>get_market_pulse</code>.{" "}
+          <strong>Not financial advice.</strong> The agent decides.
         </p>
         <p className="onchain muted">
-          On-chain registry (Base Sepolia):{" "}
+          On-chain registry (Ethereum Sepolia):{" "}
           {import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS ? (
             <a
               href={
                 import.meta.env.VITE_CASANDRA_REGISTRY_EXPLORER ||
-                `https://sepolia.basescan.org/address/${import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS}`
+                `https://sepolia.etherscan.io/address/${import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS}`
               }
               target="_blank"
               rel="noreferrer"
@@ -218,7 +305,7 @@ export function App() {
             </a>
           ) : (
             <span>
-              pending deploy — see <code>contracts/README.md</code>
+              pending — see <code>contracts/README.md</code>
             </span>
           )}
         </p>

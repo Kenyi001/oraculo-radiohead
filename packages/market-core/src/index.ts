@@ -1,6 +1,6 @@
 export type MarketBias = "bullish" | "bearish" | "sideways";
 export type RiskBand = "low" | "med" | "high";
-/** Structured action for agents + WDK guardrails (Aleph WDK track). */
+/** Structured context hint for agents (also used by optional WDK guardrail). Not a trade order. */
 export type WdkAction = "proceed" | "caution" | "avoid";
 
 export interface PriceQuote {
@@ -439,8 +439,8 @@ export async function getRiskLevel(input: {
     );
     const band = bandFromScore(score);
     const action = actionFromBand(band);
-    const verdict = `Portfolio risk: ${band.toUpperCase()} (${score}/100). ${portfolio.usdt_share_pct.toFixed(1)}% USDT allocation reduces overall volatility. WDK action: ${action}.`;
-    const verdict_es = `Riesgo del portafolio: ${band === "low" ? "BAJO" : band === "med" ? "MEDIO" : "ALTO"} (${score}/100). ${portfolio.usdt_share_pct.toFixed(1)}% asignado a USDT reduce la volatilidad general. Acción WDK: ${action}.`;
+    const verdict = `Portfolio risk: ${band.toUpperCase()} (${score}/100). ${portfolio.usdt_share_pct.toFixed(1)}% USDT allocation reduces overall volatility. Agent decision hint: ${action} (context only — not a trade or send order).`;
+    const verdict_es = `Riesgo del portafolio: ${band === "low" ? "BAJO" : band === "med" ? "MEDIO" : "ALTO"} (${score}/100). ${portfolio.usdt_share_pct.toFixed(1)}% asignado a USDT reduce la volatilidad general. Hint para el agente: ${action} (contexto — no es orden de trade ni de envío).`;
 
     return {
       score,
@@ -467,8 +467,8 @@ export async function getRiskLevel(input: {
   );
   const band = bandFromScore(score);
   const action = actionFromBand(band);
-  const verdict = `${symbol.toUpperCase()} risk level: ${band.toUpperCase()} (${score}/100). 24h change ${quote.change_24h_pct == null ? "n/a" : `${quote.change_24h_pct >= 0 ? "+" : ""}${quote.change_24h_pct.toFixed(2)}%`}. WDK action: ${action}.`;
-  const verdict_es = `Nivel de riesgo de ${symbol.toUpperCase()}: ${band === "low" ? "BAJO" : band === "med" ? "MEDIO" : "ALTO"} (${score}/100). Cambio 24h ${quote.change_24h_pct == null ? "n/a" : `${quote.change_24h_pct >= 0 ? "+" : ""}${quote.change_24h_pct.toFixed(2)}%`}. Acción WDK: ${action}.`;
+  const verdict = `${symbol.toUpperCase()} risk level: ${band.toUpperCase()} (${score}/100). 24h change ${quote.change_24h_pct == null ? "n/a" : `${quote.change_24h_pct >= 0 ? "+" : ""}${quote.change_24h_pct.toFixed(2)}%`}. Agent decision hint: ${action} (context only — not a trade or send order).`;
+  const verdict_es = `Nivel de riesgo de ${symbol.toUpperCase()}: ${band === "low" ? "BAJO" : band === "med" ? "MEDIO" : "ALTO"} (${score}/100). Cambio 24h ${quote.change_24h_pct == null ? "n/a" : `${quote.change_24h_pct >= 0 ? "+" : ""}${quote.change_24h_pct.toFixed(2)}%`}. Hint para el agente: ${action} (contexto — no es orden de trade ni de envío).`;
 
   return {
     score,

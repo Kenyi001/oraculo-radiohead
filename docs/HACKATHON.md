@@ -17,7 +17,8 @@
 - [ ] MCP tools work in Cursor (incl. `check_wdk_guardrail`)
 - [ ] Dual MCP: Casandra + `wdk-mcp` documented
 - [ ] Demo web live on Vercel (URL in README)
-- [ ] CasandraRegistry address (Base Sepolia) in README + demo
+- [x] CasandraRegistry address (Ethereum Sepolia) in README + demo
+
 - [ ] Repo public: `Kenyi001/oraculo-radiohead`
 - [ ] Video ≤3 min uploaded (YouTube or Drive) — Casandra→WDK loop
 - [ ] Hacki / DoraHacks submit with **General + WDK**

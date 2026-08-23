@@ -3,5 +3,6 @@
   "chainId": 11155111,
   "network": "sepolia",
   "explorer": "https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF",
-  "deployedAt": "2026-08-22T22:20:27.052Z"
+  "deployedAt": "2026-08-22T22:20:27.052Z",
+  "note": "Official CasandraRegistry for Aleph demo — Ethereum Sepolia (team has SepoliaETH; Base faucet unavailable)."
 }

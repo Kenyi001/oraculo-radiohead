@@ -13,13 +13,13 @@
 
 ---
 
-## Regla Hacki (cómo se elige)
+## Regla Hacki
 
 | Capa | Qué hacemos |
 |------|-------------|
-| **General** | Se participa **por defecto** (best overall; incluye proyectos AI/MCP) |
-| **Track sponsor** | Se escoge **uno más** → **WDK** |
-| **No elegidos** | QVAC · Pears |
+| **General** | Por **defecto** — best overall (producto = evidencia para agentes) |
+| **Track sponsor** | Uno más → **WDK** (ejecución opcional bajo evidencia) |
+| **No** | QVAC · Pears |
 
 **Equipos:** 1–4 miembros.
 
@@ -29,37 +29,39 @@
 
 | Capa | Decisión |
 |------|----------|
-| Default | **General** |
-| Sponsor | **[WDK Track 1](https://hacki.crecimiento.build/h/aleph-hackathon-2026/tracks/wdk-track)** — CLI / `wdk-mcp` |
-| Producto | Oráculo Casandra MCP + wallet WDK bajo **guardrails de riesgo** (`verdict`) |
+| Default | **General** — Decision Substrate / Evidence Pack |
+| Sponsor | **WDK Track 1** — `wdk-mcp` solo si el agente elige actuar |
+| Producto | Casandra MCP evidencia-first; WDK ≠ héroe |
 
 ### Historia (General + WDK)
 
 ```mermaid
 flowchart LR
-  agent[Agente_IA] --> casandra[Casandra_MCP]
-  casandra --> verdict{verdict}
-  verdict -->|proceed_or_caution| wdk[wdk_mcp_USDT]
-  verdict -->|avoid| block[Bloquear_send]
+  agent[Agente_IA] --> pulse[get_market_pulse]
+  pulse --> evidence[Evidence_Pack]
+  evidence --> agentDecide[Agente_decide]
+  agentDecide -->|"elige actuar"| wdk[wdk_mcp_opcional]
+  agentDecide -->|no actuar| stop[Stop]
 ```
 
-1. Agente llama Casandra → `get_risk_level` / portfolio → `verdict`
-2. Si `proceed` o `caution` → puede usar **wdk-mcp** (balance / send USD₮)
-3. Si `avoid` → **no** ejecuta send
+1. Agente llama `get_market_pulse` → `why` + `reasons` + meters + headlines  
+2. **El agente decide** (no Casandra “ordena” el trade)  
+3. Si elige ejecutar → `check_wdk_guardrail` + `wdk-mcp` dry-run (sponsor proof)
 
 ### Por qué WDK (no QVAC / Pears)
 
 | Track | Fit | Motivo |
 |-------|-----|--------|
-| **WDK** | Mejor | USDT ya en producto; ejemplo oficial #1 = agente con wallet + guardrails |
-| QVAC | Bajo | Exige inferencia 100% local `@qvac/sdk` |
-| Pears | Bajo | Exige `pear install` + OTA P2P |
+| **WDK** | Bueno como **capa 2** | Prueba que el agente puede actuar con evidencia; packages reales `@tetherto/wdk*` |
+| QVAC | Bajo | Inferencia 100% local — no es nuestro producto |
+| Pears | Bajo | Stack P2P OTA — no es nuestro producto |
 
-### Qué NO cuenta para WDK (descarte)
+### Qué NO cuenta para WDK
 
-- Solo USDT en la fórmula de riesgo
-- Contrato Base sin `@tetherto/wdk`
-- Bolt-on sin uso en el demo
+- Solo USDT en la fórmula de riesgo  
+- Contrato Base sin `@tetherto/wdk`  
+- Bolt-on sin uso en el demo  
+- Vender Casandra como “money-mover” genérico  
 
 ---
 
@@ -67,11 +69,11 @@ flowchart LR
 
 | Criterion | Proof Casandra |
 |-----------|----------------|
-| Technicality | MCP + market-core + WDK guardrail + registry opcional |
-| Originality | Agentes alucinan → JSON timestamped + send gated |
-| UI/UX/DX | Gauge web + dual MCP config (Casandra + WDK) |
-| Practicality | Portfolio / risk / USD₮ ballast + wallet tools |
-| Presentation | Video: problema → gauge → verdict → WDK → disclaimer |
+| Technicality | MCP Evidence Pack + algoritmos versionados + Pulse |
+| Originality | Agente decide con `why`/`reasons` — no alucinación ni predicción |
+| UI/UX/DX | Demo Pulse-first + dual MCP |
+| Practicality | Consume-only JSON listo para agentes |
+| Presentation | 70% evidencia · 20% WDK dry-run · 10% tracks/disclaimer |
 
 ## Deadline
 
@@ -79,10 +81,10 @@ Sun 23 Aug ~11:00 BO (Hacki 12:00 ARG).
 
 ## Checklist submit
 
-- [ ] DoraHacks/Hacki: **General** (default) + marcar **WDK**
-- [ ] Video ≤3 min muestra loop Casandra → WDK
-- [ ] Repo + README con packages WDK + permalinks
-- [ ] Deploy URL + contract address si #10 green
-- [ ] `.env.example` WDK; wallet de prueba dedicada
+- [ ] DoraHacks/Hacki: **General** + marcar **WDK**
+- [ ] Video ≤3 min: Pulse/evidencia primero; WDK secundario
+- [ ] Repo + README one-liner evidencia-first + permalinks WDK
+- [ ] Deploy URL + contract si #10 green
+- [ ] Wallet test dedicada
 
-Integración: [docs/WDK.md](WDK.md) · Direction: [DIRECTION.md](DIRECTION.md)
+Integración: [WDK.md](WDK.md) · [DIRECTION.md](DIRECTION.md)

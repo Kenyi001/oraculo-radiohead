@@ -1,71 +1,75 @@
 # Pitch + video — Augusto (@RonaldGaymer2002)
 
-**Tu rol:** exponer el proyecto (pitch) y grabar el demo ≤3 min.  
-**Tracks:** General (default) + sponsor WDK.  
-**Script base:** [SUBMIT.md](SUBMIT.md) · **Setup WDK:** [WDK.md](WDK.md)
+**Tu rol:** exponer y grabar el demo ≤3 min.  
+**Tracks:** General (producto = evidencia) + sponsor WDK (prueba opcional).  
+**Tesis:** [DIRECTION.md](DIRECTION.md) · script: [SUBMIT.md](SUBMIT.md) · WDK setup: [WDK.md](WDK.md)
+
+**Reparto del video: 70% Pulse/evidencia · 20% WDK dry-run · 10% cierre.**
 
 ---
 
 ## Qué debes tener listo antes de grabar
 
-| # | Qué | Quién te lo entrega | Check |
-|---|-----|---------------------|-------|
-| 1 | Demo web corriendo (`npm run dev:web` o URL Vercel) | Tú (#5) o master local | [ ] |
-| 2 | Gauge con `action` proceed/caution/avoid | Ya en master | [ ] |
-| 3 | Cursor con dual MCP (Casandra + wdk-wallet) | Dax (#8) / [mcp-casandra-wdk.example.json](mcp-casandra-wdk.example.json) | [ ] |
-| 4 | Wallet test unlock (solo demo) | Dax | [ ] |
-| 5 | Address contrato (si ya está) | Victor (#10) — opcional en video | [ ] |
+| # | Qué | Quién | Check |
+|---|-----|-------|-------|
+| 1 | Live demo https://casandra-two.vercel.app | Dax (#5 done) | [ ] |
+| 2 | Panel **Market Pulse** (why / reasons / headlines) | Ya en master | [ ] |
+| 3 | Cursor dual MCP (Casandra + wdk-wallet) | Dax (#8) | [ ] |
+| 4 | Wallet test unlock | Dax | [ ] |
+| 5 | Address contrato Ethereum Sepolia | Victor (#10) — `0x27544Fe4…` | [x] |
 
 ---
 
-## Qué mostrar en pantalla (orden del demo)
+## Qué mostrar (orden)
 
-### A) Demo web (jueces sin MCP) — ~40–50s
-1. Abrir Casandra (localhost o Vercel).
-2. Señalizar: **Risk level** gauge + score 0–100.
-3. Leer en voz alta el **veredicto** (`verdict_es`) y la caja **WDK guardrail: proceed | caution | avoid**.
-4. Tabla **Portfolio** con USDT share (ballast).
-5. (Opcional) Market context de BTC/ETH.
+### A) Demo web — Evidence Pack (~90–110s) — **70%**
+1. Abrir https://casandra-two.vercel.app  
+2. **Market Pulse** primero: `why` (market / news / sentiment / alignment)  
+3. Leer **≥3 reasons** con números en voz alta  
+4. Meters: Fear&Greed, news_score, change 24h  
+5. Headlines  
+6. Decir: *“Agent decision hint”* proceed/caution/avoid = **contexto**, no orden de compra ni de send  
+7. Risk gauge / portfolio = apoyo, no el héroe  
 
-### B) Agente / Cursor (producto real) — ~50–60s
-1. Pregunta al agente:  
-   *“Usa Casandra: check_wdk_guardrail del portafolio demo. Si allow_wdk_send, pide balance WDK; si avoid, no envíes.”*
-2. Mostrar JSON: `action`, `risk_pct`, `allow_wdk_send`, `reasons`.
-3. Si allow: tool WDK `get_balance` o `send_token` con **dryRun: true** (nunca mainnet con plata real).
-4. Decir: *“Casandra decide; WDK solo actúa si el guardrail lo permite.”*
+### B) Cursor — agente decide (~40–50s) — luego WDK **20%**
+1. Pregunta:  
+   *“Call get_market_pulse for eth side=buy. Summarize why and reasons. Do not send anything yet. Then, only if you would act, call check_wdk_guardrail and dry-run WDK.”*  
+2. Mostrar JSON Pulse: `why`, `reasons`, `confidence`, `verdict`  
+3. **Solo si** el agente elige actuar: `check_wdk_guardrail` → `get_balance` o `send_token` **dryRun: true**  
+4. Decir: *“Casandra informs; the agent decides; WDK is optional execution under evidence.”*
 
-### C) Cierre — ~20s
-- Repo GitHub + disclaimer: **Not financial advice**.
-- Tracks: **General + WDK**.
-
----
-
-## Guion hablado (~2:30–3:00, EN preferido)
-
-> Hi — I'm Augusto from the Casandra team, Santa Cruz. AI agents invent prices and risk, and unsafe agents might send tokens anyway. Casandra is an investment oracle MCP: live portfolio, transparent risk score, and a clear action — proceed, caution, or avoid.  
-> Here's the web demo for judges: risk gauge, Spanish verdict, and the WDK guardrail banner. Same engine powers Cursor tools.  
-> Now in Cursor: we call check_wdk_guardrail — if avoid, no send; if allowed, wdk-mcp can check balance or dry-run a send.  
-> Optional on-chain CasandraRegistry on Base Sepolia anchors a risk snapshot. Submitted under Aleph General plus WDK. Not financial advice. Thanks.
-
-Tabla por segundos: [SUBMIT.md](SUBMIT.md).
+### C) Cierre (~15–20s) — **10%**
+- Repo + live URL  
+- **Not financial advice** · no predictions · no money-mover  
+- Tracks: **General + WDK**
 
 ---
 
-## Datos que puedes citar (no inventar)
+## Guion hablado (~2:30–3:00, EN)
 
-- Producto: **Casandra** — oráculo MCP, repo `oraculo-radiohead`
-- Fórmula: `casandra-risk-v1` (cambio 24h + vol vs BTC + % USDT)
-- Bandas: 0–33 low → proceed · 34–66 med → caution · 67–100 high → avoid
-- WDK packages: `@tetherto/wdk` + `@tetherto/wdk-cli` / `wdk-mcp`
-- USDT = ballast en riesgo + token del flujo WDK
-- Disclaimer siempre
+> Hi — I'm Augusto from the Casandra team, Santa Cruz. AI agents invent prices and invent reasons. Casandra is a decision substrate, not a money-mover and not a predictor. It gives agents a consume-only Evidence Pack: price, risk, news, Fear and Greed, and a structured why — so the agent decides on its own.  
+> Here's the web demo: Market Pulse first — reasons with numbers, then a context hint. Same engine in Cursor via get_market_pulse.  
+> Only if the agent chooses to act, we optionally check a WDK guardrail and dry-run a USD₮ send — that's our sponsor proof, not the product.  
+> Submitted under Aleph General plus WDK. Not financial advice. Thanks.
 
 ---
 
-## Entregables tuyos
+## Datos que puedes citar
 
-1. **[#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6)** — Video ≤3 min (Loom/YouTube) + URL en README  
-2. **[#5](https://github.com/Kenyi001/oraculo-radiohead/issues/5)** — Vercel live URL (para que el demo del video también sea público)  
-3. Pegar ambas URLs en los issues y avisar a Dax para submit (#7)
+- Producto: **Casandra** — Evidence Pack / Decision Substrate  
+- **Simplifica:** una tool → evidencia completa; el agente decide (no inventa)  
+- **Vs otros:** no es chat-opinion ni money-mover; es JSON con `why`/`reasons` + timestamp  
+- Tools héroe: `get_market_pulse` (`casandra-pulse-v1`)  
+- Hint: proceed / caution / avoid = contexto para el agente  
+- WDK: `@tetherto/wdk` + `wdk-mcp` — capa opcional  
+- Live: https://casandra-two.vercel.app  
+- Disclaimer siempre  
 
-Dax te ayuda con wallet unlock / MCP si se traba. Victor te pasa el address del contrato cuando #10 esté green.
+---
+
+## Entregables
+
+1. **[#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6)** — Video ≤3 min + URL en README  
+2. Avisar a Dax para submit (#7)
+
+Vercel (#5) ya está live. Dax ayuda con wallet/MCP. Victor con contrato si alcanza.

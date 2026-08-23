@@ -1,7 +1,7 @@
 require("@nomicfoundation/hardhat-ethers");
 require("dotenv").config();
 
-const { PRIVATE_KEY, BASE_SEPOLIA_RPC } = process.env;
+const { PRIVATE_KEY, BASE_SEPOLIA_RPC, SEPOLIA_RPC } = process.env;
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -14,6 +14,13 @@ module.exports = {
   },
   networks: {
     hardhat: {},
+    /** Official Aleph demo network (faucet available to the team). */
+    sepolia: {
+      url: SEPOLIA_RPC || "https://ethereum-sepolia-rpc.publicnode.com",
+      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+      chainId: 11155111,
+    },
+    /** Optional — keep if Base faucet becomes available later. */
     baseSepolia: {
       url: BASE_SEPOLIA_RPC || "https://base-sepolia-rpc.publicnode.com",
       accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
