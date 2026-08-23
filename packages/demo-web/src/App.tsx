@@ -20,6 +20,10 @@ const PITCH_SCRIPT_URL =
   "https://github.com/Kenyi001/oraculo-radiohead/blob/master/docs/RONALD_PITCH.md";
 const MCP_README_URL =
   "https://github.com/Kenyi001/oraculo-radiohead/blob/master/packages/mcp-server/README.md";
+const MCP_LITE_README_URL =
+  "https://github.com/Kenyi001/oraculo-radiohead/blob/master/packages/mcp-lite/README.md";
+const MCP_DOCS_URL =
+  "https://github.com/Kenyi001/oraculo-radiohead/blob/master/docs/MCP.md";
 
 const DEMO_VIDEO_RAW = import.meta.env.VITE_DEMO_VIDEO_URL as
   | string
@@ -424,14 +428,21 @@ export function App() {
             </p>
           </div>
           <p className="muted gate-copy">
-            Same loop judges sell:{" "}
-            <code>audit_claim</code> → <code>seal_receipt</code> →{" "}
-            <code>check_spend_guard</code> → WDK dry-run. Wire it in Cursor via
-            MCP, or hit the HTTP twin on this host.
+            Two real MCP servers in this repo.{" "}
+            <strong>Pick one in Cursor</strong> — Lite = fewer CoinGecko calls.{" "}
+            Loop: <code>audit_claim</code> → <code>check_spend_guard</code> →
+            WDK dry-run. Docs:{" "}
+            <a href={MCP_DOCS_URL} target="_blank" rel="noreferrer">
+              MCP.md
+            </a>
+            .
           </p>
-          <div className="agent-grid">
+          <div className="agent-grid mcp-dual">
             <div className="agent-col">
-              <h3>MCP (Cursor)</h3>
+              <h3>Casandra · general</h3>
+              <p className="muted agent-note">
+                Full agent MCP · live market tools + seal + WDK gate
+              </p>
               <pre className="agent-snippet" tabIndex={0}>{`{
   "mcpServers": {
     "casandra": {
@@ -443,35 +454,60 @@ export function App() {
   }
 }`}</pre>
               <p className="muted agent-note">
-                Build first: <code>npm run build -w @oraculo/mcp-server</code>.{" "}
+                <code>npm run build -w @oraculo/mcp-server</code> ·{" "}
                 <a href={MCP_README_URL} target="_blank" rel="noreferrer">
-                  Full setup
+                  README
                 </a>
               </p>
             </div>
             <div className="agent-col">
-              <h3>HTTP API</h3>
-              <ul className="api-list">
-                <li>
-                  <code>POST /api/audit-claim</code>
-                </li>
-                <li>
-                  <code>POST /api/seal-receipt</code>
-                </li>
-                <li>
-                  <code>POST /api/check-spend-guard</code>
-                </li>
-                <li>
-                  <a href="/api/health">
-                    <code>GET /api/health</code>
-                  </a>
-                </li>
-              </ul>
+              <h3>Casandra Lite · low API</h3>
               <p className="muted agent-note">
-                Pass <code>receipt</code> with <code>receipt_id</code> on spend
-                guard so serverless stays consistent. Dry-run only — no custody.
+                3 tools only · 5 min quote cache · optional offline mock
+              </p>
+              <pre className="agent-snippet" tabIndex={0}>{`{
+  "mcpServers": {
+    "casandra-lite": {
+      "command": "node",
+      "args": [
+        "…/packages/mcp-lite/dist/index.js"
+      ],
+      "env": {
+        "CASANDRA_CACHE_TTL_MS": "300000"
+      }
+    }
+  }
+}`}</pre>
+              <p className="muted agent-note">
+                <code>npm run build -w @oraculo/mcp-lite</code> ·{" "}
+                <a href={MCP_LITE_README_URL} target="_blank" rel="noreferrer">
+                  README
+                </a>
               </p>
             </div>
+          </div>
+          <div className="agent-col agent-api-block">
+            <h3>HTTP API (same engine)</h3>
+            <ul className="api-list">
+              <li>
+                <code>POST /api/audit-claim</code>
+              </li>
+              <li>
+                <code>POST /api/seal-receipt</code>
+              </li>
+              <li>
+                <code>POST /api/check-spend-guard</code>
+              </li>
+              <li>
+                <a href="/api/health">
+                  <code>GET /api/health</code>
+                </a>
+              </li>
+            </ul>
+            <p className="muted agent-note">
+              Pass <code>receipt</code> with <code>receipt_id</code> on spend
+              guard so serverless stays consistent. Dry-run only — no custody.
+            </p>
           </div>
         </section>
 

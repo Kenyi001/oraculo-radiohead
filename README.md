@@ -45,19 +45,26 @@ Casandra attacks the link *“the agent lied about the market and still wants to
 Open the demo → default claim is a lie (`ETH is $8,000…`) → seal shows **FALSE** → **Send 200 USDT** → **BLOCKED**.  
 Pitch checklist for Ronald: [docs/RONALD.md](docs/RONALD.md)
 
-## MCP tools (hero)
+## MCP (two real servers)
+
+| Server | Package | Use when |
+|---|---|---|
+| **casandra** | [packages/mcp-server](packages/mcp-server) | Full agent MCP — seal + market evidence tools |
+| **casandra-lite** | [packages/mcp-lite](packages/mcp-lite) | Low API — 3 tools + 5 min quote cache |
+
+Guide: [docs/MCP.md](docs/MCP.md) · Cursor example: [docs/mcp-casandra-wdk.example.json](docs/mcp-casandra-wdk.example.json)
+
+### Hero tools
 
 | Tool | Purpose |
 |---|---|
 | `audit_claim` | Parse claim → live quotes + risk → `TRUE` / `MIXED` / `FALSE` + contradictions |
-| `seal_receipt` | Persist sealed receipt (`id`, `hash`, `hash_bytes32`) |
+| `seal_receipt` | Persist sealed receipt (`id`, `hash`, `hash_bytes32`) — **general only** |
 | `check_spend_guard` | **WDK gate** — `FALSE` → blocked; else dry-run preview (no broadcast) |
 
-### Evidence sources (supporting)
+### Evidence sources (general MCP only)
 
 `get_price` · `get_portfolio_state` · `get_risk_level` · `get_market_context` · `get_market_summary` · `health`
-
-Package docs: [packages/mcp-server/README.md](packages/mcp-server/README.md)
 
 ## HTTP API (same loop)
 

@@ -5,6 +5,14 @@
       "args": ["packages/mcp-server/dist/index.js"],
       "cwd": "D:/_Dev/Projects/Oraculo-radiohead"
     },
+    "casandra-lite": {
+      "command": "node",
+      "args": ["packages/mcp-lite/dist/index.js"],
+      "cwd": "D:/_Dev/Projects/Oraculo-radiohead",
+      "env": {
+        "CASANDRA_CACHE_TTL_MS": "300000"
+      }
+    },
     "wdk-wallet": {
       "command": "wdk-mcp"
     }

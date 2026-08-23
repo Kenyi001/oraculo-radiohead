@@ -887,6 +887,12 @@ pre {
   font-size: 0.8rem;
 }
 
+.agent-api-block {
+  margin-top: 1.15rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line-soft);
+}
+
 @media (max-width: 640px) {
   .agent-grid {
     grid-template-columns: 1fr;

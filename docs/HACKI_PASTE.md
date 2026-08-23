@@ -17,7 +17,7 @@ Your USDT stays in your WDK wallet — Casandra never custodies. Agents invent p
 - Registry: `0xc9fcDEC150C8903b51F299dcBa308F453C4AB975`
 - Explorer: https://sepolia.etherscan.io/address/0xc9fcDEC150C8903b51F299dcBa308F453C4AB975
 - API: `GET https://casandra-two.vercel.app/api/health` · `POST /api/audit-claim` · `POST /api/check-spend-guard`
-- MCP setup: `packages/mcp-server/README.md`
+- MCP (general + lite): `docs/MCP.md` · `packages/mcp-server` · `packages/mcp-lite`
 
 ## WDK packages
 

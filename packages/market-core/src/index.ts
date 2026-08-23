@@ -186,6 +186,21 @@ const MOCK_PRICES: Record<string, { name: string; price: number; change: number 
 };
 
 let lastFetchAt: string | null = null;
+
+type QuoteCacheEntry = { at: number; quote: PriceQuote };
+const quoteCache = new Map<string, QuoteCacheEntry>();
+
+function cacheTtlMs(): number {
+  const raw = process.env.CASANDRA_CACHE_TTL_MS;
+  if (!raw) return 0;
+  const n = Number(raw);
+  return Number.isFinite(n) && n > 0 ? n : 0;
+}
+
+function offlineMode(): boolean {
+  const v = (process.env.CASANDRA_OFFLINE || "").trim().toLowerCase();
+  return v === "1" || v === "true" || v === "yes";
+}
 const VERSION = "0.3.0";
 const DISCLAIMER =
   "Not financial advice. Casandra seals contradictions; it does not predict prices or execute trades.";
@@ -319,6 +334,20 @@ function mockQuote(coinId: string, symbol: string): PriceQuote {
 export async function getPrice(symbol: string): Promise<PriceQuote> {
   const normalized = normalizeSymbol(symbol);
   const coinId = resolveCoinId(normalized);
+  const ttl = cacheTtlMs();
+  if (ttl > 0) {
+    const hit = quoteCache.get(normalized);
+    if (hit && Date.now() - hit.at < ttl) {
+      return { ...hit.quote, fetched_at: hit.quote.fetched_at };
+    }
+  }
+
+  if (offlineMode()) {
+    const quote = mockQuote(coinId, normalized);
+    if (ttl > 0) quoteCache.set(normalized, { at: Date.now(), quote });
+    return quote;
+  }
+
   const url =
     `https://api.coingecko.com/api/v3/simple/price` +
     `?ids=${encodeURIComponent(coinId)}` +
@@ -330,7 +359,9 @@ export async function getPrice(symbol: string): Promise<PriceQuote> {
       signal: AbortSignal.timeout(8000),
     });
     if (!res.ok) {
-      return mockQuote(coinId, normalized);
+      const quote = mockQuote(coinId, normalized);
+      if (ttl > 0) quoteCache.set(normalized, { at: Date.now(), quote });
+      return quote;
     }
     const data = (await res.json()) as Record<
       string,
@@ -338,11 +369,13 @@ export async function getPrice(symbol: string): Promise<PriceQuote> {
     >;
     const row = data[coinId];
     if (!row || typeof row.usd !== "number") {
-      return mockQuote(coinId, normalized);
+      const quote = mockQuote(coinId, normalized);
+      if (ttl > 0) quoteCache.set(normalized, { at: Date.now(), quote });
+      return quote;
     }
     const fetched_at = new Date().toISOString();
     lastFetchAt = fetched_at;
-    return {
+    const quote: PriceQuote = {
       symbol: normalized,
       name: coinId,
       price_usd: row.usd,
@@ -351,8 +384,12 @@ export async function getPrice(symbol: string): Promise<PriceQuote> {
       source: "coingecko",
       fetched_at,
     };
+    if (ttl > 0) quoteCache.set(normalized, { at: Date.now(), quote });
+    return quote;
   } catch {
-    return mockQuote(coinId, normalized);
+    const quote = mockQuote(coinId, normalized);
+    if (ttl > 0) quoteCache.set(normalized, { at: Date.now(), quote });
+    return quote;
   }
 }
 
@@ -1182,7 +1219,11 @@ export function getHealth(): HealthStatus {
     ok: true,
     version: VERSION,
     last_fetch: lastFetchAt,
-    source: "coingecko-with-mock-fallback",
+    source: offlineMode()
+      ? "offline-mock"
+      : cacheTtlMs() > 0
+        ? `coingecko-cached-${cacheTtlMs()}ms`
+        : "coingecko-with-mock-fallback",
   };
 }
 

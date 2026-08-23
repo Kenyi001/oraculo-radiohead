@@ -1,0 +1,23 @@
+{
+  "name": "@oraculo/mcp-lite",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "casandra-lite": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "@oraculo/market-core": "*",
+    "@tetherto/wdk": "^1.0.0-beta.16",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "typescript": "^5.8.2"
+  }
+}
