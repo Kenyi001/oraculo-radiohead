@@ -755,9 +755,11 @@ export async function fetchHeadlines(
         block.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/i)?.[1] ??
         block.match(/<title>(.*?)<\/title>/i)?.[1] ??
         "";
-      const link =
-        block.match(/<link>(.*?)<\/link>/i)?.[1]?.trim() ??
-        "https://cointelegraph.com";
+      const linkRaw =
+        block.match(/<link><!\[CDATA\[([\s\S]*?)\]\]><\/link>/i)?.[1] ??
+        block.match(/<link>([^<]+)<\/link>/i)?.[1] ??
+        "";
+      const link = linkRaw.trim() || "https://cointelegraph.com";
       const pub =
         block.match(/<pubDate>(.*?)<\/pubDate>/i)?.[1] ??
         new Date().toISOString();
@@ -800,6 +802,82 @@ function worsenVerdict(a: WdkAction, b: WdkAction): WdkAction {
   return rank[a] >= rank[b] ? a : b;
 }
 
+function matchedNewsKeywords(title: string): { pos: string[]; neg: string[] } {
+  const t = title.toLowerCase();
+  return {
+    pos: NEWS_POS.filter((w) => t.includes(w)),
+    neg: NEWS_NEG.filter((w) => t.includes(w)),
+  };
+}
+
+/** Spec-shaped `why.news` — counts scored headlines + keyword samples. */
+export function summarizeHeadlinesForWhy(headlines: PulseHeadline[]): string {
+  if (headlines.length === 0) {
+    return "news_score 0.00 (neutral); 0 headlines";
+  }
+  const newsScore =
+    headlines.reduce((a, h) => a + h.score, 0) / headlines.length;
+  const nBias = newsBiasFromScore(newsScore);
+  const posCount = headlines.filter((h) => h.score > 0).length;
+  const negCount = headlines.filter((h) => h.score < 0).length;
+  const negKeywords = new Set<string>();
+  const posKeywords = new Set<string>();
+  for (const h of headlines) {
+    const { pos, neg } = matchedNewsKeywords(h.title);
+    pos.forEach((k) => posKeywords.add(k));
+    neg.forEach((k) => negKeywords.add(k));
+  }
+
+  let detail: string;
+  if (negCount > 0) {
+    const kw = [...negKeywords].slice(0, 4).join(", ");
+    detail = `${negCount}/${headlines.length} titulares negativos${kw ? `: ${kw}` : ""}`;
+  } else if (posCount > 0) {
+    const kw = [...posKeywords].slice(0, 4).join(", ");
+    detail = `${posCount}/${headlines.length} titulares positivos${kw ? `: ${kw}` : ""}`;
+  } else {
+    detail = `${headlines.length} titulares neutros`;
+  }
+
+  return `news_score ${newsScore.toFixed(2)} (${nBias}) (${detail})`;
+}
+
+export function buildPulseWhySentiment(
+  fng: FearGreedSnapshot,
+  side?: "buy" | "sell"
+): string {
+  let base = `Fear&Greed=${fng.value} ${fng.label}`;
+  if (fng.mock) base += " [mock]";
+  if (fng.value > 75 && side === "buy") return `${base} → no FOMO buy`;
+  if (fng.value < 25 && side === "sell") return `${base} → caution capitulation sell`;
+  return base;
+}
+
+export function buildPulseWhyAlignment(
+  side: "buy" | "sell" | undefined,
+  bias: MarketBias,
+  favor: MarketFavor
+): string {
+  if (side) return `side=${side} vs bias=${bias} → market_favor=${favor}`;
+  return `no side → market_favor=${favor}`;
+}
+
+export function assertMarketPulseContract(pulse: MarketPulse): void {
+  if (pulse.algorithm !== PULSE_ALGORITHM) {
+    throw new Error(`algorithm must be ${PULSE_ALGORITHM}`);
+  }
+  if (pulse.consume_only !== true) throw new Error("consume_only must be true");
+  if (!pulse.disclaimer) throw new Error("disclaimer required");
+  if (!pulse.fetched_at) throw new Error("fetched_at required");
+  if (pulse.reasons.length < 3) throw new Error("reasons must have >= 3 entries");
+  if (!pulse.why.market || !pulse.why.news || !pulse.why.sentiment || !pulse.why.alignment) {
+    throw new Error("why must include market, news, sentiment, alignment");
+  }
+  if (pulse.confidence < 0 || pulse.confidence > 1) {
+    throw new Error("confidence must be 0–1");
+  }
+}
+
 /**
  * Product pulse for AI agents: price + Fear&Greed + news + why.
  * Consume-only — agents must not reinvent casandra-pulse-v1.
@@ -814,7 +892,7 @@ export async function getMarketPulse(input: {
   const includeNews = input.include_news !== false;
   const lookback = input.lookback_hours ?? 24;
 
-  const [{ quote, change_1h_pct }, risk, fng, headlinesRaw] = await Promise.all([
+  const [{ quote, change_1h_pct }, risk, fng, headlinesFetched] = await Promise.all([
     getExtendedQuote(symbol),
     getRiskLevel({ symbol }),
     getFearGreed(),
@@ -822,6 +900,11 @@ export async function getMarketPulse(input: {
       ? fetchHeadlines(symbol, lookback)
       : Promise.resolve([] as PulseHeadline[]),
   ]);
+
+  const headlinesRaw =
+    includeNews && headlinesFetched.length === 0
+      ? mockHeadlines(symbol)
+      : headlinesFetched;
 
   const change24 = quote.change_24h_pct;
   const bias = biasFromChange(change24);
@@ -893,21 +976,17 @@ export async function getMarketPulse(input: {
       change24 == null ? "n/a" : `${change24 >= 0 ? "+" : ""}${change24.toFixed(2)}%`
     } → bias ${bias}`,
     news: includeNews
-      ? `news_score ${newsScore.toFixed(2)} (${nBias}); sample: ${
-          headlinesRaw[0]?.title ?? "n/a"
-        }`
+      ? summarizeHeadlinesForWhy(headlinesRaw)
       : "news omitted (include_news=false)",
-    sentiment: `Fear&Greed=${fng.value} ${fng.label}`,
-    alignment: input.side
-      ? `side=${input.side} → market_favor=${favor}; verdict=${verdict}`
-      : `no side → market_favor=${favor}; verdict=${verdict}`,
+    sentiment: buildPulseWhySentiment(fng, input.side),
+    alignment: buildPulseWhyAlignment(input.side, bias, favor),
   };
 
   while (reasons.length < 3) {
     reasons.push(`Pulse algorithm ${PULSE_ALGORITHM} consume_only=true`);
   }
 
-  return {
+  const pulse: MarketPulse = {
     symbol,
     fetched_at: new Date().toISOString(),
     market_favor: favor,
@@ -933,6 +1012,9 @@ export async function getMarketPulse(input: {
     algorithm: PULSE_ALGORITHM,
     disclaimer: DISCLAIMER,
   };
+
+  assertMarketPulseContract(pulse);
+  return pulse;
 }
 
 export async function getMarketNews(symbol: string): Promise<MarketNews> {

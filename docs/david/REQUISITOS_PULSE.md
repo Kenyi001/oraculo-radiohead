@@ -123,14 +123,14 @@ Regla de agente (documentar en README):
 
 ## Definition of Done (David)
 
-- [ ] `getMarketPulse` en `market-core` con tipos exportados  
-- [ ] Tool MCP + Zod  
-- [ ] `why` + `reasons` (≥3) + `headlines` en respuesta real  
-- [ ] F&G live (Alternative.me) con fallback  
-- [ ] Noticias: RSS o lexicon + mock fallback  
-- [ ] README: sección “Market Pulse — consume-only API for agents” + ejemplo JSON  
-- [ ] Comentario en #17 con captura JSON de `btc` y `eth`  
-- [ ] Disclaimer en toda respuesta  
+- [x] `getMarketPulse` en `market-core` con tipos exportados  
+- [x] Tool MCP + Zod  
+- [x] `why` + `reasons` (≥3) + `headlines` en respuesta real  
+- [x] F&G live (Alternative.me) con fallback  
+- [x] Noticias: RSS o lexicon + mock fallback  
+- [x] README: sección “Market Pulse — consume-only API for agents” + ejemplo JSON  
+- [x] Comentario en #17 con captura JSON de `btc` y `eth`  
+- [x] Disclaimer en toda respuesta  
 
 **Rechazo automático si:** reasons genéricas (“el mercado es volátil”), sin noticias cuando `include_news=true`, sin `algorithm`, o sin `why`.
 
