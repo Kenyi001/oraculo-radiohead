@@ -32,7 +32,7 @@ Full thesis: [docs/DIRECTION.md](docs/DIRECTION.md).
 |---|---|
 | MCP + core + Pulse + submit | **Dax** ([Kenyi001](https://github.com/Kenyi001)) |
 | Market Pulse quality | **David** ([arnez69](https://github.com/arnez69)) |
-| Contrato + Web3 (Base Sepolia) | **Vctor11180** ([Vctor11180](https://github.com/Vctor11180)) |
+| Contrato + Web3 (Ethereum Sepolia) | **Vctor11180** ([Vctor11180](https://github.com/Vctor11180)) |
 | Vercel live demo | **Dax** — [docs/VERCEL.md](docs/VERCEL.md) |
 | Pitch + video | **Augusto** ([RonaldGaymer2002](https://github.com/RonaldGaymer2002)) — [docs/PITCH_AUGUSTO.md](docs/PITCH_AUGUSTO.md) |
 
@@ -138,23 +138,23 @@ packages/market-core   # prices, portfolio, risk, Pulse, optional WDK guardrail
 packages/mcp-server    # Casandra MCP (get_market_pulse primary)
 packages/wdk-bridge    # WDK package manifest (sponsor track)
 packages/demo-web      # judges UI — Pulse-first
-contracts/             # CasandraRegistry (Base Sepolia)
+contracts/             # CasandraRegistry (Ethereum Sepolia)
 docs/                  # DIRECTION, TRACK, WDK, pitch
 ```
 
 ## On-chain (CasandraRegistry)
 
-Minimal risk-snapshot registry for Aleph (Hacki requires address if deployed).
+Minimal risk-snapshot registry for Aleph. **Official network: Ethereum Sepolia** (team SepoliaETH; Base optional later).
 
 ```bash
 npm run contracts:compile
-npm run contracts:deploy:base
+npm run contracts:deploy:sepolia
 ```
 
 See [contracts/README.md](contracts/README.md).
 
-**Contract address (Base Sepolia):** _pending faucet → `npm run contracts:deploy:base`_  
-**Explorer:** _TBD_
+**Contract address (Ethereum Sepolia):** [`0x27544Fe45b81C09fC91f99c0A7374970839eC4FF`](https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF)  
+**Explorer:** https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF
 
 ## Code graph ([graphify](https://github.com/graphify-project))
 

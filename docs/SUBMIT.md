@@ -21,7 +21,7 @@
 1. **Augusto:** grabar ≤3 min con [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md) (Pulse-first).
 2. Pegar video URL en README + #6.
 3. Live demo ya en https://casandra-two.vercel.app (#5 done).
-4. Victor: CasandraRegistry **Base Sepolia** (#10).
+4. Victor: CasandraRegistry **Ethereum Sepolia** — address en README (#10); confirmar checklist.
 5. Dax: submit Hacki — **General** + **WDK**; repo/video/deploy/contract (#7).
 
 Links: https://hacki.crecimiento.build/h/aleph-hackathon-2026 · https://github.com/Kenyi001/oraculo-radiohead

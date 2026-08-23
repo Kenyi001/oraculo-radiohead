@@ -23,15 +23,17 @@ Tracks: **General (default) + WDK sponsor** — evidencia-first — [TRACK.md](T
 3. Unlock short TTL; Cursor dual MCP: [mcp-casandra-wdk.example.json](mcp-casandra-wdk.example.json)
 4. Listo para mostrar en video: Pulse → (si actúa) guardrail → dry-run
 
-### 2) Base Sepolia deploy (#10 — Victor)
+### 2) Ethereum Sepolia deploy (#10 — Victor)
 
-Eth Sepolia **no cuenta**. Pasos en el comentario de #10 / [contracts/README.md](../contracts/README.md):
+**Official network = Ethereum Sepolia** (team has SepoliaETH; Base faucet unavailable).
+
+Address: [`0x27544Fe45b81C09fC91f99c0A7374970839eC4FF`](https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF)
+
+Victor: confirm snapshot id=0 + checklist in #10. Docs/README already updated on master.
 
 ```bash
-npm run contracts:deploy:base   # chainId must be 84532
+npm run contracts:deploy:sepolia   # chainId must be 11155111
 ```
-
-Paste address → README + `packages/demo-web/.env` → Dax redeploy Vercel env.
 
 ### 3) Vercel (#5)
 
@@ -46,6 +48,6 @@ Guion: [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md) · [SUBMIT.md](SUBMIT.md)
 
 1. BUIDL en Hacki/DoraHacks  
 2. Tracks: **General** + marcar **WDK** (no “AI only”)  
-3. Adjuntar: repo · video · https://casandra-two.vercel.app · contract Base si #10 · packages WDK ([WDK.md](WDK.md))
+3. Adjuntar: repo · video · https://casandra-two.vercel.app · contract Sepolia si #10 · packages WDK ([WDK.md](WDK.md))
 
 Links: https://hacki.crecimiento.build/h/aleph-hackathon-2026 · https://hacki.crecimiento.build/h/aleph-hackathon-2026/tracks/wdk-track

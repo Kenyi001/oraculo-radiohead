@@ -16,7 +16,7 @@
 | 2 | Panel **Market Pulse** (why / reasons / headlines) | Ya en master | [ ] |
 | 3 | Cursor dual MCP (Casandra + wdk-wallet) | Dax (#8) | [ ] |
 | 4 | Wallet test unlock | Dax | [ ] |
-| 5 | Address contrato (opcional) | Victor (#10) | [ ] |
+| 5 | Address contrato Ethereum Sepolia | Victor (#10) — `0x27544Fe4…` | [x] |
 
 ---
 

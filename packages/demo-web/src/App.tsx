@@ -291,12 +291,12 @@ export function App() {
           <strong>Not financial advice.</strong> The agent decides.
         </p>
         <p className="onchain muted">
-          On-chain registry (Base Sepolia):{" "}
+          On-chain registry (Ethereum Sepolia):{" "}
           {import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS ? (
             <a
               href={
                 import.meta.env.VITE_CASANDRA_REGISTRY_EXPLORER ||
-                `https://sepolia.basescan.org/address/${import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS}`
+                `https://sepolia.etherscan.io/address/${import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS}`
               }
               target="_blank"
               rel="noreferrer"
@@ -305,7 +305,7 @@ export function App() {
             </a>
           ) : (
             <span>
-              pending deploy — see <code>contracts/README.md</code>
+              pending — see <code>contracts/README.md</code>
             </span>
           )}
         </p>

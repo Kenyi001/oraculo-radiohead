@@ -15,7 +15,7 @@ Entrega un **Evidence Pack** (precio, riesgo, noticias, sentimiento, `why` / `re
 | **Casandra (héroe)** | `get_market_pulse` → evidencia consume-only + hint `proceed`/`caution`/`avoid` |
 | **Demo web** | Muestra el Pulse a jueces sin instalar MCP |
 | **WDK (opcional)** | Solo si el agente **elige** actuar: dry-run USD₮ bajo evidencia (track sponsor) |
-| **Contrato** | Opcional: “sello” on-chain del snapshot en Base Sepolia |
+| **Contrato** | Opcional: “sello” del snapshot de riesgo en **Ethereum Sepolia** |
 
 **No es:** exchange, predictor, ni app de trading automática / money-mover.
 
@@ -57,7 +57,7 @@ Repo: https://github.com/Kenyi001/oraculo-radiohead (`master` / `main`)
 | # | Qué | Quién |
 |---|-----|-------|
 | 6 | Video ≤3 min (70% Pulse · 20% WDK · 10% cierre) | **Augusto** |
-| 10 | Address contrato **Base Sepolia** | **Victor** |
+| 10 | Address contrato **Ethereum Sepolia** | **Victor** (ya deployed — confirmar checklist) |
 | 8 | Wallet WDK test unlock | **Dax** |
 | 7 | Submit Hacki General + WDK | **Dax** |
 
@@ -68,11 +68,11 @@ Repo: https://github.com/Kenyi001/oraculo-radiohead (`master` / `main`)
 ## 5. Orden
 
 ```
-Código + Vercel OK
+Código + Vercel OK + contrato Sepolia OK
     ↓
 Augusto: video (#6) con guion evidencia-first
-Victor: contrato Base (#10)
 Dax: WDK unlock (#8) + submit (#7)
+Victor: confirmar checklist #10
 ```
 
 Guion: [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md) · [SUBMIT.md](SUBMIT.md) · [DIRECTION.md](DIRECTION.md)

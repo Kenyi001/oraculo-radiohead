@@ -19,7 +19,7 @@ Que un **agente IA** consulte Casandra (precios, portafolio, riesgo con `action`
 | Rama | Qué tiene | Pendiente |
 |------|-----------|-----------|
 | `master` | Core MCP + demo + verdict + WDK guardrail + docs General/WDK | Push de cambios locales WDK si aún no están en origin |
-| `rama-victor` | Ya mergeado a master (verdict + investigación) | **Solo queda #10 deploy Base Sepolia** |
+| `rama-victor` | Deploy Eth Sepolia **oficial** | Confirmar checklist #10 |
 | `feature/Arnez` | Investigación docs (también en master) | **Implementar #17 Market Pulse** (no más docs sueltos) |
 | `rama-augusto` | Sin commits propios vs master | **Tomar #6 video / #11 polish** |
 

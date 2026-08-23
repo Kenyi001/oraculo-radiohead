@@ -46,8 +46,11 @@ In Vercel → Project → Settings → Environment Variables (Production):
 
 | Name | Example |
 |---|---|
-| `VITE_CASANDRA_REGISTRY_ADDRESS` | `0x…` (Base Sepolia only) |
-| `VITE_CASANDRA_REGISTRY_EXPLORER` | `https://sepolia.basescan.org/address/0x…` |
+| `VITE_CASANDRA_REGISTRY_ADDRESS` | `0x27544Fe45b81C09fC91f99c0A7374970839eC4FF` |
+| `VITE_CASANDRA_REGISTRY_EXPLORER` | `https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF` |
+
+Already baked in `packages/demo-web/.env.production` for Vercel builds.
+
 
 Redeploy after setting them so Vite bakes them into the bundle.
 

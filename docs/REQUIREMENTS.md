@@ -47,9 +47,9 @@ Track lock: [TRACK.md](TRACK.md) (General default + **WDK** sponsor) · WDK: [WD
 
 - [x] `CasandraRegistry` — `publishRiskSnapshot(bytes32 portfolioHash, uint8 band, uint256 score, uint256 timestamp)`
 - [x] Compile + local Hardhat smoke deploy
-- [ ] Deploy **Base Sepolia** (needs faucet-funded `PRIVATE_KEY` — see `contracts/deployments/baseSepolia.json`)
-- [ ] Address + explorer link in README
-- [ ] Address shown in demo web (footer wired to `VITE_CASANDRA_*`)
+- [x] Deploy **Ethereum Sepolia** — [`0x27544Fe45b81C09fC91f99c0A7374970839eC4FF`](https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF)
+- [x] Address + explorer in README + demo `.env.production`
+- [ ] Victor confirms snapshot checklist on #10
 - [x] Out of P0: trading, custody, real USDT transfer, multi-chain
 
 ## E. Submit DoD (dom ~11:00 BO)

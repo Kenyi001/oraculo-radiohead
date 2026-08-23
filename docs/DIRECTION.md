@@ -84,7 +84,7 @@ Ver [SUBMIT.md](SUBMIT.md) · [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md):
 |------|-------|
 | Core + MCP + Pulse + submit | Dax |
 | Market Pulse calidad (#17) | David (@arnez69) |
-| Contrato Base Sepolia (#10) | @Vctor11180 |
+| Contrato Ethereum Sepolia (#10) | @Vctor11180 |
 | Pitch + video (#6) | Augusto |
 | Vercel (#5) | Dax |
 

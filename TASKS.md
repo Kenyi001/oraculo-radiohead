@@ -11,14 +11,14 @@
 |---|---|
 | Dax | MCP, market-core, WDK guardrail, **Vercel (#5)**, submit |
 | David (@arnez69) | Market Pulse (#17) |
-| Vctor11180 | Contrato Base Sepolia (#10) |
+| Vctor11180 | Contrato Ethereum Sepolia (#10) |
 | Augusto (@RonaldGaymer2002) | Pitch + video (#6) |
 
 ## Work order (remaining)
 
 1. WDK wallet unlock + demo loop (#8 human steps) — [docs/WDK.md](docs/WDK.md)
 2. Vercel live URL (#5)
-3. CasandraRegistry Base Sepolia (#10)
+3. CasandraRegistry Ethereum Sepolia (#10)
 4. Video ≤3 min with Casandra→WDK (#6)
 5. Hacki submit **General + WDK** (#7)
 6. Market Pulse / UI polish if time (#17 / #11)
@@ -29,7 +29,7 @@
 |---|---|---|---|
 | T1–T7 | Specs / core / MCP / UI / requirements | Dax | **done** |
 | T8 | Vercel live URL | Dax | ready — [docs/VERCEL.md](docs/VERCEL.md) (#5) |
-| T9 | CasandraRegistry Base Sepolia | Vctor11180 | local smoke done · redeploy Base (#10) |
+| T9 | CasandraRegistry Ethereum Sepolia | Vctor11180 | **deployed** `0x27544Fe4…` — confirm checklist (#10) |
 | T10 | Video 3 min (incl. WDK) | Augusto+Dax | open (#6) |
 | T11 | Hacki submit General + WDK | Dax | open (#7) |
 | T12 | WDK CLI/`wdk-mcp` + guardrail | Dax | **code done** · human unlock for video (#8) |
