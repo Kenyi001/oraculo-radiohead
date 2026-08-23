@@ -1,37 +1,43 @@
 import { FormEvent, useEffect, useState } from "react";
 import {
-  DEFAULT_DEMO_POSITIONS,
+  DEMO_LIE_CLAIM,
+  auditClaim,
+  checkSpendGuard,
   getHealth,
-  getMarketPulse,
   getPortfolioState,
   getRiskLevel,
+  rememberReceipt,
+  type AuditResult,
   type HealthStatus,
-  type MarketPulse,
   type PortfolioState,
   type RiskAssessment,
+  type SpendGuardResult,
 } from "@oraculo/market-core";
 
 export function App() {
+  const [claim, setClaim] = useState(DEMO_LIE_CLAIM);
+  const [audit, setAudit] = useState<AuditResult | null>(null);
+  const [guard, setGuard] = useState<SpendGuardResult | null>(null);
   const [portfolio, setPortfolio] = useState<PortfolioState | null>(null);
   const [risk, setRisk] = useState<RiskAssessment | null>(null);
-  const [pulse, setPulse] = useState<MarketPulse | null>(null);
-  const [pulseSymbol, setPulseSymbol] = useState("eth");
+  const [health, setHealth] = useState<HealthStatus | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [health, setHealth] = useState<HealthStatus | null>(null);
 
-  async function loadDemo() {
+  async function runAudit(text = claim) {
     setLoading(true);
     setError(null);
+    setGuard(null);
     try {
-      const [p, r, pul] = await Promise.all([
-        getPortfolioState(DEFAULT_DEMO_POSITIONS),
-        getRiskLevel({ positions: DEFAULT_DEMO_POSITIONS }),
-        getMarketPulse({ symbol: pulseSymbol, side: "buy", include_news: true }),
+      const result = await auditClaim({ text });
+      rememberReceipt(result.receipt);
+      setAudit(result);
+      const [p, r] = await Promise.all([
+        getPortfolioState([]),
+        getRiskLevel({ positions: [] }),
       ]);
       setPortfolio(p);
       setRisk(r);
-      setPulse(pul);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -40,245 +46,177 @@ export function App() {
   }
 
   useEffect(() => {
-    void loadDemo();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- initial load only
+    void runAudit(DEMO_LIE_CLAIM);
   }, []);
 
-  async function onPulse(e: FormEvent) {
+  function onAudit(e: FormEvent) {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
-    try {
-      setPulse(
-        await getMarketPulse({
-          symbol: pulseSymbol,
-          side: "buy",
-          include_news: true,
-        })
-      );
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setLoading(false);
-    }
+    void runAudit(claim);
   }
 
-  const gaugePct = risk ? Math.min(100, Math.max(0, risk.score)) : 0;
-  const hint = pulse?.verdict ?? risk?.action;
+  function onTrySend() {
+    if (!audit) return;
+    rememberReceipt(audit.receipt);
+    setGuard(checkSpendGuard(audit.receipt.id));
+  }
 
-  const registryAddress =
-    import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS ||
-    "0x27544Fe45b81C09fC91f99c0A7374970839eC4FF";
-  const registryExplorer =
-    import.meta.env.VITE_CASANDRA_REGISTRY_EXPLORER ||
-    `https://sepolia.etherscan.io/address/${registryAddress}`;
+  const verdict = audit?.verdict ?? null;
 
   return (
     <main className="page">
       <header>
-        <p className="eyebrow">Aleph 2026 · Santa Cruz · General + WDK sponsor</p>
+        <p className="eyebrow">
+          Aleph Hackathon 2026 · Santa Cruz · General + WDK Track 1
+        </p>
         <h1>Casandra</h1>
         <p className="tagline">
-          One call → Evidence Pack (price, risk, news, why). The agent decides —
-          we don&apos;t invent numbers or move money for you. Not predictions. Not
-          financial advice.
+          A lie detector for AI agents that talk about money. They can speak.
+          They cannot seal a lie — and they cannot spend USDT on one.
         </p>
       </header>
 
-      <section className="card hero-pulse">
-        <div className="hero-top">
-          <h2>Market Pulse — Evidence Pack</h2>
-          <button type="button" onClick={() => void loadDemo()} disabled={loading}>
-            Refresh
-          </button>
-        </div>
-        <form onSubmit={onPulse} className="row">
-          <input
-            value={pulseSymbol}
-            onChange={(e) => setPulseSymbol(e.target.value)}
-            placeholder="eth"
-            aria-label="symbol"
+      <section className="card hero-audit">
+        <h2>Audit a claim</h2>
+        <form onSubmit={onAudit} className="claim-form">
+          <textarea
+            value={claim}
+            onChange={(e) => setClaim(e.target.value)}
+            rows={3}
+            aria-label="agent claim"
           />
-          <button type="submit" disabled={loading}>
-            Pulse
-          </button>
+          <div className="row">
+            <button type="submit" disabled={loading}>
+              {loading ? "Sealing…" : "Seal contradiction"}
+            </button>
+            <button
+              type="button"
+              className="ghost"
+              disabled={loading}
+              onClick={() => {
+                setClaim(DEMO_LIE_CLAIM);
+                void runAudit(DEMO_LIE_CLAIM);
+              }}
+            >
+              Demo lie
+            </button>
+          </div>
         </form>
-
-        {pulse && (
-          <>
-            <p className={`decision-hint action-${pulse.verdict}`}>
-              Agent decision hint: <strong>{pulse.verdict}</strong>
-              {" · "}
-              favor <strong>{pulse.market_favor}</strong>
-              {" · "}
-              confidence {(pulse.confidence * 100).toFixed(0)}%
-            </p>
-            <p className="muted tip">
-              Hint is context for the agent — not a trade order and not a send
-              command. WDK execution is optional after the agent decides.
-            </p>
-
-            <h3 className="subhead">Why</h3>
-            <dl className="why-grid">
-              <div>
-                <dt>Market</dt>
-                <dd>{pulse.why.market}</dd>
-              </div>
-              <div>
-                <dt>News</dt>
-                <dd>{pulse.why.news}</dd>
-              </div>
-              <div>
-                <dt>Sentiment</dt>
-                <dd>{pulse.why.sentiment}</dd>
-              </div>
-              <div>
-                <dt>Alignment</dt>
-                <dd>{pulse.why.alignment}</dd>
-              </div>
-            </dl>
-
-            <h3 className="subhead">Reasons</h3>
-            <ul className="reasons">
-              {pulse.reasons.map((r) => (
-                <li key={r}>{r}</li>
-              ))}
-            </ul>
-
-            <h3 className="subhead">Meters</h3>
-            <ul className="meters">
-              <li>
-                Price ${pulse.meters.price_usd.toLocaleString("en-US", {
-                  maximumFractionDigits: 2,
-                })}{" "}
-                · 24h{" "}
-                {pulse.meters.change_24h_pct == null
-                  ? "n/a"
-                  : `${pulse.meters.change_24h_pct >= 0 ? "+" : ""}${pulse.meters.change_24h_pct.toFixed(2)}%`}
-              </li>
-              <li>
-                Fear&amp;Greed {pulse.meters.fear_greed_value} (
-                {pulse.meters.fear_greed_label})
-              </li>
-              <li>
-                News score {pulse.meters.news_score.toFixed(2)} · bias{" "}
-                {pulse.meters.news_bias}
-              </li>
-            </ul>
-
-            {pulse.headlines.length > 0 && (
-              <>
-                <h3 className="subhead">Headlines</h3>
-                <ul className="headlines">
-                  {pulse.headlines.slice(0, 5).map((h) => (
-                    <li key={h.url || h.title}>
-                      {h.url ? (
-                        <a href={h.url} target="_blank" rel="noreferrer">
-                          {h.title}
-                        </a>
-                      ) : (
-                        h.title
-                      )}
-                      {h.source ? (
-                        <span className="muted"> · {h.source}</span>
-                      ) : null}
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
-
-            <p className="muted">
-              <code>{pulse.algorithm}</code> · consume_only=
-              {String(pulse.consume_only)} · {pulse.fetched_at}
-            </p>
-          </>
-        )}
       </section>
 
-      <section className="card">
-        <div className="hero-top">
-          <h2>Risk level (supporting)</h2>
-        </div>
-        {risk && (
-          <>
-            <div
-              className={`gauge gauge-${risk.band}`}
-              style={{ ["--gauge" as string]: `${gaugePct}%` }}
-              role="img"
-              aria-label={`Risk score ${risk.score}, band ${risk.band}`}
-            >
-              <span className="gauge-score">{risk.score}</span>
-              <span className="gauge-band">{risk.band}</span>
+      {audit && (
+        <section className="card split-board">
+          <div className="split">
+            <div className="panel claim-panel">
+              <p className="panel-label">The claim</p>
+              <p className="panel-body">{audit.receipt.claim_text}</p>
             </div>
-            <p className="verdict">{risk.verdict_es}</p>
-            {hint && (
-              <p className={`decision-hint action-${hint}`}>
-                Context signal: <strong>{hint}</strong>
-              </p>
-            )}
-            <p className="muted">
-              Algorithm <code>{risk.algorithm}</code> · scope {risk.scope}
-            </p>
-            <ul className="factors">
-              {risk.factors.map((f) => (
-                <li key={f.name}>
-                  <strong>{f.name}</strong> ({f.weight}): {f.value.toFixed(1)} —{" "}
-                  {f.note}
+            <div className="panel world-panel">
+              <p className="panel-label">The world</p>
+              <ul className="world-list">
+                {audit.receipt.world_snapshot.quotes.map((q) => (
+                  <li key={q.symbol}>
+                    {q.symbol.toUpperCase()} live $
+                    {q.price_usd.toLocaleString("en-US", {
+                      maximumFractionDigits: q.price_usd < 1 ? 4 : 2,
+                    })}{" "}
+                    <span className="muted">({q.source})</span>
+                  </li>
+                ))}
+                {audit.receipt.world_snapshot.risk && (
+                  <li>
+                    Risk {audit.receipt.world_snapshot.risk.band} ·{" "}
+                    {audit.receipt.world_snapshot.risk.score}/100
+                  </li>
+                )}
+                {audit.receipt.world_snapshot.quotes.length === 0 &&
+                  !audit.receipt.world_snapshot.risk && (
+                    <li className="muted">No price/risk facts extracted</li>
+                  )}
+              </ul>
+            </div>
+          </div>
+
+          <div
+            className={`seal seal-${verdict?.toLowerCase()}`}
+            role="status"
+            aria-label={`Verdict ${verdict}`}
+          >
+            <span className="seal-mark">{verdict}</span>
+            <span className="seal-sub">
+              {audit.receipt.algorithm} · sealed
+            </span>
+          </div>
+
+          <h3>Contradictions</h3>
+          {audit.contradictions.length === 0 ? (
+            <p className="muted">No contradictions — claim matches the world.</p>
+          ) : (
+            <ul className="contradictions">
+              {audit.contradictions.map((c, i) => (
+                <li key={`${c.kind}-${i}`} className={`sev-${c.severity}`}>
+                  <strong>{c.kind}</strong> · {c.claim}
+                  <br />
+                  <span className="world-line">→ {c.world}</span>
                 </li>
               ))}
             </ul>
-          </>
+          )}
+
+          <p className="receipt-meta muted">
+            Receipt <code>{audit.receipt.id}</code>
+            <br />
+            Hash <code>{audit.receipt.hash_bytes32}</code>
+            <br />
+            {audit.receipt.fetched_at}
+          </p>
+        </section>
+      )}
+
+      <section className="card wdk-gate">
+        <h2>WDK spend gate</h2>
+        <p className="muted">
+          Core loop: sealed FALSE → USDT does not move. Uses{" "}
+          <code>@tetherto/wdk</code> dry-run (no live broadcast).
+        </p>
+        <button
+          type="button"
+          onClick={onTrySend}
+          disabled={!audit || loading}
+          className={verdict === "FALSE" ? "danger" : undefined}
+        >
+          Try send USDT
+        </button>
+        {guard && (
+          <div
+            className={`guard-result guard-${guard.status}`}
+            role="status"
+          >
+            <p className="guard-status">{guard.status.toUpperCase()}</p>
+            <p>{guard.reason}</p>
+            <pre>{JSON.stringify(guard.wdk, null, 2)}</pre>
+          </div>
         )}
       </section>
 
-      <section className="card">
-        <h2>Portfolio state</h2>
+      <section className="card sources">
+        <h2>Evidence sources</h2>
+        <p className="muted">
+          Same quotes + risk engine the audit uses — supporting, not the product.
+        </p>
         {portfolio && (
-          <>
-            <p>
-              Total{" "}
-              <strong>
-                $
-                {portfolio.total_value_usd.toLocaleString("en-US", {
-                  maximumFractionDigits: 0,
-                })}
-              </strong>
-              {" · "}
-              USDT share{" "}
-              <strong>{portfolio.usdt_share_pct.toFixed(1)}%</strong>
-            </p>
-            <table>
-              <thead>
-                <tr>
-                  <th>Asset</th>
-                  <th>Value</th>
-                  <th>Weight</th>
-                  <th>PnL</th>
-                  <th>24h</th>
-                </tr>
-              </thead>
-              <tbody>
-                {portfolio.positions.map((p) => (
-                  <tr key={p.symbol}>
-                    <td>{p.symbol.toUpperCase()}</td>
-                    <td>${p.value_usd.toFixed(0)}</td>
-                    <td>{p.weight_pct.toFixed(1)}%</td>
-                    <td>
-                      {p.pnl_pct == null
-                        ? "—"
-                        : `${p.pnl_pct >= 0 ? "+" : ""}${p.pnl_pct.toFixed(1)}%`}
-                    </td>
-                    <td>
-                      {p.change_24h_pct == null
-                        ? "—"
-                        : `${p.change_24h_pct >= 0 ? "+" : ""}${p.change_24h_pct.toFixed(2)}%`}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </>
+          <p>
+            Portfolio $
+            {portfolio.total_value_usd.toLocaleString("en-US", {
+              maximumFractionDigits: 0,
+            })}{" "}
+            · USDT share {portfolio.usdt_share_pct.toFixed(1)}%
+            {risk && (
+              <>
+                {" "}
+                · risk {risk.band} ({risk.score})
+              </>
+            )}
+          </p>
         )}
       </section>
 
@@ -294,14 +232,32 @@ export function App() {
 
       <footer>
         <p>
-          Same evidence engine as MCP <code>get_market_pulse</code>.{" "}
-          <strong>Not financial advice.</strong> The agent decides.
+          Same engine as MCP (<code>audit_claim</code>,{" "}
+          <code>check_spend_guard</code>). <strong>Not financial advice.</strong>
         </p>
         <p className="onchain muted">
           On-chain registry (Ethereum Sepolia):{" "}
-          <a href={registryExplorer} target="_blank" rel="noreferrer">
-            {registryAddress.slice(0, 10)}…
-          </a>
+          {import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS ? (
+            <a
+              href={
+                import.meta.env.VITE_CASANDRA_REGISTRY_EXPLORER ||
+                `https://sepolia.etherscan.io/address/${import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS}`
+              }
+              target="_blank"
+              rel="noreferrer"
+            >
+              {String(import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS).slice(0, 10)}
+              …
+            </a>
+          ) : (
+            <a
+              href="https://sepolia.etherscan.io/address/0xc9fcDEC150C8903b51F299dcBa308F453C4AB975"
+              target="_blank"
+              rel="noreferrer"
+            >
+              0xc9fcDEC1…
+            </a>
+          )}
         </p>
       </footer>
     </main>

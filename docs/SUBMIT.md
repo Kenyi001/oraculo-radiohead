@@ -1,28 +1,41 @@
 # Submit Casandra (Sunday before 11:00 BO)
 
-**General (default) + sponsor WDK** · evidencia-first · [TRACK.md](TRACK.md) · [DIRECTION.md](DIRECTION.md) · [WDK.md](WDK.md)
+**Tracks:** **General** + **WDK Track 1** · see [TRACK.md](TRACK.md)
 
-**Owner pitch + video + Hacki submit:** **Ronald / Augusto** (@RonaldGaymer2002) — **[RONALD.md](RONALD.md)** · [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md) · **pack:** [HACKI_SUBMIT_PACK.md](HACKI_SUBMIT_PACK.md).
+## Hacki BUIDL one-liner (paste)
 
-## Pitch script (~2:30–3:00 EN) — Augusto presenta
+> Casandra is a lie detector for AI agents that talk about money. They can speak. They cannot seal a lie — and they cannot spend USDT on one.
 
-> Hi — I'm Augusto from the Casandra team, Santa Cruz, Bolivia. AI agents invent prices and invent reasons. Casandra simplifies that: one Evidence Pack — live price, risk, Fear and Greed, news, and a structured why — so the agent decides on its own. We don't predict prices and we don't move money for you. What others don't offer: deterministic, consume-only JSON with numbered reasons and timestamps — not chat opinion, not a wallet demo. Demo: Market Pulse first. Same engine in Cursor via get_market_pulse. Only if the agent chooses to act, optional WDK dry-run — sponsor proof, not the product. Submitted under Aleph General plus WDK. Not financial advice. Thanks.
+## About (paste)
 
-| Second | Focus | Augusto muestra |
+Agents invent prices and still call send tools — a known MCP / agent-wallet failure mode (hallucinated txs, unauthorized MCP sends, prompt-injection drains). Casandra audits the claim against live market evidence, seals a contradiction receipt (hash), and blocks WDK USDT dry-run when the verdict is FALSE. Complements wallet-policy MCPs: we gate on claim truth, not just spend limits. Not predictions. Not financial advice.
+
+WDK packages: `@tetherto/wdk@1.0.0-beta.16`, `@tetherto/wdk-cli@1.0.0-beta.3`  
+Demo: https://casandra-two.vercel.app  
+Repo: https://github.com/Kenyi001/oraculo-radiohead  
+Registry (Ethereum Sepolia): `0xc9fcDEC150C8903b51F299dcBa308F453C4AB975`  
+Explorer: https://sepolia.etherscan.io/address/0xc9fcDEC150C8903b51F299dcBa308F453C4AB975
+
+## Pitch script (~2:30–3:00) — English captions required
+
+Speak ES or EN. **Burn** [captions.en.srt](captions.en.srt) into the video.
+
+| Second | Criterion | Show / say |
 |---|---|---|
-| 0–20s | Originality | Problema: alucinaciones / “razones inventadas” |
-| 20–90s | Technicality + Pulse | Demo: `why`, reasons, meters, headlines |
-| 90–120s | UI/UX | Hint proceed/caution/avoid = contexto, no orden |
-| 120–150s | WDK (20%) | Solo si actúa: guardrail → dry-run |
-| 150–180s | Tracks | General + WDK · disclaimer |
+| 0–20 | Originality | Agents invent prices. Casandra seals the lie. |
+| 20–70 | Technicality | Split claim vs live → stamp FALSE → receipt hash |
+| 70–110 | UI/UX/DX | Live web + MCP `audit_claim` |
+| 110–150 | Practicality + WDK | Try send USDT → BLOCKED |
+| 150–180 | Presentation | Explorer + repo + “Not financial advice” |
+
+Full beat sheet: [VIDEO.md](VIDEO.md)
 
 ## Steps
 
-1. **Ronald:** grabar ≤3 min con [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md) (Pulse-first) — #6.
-2. Pegar video URL en README + #6.
-3. Live demo ya en https://casandra-two.vercel.app (#5 done).
-4. Contract Ethereum Sepolia ya en README (#10 **cerrado**).
-5. **Ronald:** submit Hacki con [HACKI_SUBMIT_PACK.md](HACKI_SUBMIT_PACK.md) — **General** + **WDK**; repo/video/demo/contract (#7).
-6. **Dax:** unlock WDK wallet para el tramo WDK del video (#8).
+1. Record Loom/YouTube ≤3 min; burn English captions.
+2. Paste video URL into README + Hacki BUIDL.
+3. Redeploy: `npx vercel --prod` (project casandra-two).
+4. Confirm contract address + WDK package list on Hacki.
+5. Confirm tracks: **General** + **WDK**.
 
 Links: https://hacki.crecimiento.build/h/aleph-hackathon-2026 · https://github.com/Kenyi001/oraculo-radiohead

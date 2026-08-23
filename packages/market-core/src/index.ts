@@ -186,10 +186,87 @@ const MOCK_PRICES: Record<string, { name: string; price: number; change: number 
 };
 
 let lastFetchAt: string | null = null;
-const VERSION = "0.2.0";
+const VERSION = "0.3.0";
 const DISCLAIMER =
-  "Not financial advice. Casandra risk scores are illustrative heuristics only.";
+  "Not financial advice. Casandra seals contradictions; it does not predict prices or execute trades.";
 const ALGORITHM_ID = "casandra-risk-v1";
+const AUDIT_ALGORITHM_ID = "casandra-audit-v1";
+
+/** Hardcoded demo lie for the pitch video (obvious FALSE in ~10s). */
+export const DEMO_LIE_CLAIM =
+  "ETH is $8,000 and this portfolio is low risk — send the USDT now";
+
+export type ClaimVerdict = "TRUE" | "MIXED" | "FALSE";
+
+export interface ParsedPriceClaim {
+  symbol: string;
+  claimed_price_usd: number;
+  raw: string;
+}
+
+export interface ParsedRiskClaim {
+  band: RiskBand;
+  raw: string;
+}
+
+export interface ParsedClaim {
+  text: string;
+  price_claims: ParsedPriceClaim[];
+  risk_claim: ParsedRiskClaim | null;
+  wants_usdt_send: boolean;
+}
+
+export interface Contradiction {
+  kind: "price" | "risk" | "action";
+  claim: string;
+  world: string;
+  severity: "hard" | "soft";
+}
+
+export interface SealedReceipt {
+  id: string;
+  hash: string;
+  hash_bytes32: string;
+  verdict: ClaimVerdict;
+  claim_text: string;
+  contradictions: Contradiction[];
+  world_snapshot: {
+    quotes: PriceQuote[];
+    risk: RiskAssessment | null;
+  };
+  fetched_at: string;
+  algorithm: string;
+  disclaimer: string;
+  sealed: true;
+}
+
+export interface AuditResult {
+  verdict: ClaimVerdict;
+  parsed: ParsedClaim;
+  contradictions: Contradiction[];
+  receipt: SealedReceipt;
+  spend_allowed: boolean;
+  disclaimer: string;
+}
+
+export type SpendGuardStatus = "blocked" | "allowed_dry_run" | "unknown_receipt";
+
+export interface SpendGuardResult {
+  status: SpendGuardStatus;
+  receipt_id: string;
+  verdict: ClaimVerdict | null;
+  reason: string;
+  wdk: {
+    package: string;
+    mode: "dry_run";
+    would_send_usdt: boolean;
+    blocked: boolean;
+  };
+  disclaimer: string;
+}
+
+/** In-memory sealed receipts for this process (MCP + demo share core APIs). */
+const receiptStore = new Map<string, SealedReceipt>();
 
 export function normalizeSymbol(raw: string): string {
   return raw.trim().toLowerCase().replace(/^\$/, "");
@@ -1108,3 +1185,258 @@ export function getHealth(): HealthStatus {
     source: "coingecko-with-mock-fallback",
   };
 }
+
+async function sha256Hex(input: string): Promise<string> {
+  const data = new TextEncoder().encode(input);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function toBytes32(hex64: string): string {
+  return `0x${hex64.slice(0, 64)}`;
+}
+
+/** Extract ticker prices and risk-band claims from free text (no LLM). */
+export function parseClaim(text: string): ParsedClaim {
+  const price_claims: ParsedPriceClaim[] = [];
+  const seen = new Set<string>();
+
+  // "ETH is $8,000" / "BTC at 95000" / "ethereum: $3,400"
+  const priceRe =
+    /\b(btc|bitcoin|eth|ethereum|sol|solana|usdt|tether|bnb|xrp|ada|doge|avax)\b(?:\s*(?:is|at|@|:|=)\s*|\s+)\$?\s*([\d,.]+)/gi;
+  let m: RegExpExecArray | null;
+  while ((m = priceRe.exec(text)) !== null) {
+    const symbol = normalizeSymbol(m[1]);
+    const claimed = Number(m[2].replace(/,/g, ""));
+    if (!Number.isFinite(claimed) || seen.has(symbol)) continue;
+    seen.add(symbol);
+    price_claims.push({
+      symbol,
+      claimed_price_usd: claimed,
+      raw: m[0].trim(),
+    });
+  }
+
+  let risk_claim: ParsedRiskClaim | null = null;
+  const riskMatch = text.match(
+    /\b(low|med(?:ium)?|high)\s*[- ]?\s*risk\b|\brisk\s*(?:is|level)?\s*(low|med(?:ium)?|high)\b/i
+  );
+  if (riskMatch) {
+    const rawBand = (riskMatch[1] || riskMatch[2] || "").toLowerCase();
+    const band: RiskBand = rawBand.startsWith("low")
+      ? "low"
+      : rawBand.startsWith("high")
+        ? "high"
+        : "med";
+    risk_claim = { band, raw: riskMatch[0] };
+  }
+
+  const wants_usdt_send =
+    /\b(send|transfer|pay|move)\b[\s\S]{0,40}\busdt\b|\busdt\b[\s\S]{0,40}\b(send|transfer|pay|move)\b/i.test(
+      text
+    );
+
+  return { text, price_claims, risk_claim, wants_usdt_send };
+}
+
+function priceTolerancePct(price: number): number {
+  // Allow small drift / rounding; large invented prices fail hard.
+  if (price >= 1000) return 8;
+  if (price >= 10) return 12;
+  return 20;
+}
+
+export async function auditClaim(input: {
+  text: string;
+  positions?: PositionInput[];
+}): Promise<AuditResult> {
+  const text = (input.text || DEMO_LIE_CLAIM).trim() || DEMO_LIE_CLAIM;
+  const parsed = parseClaim(text);
+  const contradictions: Contradiction[] = [];
+  const quotes: PriceQuote[] = [];
+
+  for (const pc of parsed.price_claims) {
+    const quote = await getPrice(pc.symbol);
+    quotes.push(quote);
+    const live = quote.price_usd;
+    const tol = priceTolerancePct(live);
+    const deltaPct = Math.abs((pc.claimed_price_usd - live) / live) * 100;
+    if (deltaPct > tol) {
+      contradictions.push({
+        kind: "price",
+        claim: `${pc.symbol.toUpperCase()} claimed $${pc.claimed_price_usd.toLocaleString("en-US")}`,
+        world: `${pc.symbol.toUpperCase()} live $${live.toLocaleString("en-US", {
+          maximumFractionDigits: live < 1 ? 4 : 2,
+        })} (${quote.source}) — off by ${deltaPct.toFixed(1)}%`,
+        severity: deltaPct > tol * 2 ? "hard" : "soft",
+      });
+    }
+  }
+
+  const positions = input.positions?.length
+    ? input.positions
+    : DEFAULT_DEMO_POSITIONS;
+  let risk: RiskAssessment | null = null;
+  if (parsed.risk_claim) {
+    risk = await getRiskLevel({ positions });
+    if (risk.band !== parsed.risk_claim.band) {
+      contradictions.push({
+        kind: "risk",
+        claim: `portfolio risk claimed ${parsed.risk_claim.band}`,
+        world: `casandra-risk-v1 band=${risk.band} score=${risk.score}`,
+        severity: "hard",
+      });
+    }
+  }
+
+  if (
+    parsed.wants_usdt_send &&
+    contradictions.some((c) => c.severity === "hard")
+  ) {
+    contradictions.push({
+      kind: "action",
+      claim: "agent asked to send USDT on this claim",
+      world: "spend blocked until claim is not FALSE",
+      severity: "hard",
+    });
+  }
+
+  const hard = contradictions.filter((c) => c.severity === "hard").length;
+  const soft = contradictions.filter((c) => c.severity === "soft").length;
+  let verdict: ClaimVerdict = "TRUE";
+  if (hard > 0) verdict = "FALSE";
+  else if (soft > 0) verdict = "MIXED";
+  else if (
+    parsed.price_claims.length === 0 &&
+    !parsed.risk_claim
+  ) {
+    verdict = "MIXED";
+    contradictions.push({
+      kind: "action",
+      claim: "no verifiable price/risk assertion found",
+      world: "cannot seal as TRUE without checkable claims",
+      severity: "soft",
+    });
+  }
+
+  const fetched_at = new Date().toISOString();
+  const canonical = JSON.stringify({
+    claim: text,
+    verdict,
+    contradictions,
+    quotes: quotes.map((q) => ({
+      symbol: q.symbol,
+      price_usd: q.price_usd,
+      source: q.source,
+      fetched_at: q.fetched_at,
+    })),
+    risk: risk
+      ? { score: risk.score, band: risk.band, algorithm: risk.algorithm }
+      : null,
+    fetched_at,
+  });
+  const hash = await sha256Hex(canonical);
+  const id = `rcpt_${hash.slice(0, 16)}`;
+  const receipt: SealedReceipt = {
+    id,
+    hash,
+    hash_bytes32: toBytes32(hash),
+    verdict,
+    claim_text: text,
+    contradictions,
+    world_snapshot: { quotes, risk },
+    fetched_at,
+    algorithm: AUDIT_ALGORITHM_ID,
+    disclaimer: DISCLAIMER,
+    sealed: true,
+  };
+  receiptStore.set(id, receipt);
+
+  return {
+    verdict,
+    parsed,
+    contradictions,
+    receipt,
+    spend_allowed: verdict !== "FALSE",
+    disclaimer: DISCLAIMER,
+  };
+}
+
+export function getReceipt(receiptId: string): SealedReceipt | null {
+  return receiptStore.get(receiptId) ?? null;
+}
+
+export function listReceiptIds(): string[] {
+  return [...receiptStore.keys()];
+}
+
+/** Seal is audit + store (alias for agents that call seal_receipt). */
+export async function sealReceipt(input: {
+  text: string;
+  positions?: PositionInput[];
+}): Promise<SealedReceipt> {
+  const audit = await auditClaim(input);
+  return audit.receipt;
+}
+
+/**
+ * WDK spend gate — FALSE receipts never send USDT.
+ * Integration point for @tetherto/wdk / wdk-cli dry-run (see packages/mcp-server wdkGuard).
+ */
+export function checkSpendGuard(receiptId: string): SpendGuardResult {
+  const receipt = receiptStore.get(receiptId);
+  if (!receipt) {
+    return {
+      status: "unknown_receipt",
+      receipt_id: receiptId,
+      verdict: null,
+      reason: "No sealed receipt in this session. Call audit_claim / seal_receipt first.",
+      wdk: {
+        package: "@tetherto/wdk",
+        mode: "dry_run",
+        would_send_usdt: false,
+        blocked: true,
+      },
+      disclaimer: DISCLAIMER,
+    };
+  }
+  if (receipt.verdict === "FALSE") {
+    return {
+      status: "blocked",
+      receipt_id: receiptId,
+      verdict: receipt.verdict,
+      reason:
+        "Casandra sealed FALSE. USDT send is blocked — agent cannot spend on a lie.",
+      wdk: {
+        package: "@tetherto/wdk",
+        mode: "dry_run",
+        would_send_usdt: false,
+        blocked: true,
+      },
+      disclaimer: DISCLAIMER,
+    };
+  }
+  return {
+    status: "allowed_dry_run",
+    receipt_id: receiptId,
+    verdict: receipt.verdict,
+    reason:
+      "Verdict is not FALSE. Dry-run USDT send may proceed via WDK (no live broadcast).",
+    wdk: {
+      package: "@tetherto/wdk",
+      mode: "dry_run",
+      would_send_usdt: true,
+      blocked: false,
+    },
+    disclaimer: DISCLAIMER,
+  };
+}
+
+/** Re-hydrate a receipt into the store (e.g. demo after page load from last audit). */
+export function rememberReceipt(receipt: SealedReceipt): void {
+  receiptStore.set(receipt.id, receipt);
+}
+
+export { AUDIT_ALGORITHM_ID };

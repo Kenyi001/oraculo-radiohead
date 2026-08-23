@@ -1,0 +1,55 @@
+1
+00:00:00,000 --> 00:00:08,000
+Agents invent prices. Casandra seals the lie.
+
+2
+00:00:08,000 --> 00:00:18,000
+A lie detector for AI agents that talk about money.
+
+3
+00:00:18,000 --> 00:00:32,000
+The agent claims ETH is $8,000 and this portfolio is low risk.
+
+4
+00:00:32,000 --> 00:00:42,000
+It even asks to send the USDT now.
+
+5
+00:00:42,000 --> 00:00:58,000
+Casandra compares the claim to the live market.
+
+6
+00:00:58,000 --> 00:01:12,000
+Verdict: FALSE. The contradictions are sealed.
+
+7
+00:01:12,000 --> 00:01:28,000
+Timestamped. Hashed. Same engine as the MCP.
+
+8
+00:01:28,000 --> 00:01:42,000
+Judges open the URL. Agents call audit_claim.
+
+9
+00:01:42,000 --> 00:01:58,000
+Try to send USDT through the WDK gate.
+
+10
+00:01:58,000 --> 00:02:14,000
+Blocked. USDT does not move on a false claim.
+
+11
+00:02:14,000 --> 00:02:28,000
+Receipt hash can be anchored on Ethereum Sepolia.
+
+12
+00:02:28,000 --> 00:02:42,000
+General track plus WDK Track 1 — guardrails for agents.
+
+13
+00:02:42,000 --> 00:02:55,000
+Not financial advice. Repo and live demo in the description.
+
+14
+00:02:55,000 --> 00:03:00,000
+Casandra. They can speak. They cannot seal a lie.

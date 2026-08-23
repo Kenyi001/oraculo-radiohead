@@ -1,8 +1,6 @@
 # Contracts — CasandraRegistry
 
-Minimal on-chain risk-snapshot anchor for Aleph (Hacki: provide address if deployed).
-
-**Official demo network: Ethereum Sepolia** (chainId `11155111`) — team has SepoliaETH. Base Sepolia remains optional if faucet appears later.
+Minimal on-chain anchor for Aleph (Hacki: provide address if you deploy).
 
 ## Contract
 
@@ -10,50 +8,43 @@ Minimal on-chain risk-snapshot anchor for Aleph (Hacki: provide address if deplo
 
 Bands: `0` low · `1` med · `2` high. Score 0–100.
 
-## Deployed (official)
-
-| | |
-|---|---|
-| Address | `0x27544Fe45b81C09fC91f99c0A7374970839eC4FF` |
-| Network | Ethereum Sepolia |
-| Explorer | https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF |
-| Artifact | `contracts/deployments/sepolia.json` |
-
 ## Setup
 
 ```bash
-# from repo root
+# from repo root — copy and fill PRIVATE_KEY (gitignored .env)
 cp contracts/.env.example .env
-# PRIVATE_KEY=0x...   # funded Ethereum Sepolia wallet — never commit
-# SEPOLIA_RPC=https://ethereum-sepolia-rpc.publicnode.com
+# PRIVATE_KEY=0x...   # funded Base Sepolia wallet — never commit
+# BASE_SEPOLIA_RPC=https://base-sepolia-rpc.publicnode.com
 ```
 
-## Compile / deploy (official)
+Deploy wallet currently staged in `contracts/deployments/baseSepolia.json` (`deployWallet`).  
+**Live Aleph registry (Ethereum Sepolia):**  
+`0xc9fcDEC150C8903b51F299dcBa308F453C4AB975` — https://sepolia.etherscan.io/address/0xc9fcDEC150C8903b51F299dcBa308F453C4AB975  
+
+```bash
+npm run contracts:deploy:sepolia   # funded wallet on Ethereum Sepolia
+# Base Sepolia: fund deployWallet first, then npm run contracts:deploy:base
+```
+
+Fund Base via [Alchemy Base Sepolia faucet](https://www.alchemy.com/faucets/base-sepolia) (needs mainnet eligibility) or Coinbase CDP faucet, then run Base deploy.
+
+## Compile / deploy
 
 ```bash
 npx hardhat compile
-npm run contracts:deploy:sepolia
-# = hardhat run contracts/scripts/deploy.js --network sepolia
+npx hardhat run contracts/scripts/deploy.js --network baseSepolia
 ```
 
-Log must show `chainId: 11155111`. Output: `contracts/deployments/sepolia.json`.
-
-Demo env:
+Output: `contracts/deployments/baseSepolia.json` → paste `address` into README and set:
 
 ```bash
-# packages/demo-web/.env or .env.production
-VITE_CASANDRA_REGISTRY_ADDRESS=0x27544Fe45b81C09fC91f99c0A7374970839eC4FF
-VITE_CASANDRA_REGISTRY_EXPLORER=https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF
-```
-
-## Optional Base Sepolia
-
-```bash
-npm run contracts:deploy:base
+# packages/demo-web/.env
+VITE_CASANDRA_REGISTRY_ADDRESS=0x...
+VITE_CASANDRA_REGISTRY_EXPLORER=https://sepolia.basescan.org/address/0x...
 ```
 
 ## Local smoke (no faucet)
 
 ```bash
-npm run contracts:deploy:local
+npx hardhat run contracts/scripts/deploy.js --network hardhat
 ```

@@ -14,8 +14,11 @@ Thumbs.db
 *.tsbuildinfo
 .vercel/
 coverage/
+.tmp-wdk/
 contracts/cache/
 contracts/artifacts/
 contracts/deployments/hardhat.json
 contracts/scripts/deployments/
 typechain-types/
+
+.vercel

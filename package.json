@@ -2,33 +2,27 @@
   "name": "oraculo-radiohead",
   "version": "0.1.0",
   "private": true,
-  "description": "Market Oracle MCP — real market state for AI agents (Aleph Hackathon 2026)",
+  "description": "Lie detector MCP for AI agents — seal contradictions, block USDT on FALSE (Aleph 2026)",
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w @oraculo/market-core && npm run build -w @oraculo/mcp-server && npm run build -w @oraculo/wdk-bridge && npm run build -w @oraculo/demo-web",
+    "build": "npm run build -w @oraculo/market-core && npm run build -w @oraculo/mcp-server && npm run build -w @oraculo/demo-web",
     "build:core": "npm run build -w @oraculo/market-core",
     "dev:mcp": "npm run build:core && npm run start -w @oraculo/mcp-server",
     "dev:web": "npm run build:core && npm run dev -w @oraculo/demo-web",
     "start:mcp": "npm run start -w @oraculo/mcp-server",
-    "typecheck": "npm run typecheck -w @oraculo/market-core && npm run typecheck -w @oraculo/mcp-server && npm run typecheck -w @oraculo/wdk-bridge",
-    "wdk:version": "node -e \"import('@oraculo/wdk-bridge').then(m=>console.log(JSON.stringify(m.getWdkIntegrationManifest(),null,2)))\"",
+    "typecheck": "npm run typecheck -w @oraculo/market-core && npm run typecheck -w @oraculo/mcp-server",
     "contracts:compile": "hardhat compile",
     "contracts:deploy:local": "hardhat run contracts/scripts/deploy.js --network hardhat",
-    "contracts:deploy:sepolia": "hardhat run contracts/scripts/deploy.js --network sepolia",
     "contracts:deploy:base": "hardhat run contracts/scripts/deploy.js --network baseSepolia",
-    "deploy:web": "npx vercel --prod"
+    "contracts:deploy:sepolia": "hardhat run contracts/scripts/deploy.js --network sepolia"
   },
   "engines": {
     "node": ">=20"
   },
   "author": "Dax Kenji Tellez Duran",
   "license": "MIT",
-  "dependencies": {
-    "@tetherto/wdk": "1.0.0-beta.16",
-    "@tetherto/wdk-cli": "1.0.0-beta.3"
-  },
   "devDependencies": {
     "@nomicfoundation/hardhat-ethers": "^3.0.8",
     "dotenv": "^17.4.2",

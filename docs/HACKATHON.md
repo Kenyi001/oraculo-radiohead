@@ -4,37 +4,33 @@
 
 - Deadline: **Sun 23 Aug ~11:00 Bolivia** (Hacki: 12:00 Argentina)
 - Repo: public + README
-- Demo video ≤ **3 minutes** (EN preferred for async judging)
+- Demo video ≤ **3 minutes** (EN or ES + **English captions**)
 - Deployed app URL for judges without MCP
-- **General** by default + select sponsor track **WDK** on DoraHacks / Hacki → [TRACK.md](TRACK.md) · [WDK.md](WDK.md)
-- Optimize pitch for **General** judging criteria
+- Tracks: **General** + **WDK Track 1** (see [TRACK.md](TRACK.md))
 - If contract deployed → provide address
 - Team size 1–4; each member applied individually
 
-## Oraculo / Casandra deliverables
+## Casandra deliverables
 
 - [ ] `npm run build` succeeds
-- [ ] MCP tools work in Cursor (incl. `check_wdk_guardrail`)
-- [ ] Dual MCP: Casandra + `wdk-mcp` documented
+- [ ] MCP: `audit_claim`, `seal_receipt`, `check_spend_guard`
 - [ ] Demo web live on Vercel (URL in README)
-- [x] CasandraRegistry address (Ethereum Sepolia) in README + demo
-
+- [ ] CasandraRegistry address in README + demo
 - [ ] Repo public: `Kenyi001/oraculo-radiohead`
-- [ ] Video ≤3 min uploaded (YouTube or Drive) — Casandra→WDK loop
-- [ ] Hacki / DoraHacks submit with **General + WDK**
+- [ ] Video ≤3 min + English captions burned
+- [ ] Hacki BUIDL: General + WDK; one-liner updated
 - [ ] Apply Aleph + Luma chapter SCZ completed
-
-Full checklist: [REQUIREMENTS.md](REQUIREMENTS.md)
 
 ## Pitch outline (video)
 
-1. Problem — agents hallucinate prices / may send unsafely  
-2. Solution — Casandra MCP + risk `action`  
-3. WDK — guardrail → balance / dry-run send  
-4. Live demo — web UI + Cursor  
-5. On-chain registry address (optional proof)  
-6. “Not financial advice” + repo URL
+1. Problem — agents invent prices then spend  
+2. Solution — seal contradiction + block USDT  
+3. Live demo — FALSE stamp + Try send → BLOCKED  
+4. On-chain registry + WDK packages  
+5. “Not financial advice” + repo URL
+
+Full script: [SUBMIT.md](SUBMIT.md) · [VIDEO.md](VIDEO.md) · [captions.en.srt](captions.en.srt)
 
 ## Out of scope (v1)
 
-Trading bots · custody · ML prediction · QVAC · Pears · WDK gasless Track 2
+Trading bots, custody, ML prediction, full multi-chain, QVAC/Pears.
