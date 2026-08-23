@@ -4,7 +4,7 @@
 **Deadline:** Sun 23 Aug ~11:00 America/La_Paz  
 **Tracks:** **General** (default) + sponsor **WDK**  
 **Producto:** Evidence Pack — el agente decide ([DIRECTION.md](DIRECTION.md) · [IDEA_CLARA.md](IDEA_CLARA.md))  
-**Submit pack:** [HACKI_SUBMIT_PACK.md](HACKI_SUBMIT_PACK.md)
+**Submit pack:** [HACKI_SUBMIT_PACK.md](HACKI_SUBMIT_PACK.md) · **Ronald one-pager:** [RONALD.md](RONALD.md)
 
 ## Objetivo (claro)
 
@@ -16,7 +16,7 @@ Agente → `get_market_pulse` (evidencia) → **agente decide** → solo si elig
 |---------|--------|-------|-------------|
 | **Victor** | @Vctor11180 | [#10](https://github.com/Kenyi001/oraculo-radiohead/issues/10) | **DONE** — Sepolia accepted |
 | **David** | @arnez69 | [#17](https://github.com/Kenyi001/oraculo-radiohead/issues/17) | **DONE** — Pulse en master |
-| **Ronald** | @RonaldGaymer2002 | [#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6) · [#7](https://github.com/Kenyi001/oraculo-radiohead/issues/7) | Video ≤3 min → BUIDL con [HACKI_SUBMIT_PACK.md](HACKI_SUBMIT_PACK.md) |
+| **Ronald** | @RonaldGaymer2002 | [#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6) · [#7](https://github.com/Kenyi001/oraculo-radiohead/issues/7) | **[RONALD.md](RONALD.md)** — video YouTube → Hacki Submit |
 | **Dax** | @Kenyi001 | [#8](https://github.com/Kenyi001/oraculo-radiohead/issues/8) | Unlock WDK wallet (tramo 20% del video) |
 
 ## Orden (no bloquearse)

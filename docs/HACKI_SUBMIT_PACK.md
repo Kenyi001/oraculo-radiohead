@@ -1,6 +1,7 @@
 # Hacki Submit Pack — Casandra (copy-paste para Ronald)
 
 **Owner submit:** **Ronald / Augusto** (@RonaldGaymer2002) — issues [#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6) (video) + [#7](https://github.com/Kenyi001/oraculo-radiohead/issues/7) (BUIDL).  
+**One-pager (empezá acá):** [RONALD.md](RONALD.md)  
 **Deadline:** **Sun 23 Aug ~11:00 America/La_Paz** / **~12:00 ARG**  
 **Hackathon:** [Aleph Hackathon 2026 (Hacki)](https://hacki.crecimiento.build/h/aleph-hackathon-2026)
 

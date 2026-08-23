@@ -2,7 +2,7 @@
 
 **General (default) + sponsor WDK** · evidencia-first · [TRACK.md](TRACK.md) · [DIRECTION.md](DIRECTION.md) · [WDK.md](WDK.md)
 
-**Owner pitch + video + Hacki submit:** **Ronald / Augusto** (@RonaldGaymer2002) — [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md) · **pack copy-paste:** [HACKI_SUBMIT_PACK.md](HACKI_SUBMIT_PACK.md).
+**Owner pitch + video + Hacki submit:** **Ronald / Augusto** (@RonaldGaymer2002) — **[RONALD.md](RONALD.md)** · [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md) · **pack:** [HACKI_SUBMIT_PACK.md](HACKI_SUBMIT_PACK.md).
 
 ## Pitch script (~2:30–3:00 EN) — Augusto presenta
 
