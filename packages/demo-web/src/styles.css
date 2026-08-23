@@ -89,13 +89,44 @@ body {
   margin: 0 0 0.85rem;
 }
 
+.brand-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0 0 0.85rem;
+}
+
+.brand-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius);
+  border: 1px solid var(--accent-dim);
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #000;
+}
+
+.brand-text {
+  min-width: 0;
+}
+
+.brand-mark {
+  margin: 0 0 0.15rem;
+  font-family: var(--font-brand);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
 h1,
 h1.brand-logo {
   font-family: var(--font-brand);
-  font-size: clamp(3.1rem, 12vw, 4.75rem);
+  font-size: clamp(2.6rem, 10vw, 4.4rem);
   font-weight: 700;
   font-optical-sizing: auto;
-  margin: 0 0 0.65rem;
+  margin: 0;
   letter-spacing: -0.04em;
   line-height: 0.9;
   color: var(--text);

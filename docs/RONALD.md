@@ -45,11 +45,13 @@ El formulario viejo todavía puede decir “Evidence Pack / market evidence”. 
 - [ ] 11. **Descripción de una línea\*** — pegá exactamente:
 
 ```
-Casandra is a lie detector for AI agents that talk about money. They can speak. They cannot seal a lie — and they cannot spend USDT on one.
+CAS (Casandra) is a lie detector for AI agents that talk about money — they can speak, but cannot seal a lie or spend USDT on one.
 ```
 
-- [ ] 12. **Detalles\*** — pegá el bloque “About” + Details de [HACKI_PASTE.md](HACKI_PASTE.md) (o el markdown largo de abajo).  
-  Contrato correcto: `0xc9fcDEC150C8903b51F299dcBa308F453C4AB975` (**no** `0x27544…`).
+- [ ] 12. **Detalles\*** — pegá el bloque completo de [HACKI_PASTE.md](HACKI_PASTE.md) (sección Detalles*).  
+  Aclara: **CAS** = isotype / icono · **Casandra** = producto.  
+  Contrato: `0xc9fcDEC150C8903b51F299dcBa308F453C4AB975` (**no** `0x27544…`).
+- [ ] 12b. **Logotipo** (si hay campo): `https://casandra-two.vercel.app/casandra-icon.jpg`
 - [ ] 13. **Tracks:** solo **General** + **WDK** (no Pears, no QVAC).
 - [ ] 14. **Repo:** `https://github.com/Kenyi001/oraculo-radiohead`
 - [ ] 15. Guardá / actualizá el submit (ya está “Presentado” — podés editar hasta el cierre).
@@ -57,12 +59,12 @@ Casandra is a lie detector for AI agents that talk about money. They can speak. 
 
 ---
 
-## Detalles Hacki (copiá si el About corto no alcanza)
+## Detalles Hacki (backup — mismo texto que HACKI_PASTE)
 
 ```
-## What is Casandra?
+## What is CAS / Casandra?
 
-A lie detector for AI agents that talk about money. Your USDT stays in your WDK wallet — Casandra never custodies. Agents can speak. They cannot seal a lie — and they cannot spend USDT on one.
+**CAS** is the app isotype; **Casandra** is the product — a lie detector for AI agents that talk about money. Your USDT stays in your WDK wallet — Casandra never custodies. Agents can speak. They cannot seal a lie — and they cannot spend USDT on one.
 
 ## Problem
 
@@ -79,7 +81,8 @@ Agents invent prices and still call send tools (hallucinated txs, unauthorized M
 
 - Live: https://casandra-two.vercel.app
 - Story: wallet 500 USDT → lie → FALSE → Send 200 USDT → BLOCKED
-- MCP: audit_claim → seal_receipt → check_spend_guard
+- MCP general: packages/mcp-server (casandra)
+- MCP lite (low API): packages/mcp-lite (casandra-lite)
 - API: GET /api/health · POST /api/audit-claim · POST /api/check-spend-guard
 
 ## Vs WWall (WDK Track)

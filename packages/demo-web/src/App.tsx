@@ -145,14 +145,26 @@ export function App() {
           <p className="eyebrow">
             Aleph Hackathon 2026 · Santa Cruz · General + WDK Track 1
           </p>
-          <h1 className="brand-logo" data-font-probe="casandra">
-            Casandra
-          </h1>
+          <div className="brand-row">
+            <img
+              className="brand-icon"
+              src="/casandra-icon.jpg"
+              width={72}
+              height={72}
+              alt="CAS — Casandra app icon"
+            />
+            <div className="brand-text">
+              <p className="brand-mark">CAS</p>
+              <h1 className="brand-logo" data-font-probe="casandra">
+                Casandra
+              </h1>
+            </div>
+          </div>
           <p className="tagline">
-            Lie detector for agents that talk about money.{" "}
+            <span className="tag-em">CAS</span> is Casandra — a lie detector for
+            AI agents that talk about money.{" "}
             <span className="tag-em">Your USDT stays in your WDK wallet</span>
-            — Casandra never holds funds. Seal a claim. On FALSE, send is
-            blocked.
+            — we never hold funds. Seal a claim. On FALSE, send is blocked.
           </p>
         </header>
 
