@@ -15,7 +15,8 @@
   --danger: #c94a3a;
   --brass: #c9a227;
   --radius: 0;
-  --font-display: "Fraunces", "Times New Roman", serif;
+  --font-brand: "Clash Display", "Syne", sans-serif;
+  --font-display: "Clash Display", "Syne", sans-serif;
   --font-ui: "Syne", "Arial Narrow", sans-serif;
   --font-body: "IBM Plex Sans", "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
@@ -88,15 +89,17 @@ body {
   margin: 0 0 0.85rem;
 }
 
-h1 {
-  font-family: var(--font-display);
-  font-size: clamp(3.1rem, 12vw, 4.6rem);
-  font-weight: 800;
+h1,
+h1.brand-logo {
+  font-family: var(--font-brand);
+  font-size: clamp(3.1rem, 12vw, 4.75rem);
+  font-weight: 700;
   font-optical-sizing: auto;
   margin: 0 0 0.65rem;
-  letter-spacing: -0.03em;
-  line-height: 0.92;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
   color: var(--text);
+  text-transform: none;
 }
 
 .tagline {

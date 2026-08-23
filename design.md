@@ -26,10 +26,13 @@ Patrón [getdesign.md](https://youtube.com/shorts/ba8XFsjpRvQ) + extracción ví
 
 | Rol | Familia | Uso |
 |-----|---------|-----|
-| Display | **Fraunces** | h1, balance, seal, BLOCKED |
+| Brand / logo | **Clash Display** (Fontshare; Aeternus-like geometric) | `h1.brand-logo` Casandra |
+| Display | **Clash Display** | balance, seal, BLOCKED |
 | UI | **Syne** | botones, labels, story rail |
 | Body | **IBM Plex Sans** | párrafos, claim |
 | Mono | **IBM Plex Mono** | address, hash, code |
+
+> Aeternus Variable is commercial — Clash Display is the free geometric substitute for the logo.
 
 ### Botones
 

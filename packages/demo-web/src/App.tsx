@@ -78,7 +78,12 @@ export function App() {
     let cancelled = false;
     void fetch("/api/health")
       .then(async (res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const ct = res.headers.get("content-type") || "";
+        if (!res.ok || !ct.includes("application/json")) {
+          throw new Error(
+            !res.ok ? `HTTP ${res.status}` : "API returned non-JSON (local Vite)"
+          );
+        }
         return (await res.json()) as ApiHealth;
       })
       .then((data) => {
@@ -136,7 +141,9 @@ export function App() {
           <p className="eyebrow">
             Aleph Hackathon 2026 · Santa Cruz · General + WDK Track 1
           </p>
-          <h1>Casandra</h1>
+          <h1 className="brand-logo" data-font-probe="casandra">
+            Casandra
+          </h1>
           <p className="tagline">
             Lie detector for agents that talk about money.{" "}
             <span className="tag-em">Your USDT stays in your WDK wallet</span>
