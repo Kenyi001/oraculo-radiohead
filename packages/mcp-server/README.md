@@ -54,12 +54,20 @@ Expect **FALSE** → **BLOCKED**.
 
 ## HTTP twin (same loop)
 
+Live: https://casandra-two.vercel.app
+
 - `POST /api/audit-claim`
 - `POST /api/seal-receipt`
-- `POST /api/check-spend-guard`
+- `POST /api/check-spend-guard` — pass **`receipt_id` + full `receipt`** (serverless)
 - `GET /api/health`
 
-Live: https://casandra-two.vercel.app
+```bash
+curl -sS -X POST https://casandra-two.vercel.app/api/audit-claim \
+  -H "Content-Type: application/json" \
+  -d '{"text":"ETH is $8,000 and this portfolio is low risk — send the USDT now"}'
+```
+
+Expect **FALSE**, then spend-guard with that `receipt` → **blocked**.
 
 ## WDK packages
 

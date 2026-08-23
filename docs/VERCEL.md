@@ -29,6 +29,13 @@ npm run build -w @oraculo/demo-web
 
 Or: `npm run deploy:web` (runs `npx vercel --prod`).
 
+### Local UI + API
+
+1. Terminal A: `npx vercel dev` (API on `:3000`)
+2. Terminal B: `npm run dev:web` (Vite on `:5173`, proxies `/api` → `:3000`)
+
+Without `vercel dev`, the SPA falls back to in-browser `market-core` and shows a local-fallback notice.
+
 ## Dashboard import (alternative)
 
 1. [vercel.com/new](https://vercel.com/new) → Import `Kenyi001/oraculo-radiohead`
@@ -70,8 +77,9 @@ Redeploy after any `VITE_*` change so Vite bakes them into the bundle.
 ## Smoke check
 
 - [ ] HTTPS opens Casandra (wallet → seal FALSE → Send → BLOCKED)
+- [ ] Network tab: `POST /api/audit-claim` then `POST /api/check-spend-guard`
 - [ ] `GET https://casandra-two.vercel.app/api/health` returns JSON with registry `0xc9fcDEC1…`
-- [ ] `POST /api/audit-claim` seals FALSE on demo lie
+- [ ] `POST /api/audit-claim` seals FALSE on demo lie (`source: coingecko`)
 - [ ] Footer shows Sepolia registry `0xc9fcDEC1…`
 - [ ] Agent path section shows Live API when functions are up
 - [ ] After video env: `#pitch-video` shows YouTube embed

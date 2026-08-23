@@ -26,14 +26,32 @@ export default async function handler(req, res) {
     if (!receiptId) {
       res.status(400).json({
         error: "receipt_id is required",
-        hint: "Call POST /api/audit-claim first, then pass receipt.id here.",
+        hint:
+          "Call POST /api/audit-claim first, then POST here with { receipt_id, receipt } — receipt is required across serverless cold starts.",
       });
       return;
     }
     if (body.receipt && typeof body.receipt === "object") {
+      const rid =
+        typeof body.receipt.id === "string" ? body.receipt.id : "";
+      if (rid && rid !== receiptId) {
+        res.status(400).json({
+          error: "receipt.id does not match receipt_id",
+          hint: "Use receipt.id from the same audit-claim / seal-receipt response.",
+        });
+        return;
+      }
       rememberReceipt(body.receipt);
     }
     const result = checkSpendGuard(receiptId);
+    if (result.status === "unknown_receipt" && !body.receipt) {
+      res.status(200).json({
+        ...result,
+        hint:
+          "Pass the full receipt from POST /api/audit-claim with receipt_id. Serverless instances do not share in-memory receipts.",
+      });
+      return;
+    }
     res.status(200).json(result);
   } catch (err) {
     res.status(500).json({

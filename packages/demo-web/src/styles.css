@@ -476,6 +476,65 @@ h1.brand-logo {
   margin: 0 0 0.95rem;
 }
 
+.gate-legend {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  font-size: 0.82rem;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.gate-legend strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.btn-copy {
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid var(--accent-dim);
+  padding: 0.28rem 0.55rem;
+  cursor: pointer;
+  border-radius: var(--radius);
+}
+
+.btn-copy:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.snippet-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.snippet-head h3,
+.snippet-head .snippet-sub {
+  margin: 0;
+}
+
+.snippet-head-follow {
+  margin-top: 0.85rem;
+}
+
+.agent-curl-block {
+  margin-bottom: 0.25rem;
+}
+
 .claim-form textarea {
   width: 100%;
   background: var(--ink);
@@ -830,6 +889,11 @@ pre {
 
 .error {
   color: var(--false);
+}
+
+.seal-status {
+  margin-top: 0.65rem;
+  font-size: 0.85rem;
 }
 
 /* —— Agent / MCP / API path —— */

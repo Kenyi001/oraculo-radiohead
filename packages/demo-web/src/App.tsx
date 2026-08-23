@@ -5,8 +5,17 @@ import {
   checkSpendGuard,
   rememberReceipt,
   type AuditResult,
+  type PositionInput,
   type SpendGuardResult,
 } from "@oraculo/market-core";
+import {
+  fetchHealth,
+  isMockOnlyAudit,
+  postAuditClaim,
+  postCheckSpendGuard,
+  type ApiHealth,
+  type AuditTransport,
+} from "./casandraApi";
 import { youtubeEmbedUrl, youtubeWatchUrl } from "./youtube";
 
 const DEMO_WALLET = {
@@ -16,6 +25,21 @@ const DEMO_WALLET = {
   sendAmount: 200,
 };
 
+/** Portfolio under audit — USDT ballast matches wallet story (500). */
+const DEMO_POSITIONS: PositionInput[] = [
+  { symbol: "usdt", quantity: 500, cost_basis_usd: 1 },
+  { symbol: "btc", quantity: 0.01, cost_basis_usd: 70000 },
+  { symbol: "eth", quantity: 0.25, cost_basis_usd: 3200 },
+];
+
+const REGISTRY_ADDRESS =
+  (import.meta.env.VITE_CASANDRA_REGISTRY_ADDRESS as string | undefined) ||
+  "0xc9fcDEC150C8903b51F299dcBa308F453C4AB975";
+const REGISTRY_EXPLORER =
+  (import.meta.env.VITE_CASANDRA_REGISTRY_EXPLORER as string | undefined) ||
+  `https://sepolia.etherscan.io/address/${REGISTRY_ADDRESS}`;
+const REGISTRY_SHORT = `${REGISTRY_ADDRESS.slice(0, 10)}…`;
+
 const PITCH_SCRIPT_URL =
   "https://github.com/Kenyi001/oraculo-radiohead/blob/master/docs/RONALD_PITCH.md";
 const MCP_README_URL =
@@ -24,6 +48,38 @@ const MCP_LITE_README_URL =
   "https://github.com/Kenyi001/oraculo-radiohead/blob/master/packages/mcp-lite/README.md";
 const MCP_DOCS_URL =
   "https://github.com/Kenyi001/oraculo-radiohead/blob/master/docs/MCP.md";
+const LIVE_ORIGIN = "https://casandra-two.vercel.app";
+
+const MCP_GENERAL_SNIPPET = `{
+  "mcpServers": {
+    "casandra": {
+      "command": "node",
+      "args": ["packages/mcp-server/dist/index.js"],
+      "cwd": "/absolute/path/to/oraculo-radiohead"
+    }
+  }
+}`;
+
+const MCP_LITE_SNIPPET = `{
+  "mcpServers": {
+    "casandra-lite": {
+      "command": "node",
+      "args": ["packages/mcp-lite/dist/index.js"],
+      "cwd": "/absolute/path/to/oraculo-radiohead",
+      "env": {
+        "CASANDRA_CACHE_TTL_MS": "300000"
+      }
+    }
+  }
+}`;
+
+const CURL_AUDIT = `curl -sS -X POST ${LIVE_ORIGIN}/api/audit-claim \\
+  -H "Content-Type: application/json" \\
+  -d '{"text":"ETH is $8,000 and this portfolio is low risk — send the USDT now"}'`;
+
+const CURL_GUARD = `curl -sS -X POST ${LIVE_ORIGIN}/api/check-spend-guard \\
+  -H "Content-Type: application/json" \\
+  -d '{"receipt_id":"rcpt_FROM_AUDIT","receipt":{...paste receipt object...}}'`;
 
 const DEMO_VIDEO_RAW = import.meta.env.VITE_DEMO_VIDEO_URL as
   | string
@@ -31,31 +87,99 @@ const DEMO_VIDEO_RAW = import.meta.env.VITE_DEMO_VIDEO_URL as
 const EMBED_SRC = youtubeEmbedUrl(DEMO_VIDEO_RAW);
 const WATCH_HREF = youtubeWatchUrl(DEMO_VIDEO_RAW);
 
-type ApiHealth = { ok?: boolean; version?: string; error?: string };
+/** Survive React StrictMode remount — auto-demo runs once per page load. */
+let autoDemoStarted = false;
+
+function CopyButton({ label, text }: { label: string; text: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      className="btn-copy"
+      onClick={() => {
+        void navigator.clipboard.writeText(text).then(() => {
+          setCopied(true);
+          window.setTimeout(() => setCopied(false), 1600);
+        });
+      }}
+    >
+      {copied ? "Copied" : label}
+    </button>
+  );
+}
+
+async function auditViaApiOrLocal(
+  text: string
+): Promise<{ result: AuditResult; transport: AuditTransport }> {
+  try {
+    let result = await postAuditClaim({ text, positions: DEMO_POSITIONS });
+    if (isMockOnlyAudit(result)) {
+      try {
+        result = await postAuditClaim({ text, positions: DEMO_POSITIONS });
+      } catch {
+        /* keep first API result */
+      }
+    }
+    rememberReceipt(result.receipt);
+    return { result, transport: "api" };
+  } catch {
+    const result = await auditClaim({ text, positions: DEMO_POSITIONS });
+    rememberReceipt(result.receipt);
+    return { result, transport: "local" };
+  }
+}
+
+async function guardViaApiOrLocal(
+  receipt: AuditResult["receipt"]
+): Promise<{ guard: SpendGuardResult; transport: AuditTransport }> {
+  rememberReceipt(receipt);
+  try {
+    const guard = await postCheckSpendGuard({
+      receipt_id: receipt.id,
+      receipt,
+    });
+    return { guard, transport: "api" };
+  } catch {
+    return { guard: checkSpendGuard(receipt.id), transport: "local" };
+  }
+}
 
 export function App() {
   const [claim, setClaim] = useState(DEMO_LIE_CLAIM);
   const [audit, setAudit] = useState<AuditResult | null>(null);
   const [guard, setGuard] = useState<SpendGuardResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [guardLoading, setGuardLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [sealPulse, setSealPulse] = useState(0);
   const [apiHealth, setApiHealth] = useState<ApiHealth | null>(null);
+  const [auditTransport, setAuditTransport] = useState<AuditTransport | null>(
+    null
+  );
+  const [quoteMode, setQuoteMode] = useState<"live" | "mock" | null>(null);
   const sendBtnRef = useRef<HTMLButtonElement>(null);
-  const bootstrapped = useRef(false);
   const claimId = useId();
+  const auditAbort = useRef(0);
 
   async function runAudit(text = claim, opts?: { scrollToSeal?: boolean }) {
+    const ticket = ++auditAbort.current;
     setLoading(true);
     setError(null);
     setGuard(null);
     try {
-      const result = await auditClaim({ text });
-      rememberReceipt(result.receipt);
+      const { result, transport } = await auditViaApiOrLocal(text);
+      if (ticket !== auditAbort.current) return;
       setAudit(result);
+      setAuditTransport(transport);
+      setQuoteMode(isMockOnlyAudit(result) ? "mock" : "live");
       setSealPulse((n) => n + 1);
       setStep(2);
+      if (transport === "local") {
+        setError(
+          "Local fallback — /api offline. Live deploy uses POST /api/audit-claim."
+        );
+      }
       if (opts?.scrollToSeal) {
         requestAnimationFrame(() => {
           document.getElementById("seal-board")?.scrollIntoView({
@@ -65,39 +189,33 @@ export function App() {
         });
       }
     } catch (err) {
+      if (ticket !== auditAbort.current) return;
       setError(err instanceof Error ? err.message : String(err));
     } finally {
-      setLoading(false);
+      if (ticket === auditAbort.current) setLoading(false);
     }
   }
 
   useEffect(() => {
-    if (bootstrapped.current) return;
-    bootstrapped.current = true;
+    if (autoDemoStarted) return;
+    autoDemoStarted = true;
     void runAudit(DEMO_LIE_CLAIM, { scrollToSeal: false });
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- auto-demo once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- auto-demo once per page load
   }, []);
 
   useEffect(() => {
     let cancelled = false;
-    void fetch("/api/health")
-      .then(async (res) => {
-        const ct = res.headers.get("content-type") || "";
-        if (!res.ok || !ct.includes("application/json")) {
-          throw new Error(
-            !res.ok ? `HTTP ${res.status}` : "API returned non-JSON (local Vite)"
-          );
-        }
-        return (await res.json()) as ApiHealth;
-      })
+    void fetchHealth()
       .then((data) => {
-        if (!cancelled) setApiHealth({ ok: data.ok !== false, version: data.version });
+        if (!cancelled) {
+          setApiHealth({ ok: data.ok !== false, version: data.version });
+        }
       })
       .catch(() => {
         if (!cancelled) {
           setApiHealth({
             ok: false,
-            error: "API offline in local Vite — live deploy serves /api/*",
+            error: "API offline — run vercel dev or use live deploy",
           });
         }
       });
@@ -111,18 +229,31 @@ export function App() {
     void runAudit(claim, { scrollToSeal: true });
   }
 
-  function onTrySend() {
-    if (!audit) return;
-    rememberReceipt(audit.receipt);
-    setGuard(checkSpendGuard(audit.receipt.id));
-    setStep(3);
-    requestAnimationFrame(() => {
-      document.getElementById("wdk-gate")?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
+  async function onTrySend() {
+    if (!audit || guardLoading) return;
+    setGuardLoading(true);
+    setError(null);
+    try {
+      const { guard: next, transport } = await guardViaApiOrLocal(audit.receipt);
+      setGuard(next);
+      setStep(3);
+      if (transport === "local" && auditTransport !== "local") {
+        setError(
+          "Spend guard used local fallback — prefer POST /api/check-spend-guard on deploy."
+        );
+      }
+      requestAnimationFrame(() => {
+        document.getElementById("wdk-gate")?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+        sendBtnRef.current?.focus({ preventScroll: true });
       });
-      sendBtnRef.current?.focus({ preventScroll: true });
-    });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setGuardLoading(false);
+    }
   }
 
   function scrollToLiveDemo() {
@@ -134,6 +265,25 @@ export function App() {
 
   const verdict = audit?.verdict ?? null;
   const blocked = guard?.status === "blocked";
+  const busy = loading || guardLoading;
+
+  const pathPillLabel = (() => {
+    if (apiHealth?.ok) {
+      const parts = [`Live API · v${apiHealth.version ?? "?"}`];
+      if (auditTransport === "api") parts.push("via /api");
+      if (quoteMode === "mock") parts.push("mock quotes");
+      else if (quoteMode === "live") parts.push("coingecko");
+      return parts.join(" · ");
+    }
+    if (auditTransport === "local") {
+      return quoteMode === "mock"
+        ? "Local fallback · mock quotes"
+        : "Local fallback · browser audit";
+    }
+    return apiHealth?.error
+      ? "Interactive demo · API offline"
+      : "Interactive demo · API on deploy";
+  })();
 
   return (
     <div className="shell">
@@ -287,19 +437,20 @@ export function App() {
               onChange={(e) => setClaim(e.target.value)}
               rows={3}
               aria-labelledby={claimId}
+              disabled={busy}
             />
             <div className="row">
               <button
                 type="submit"
                 className="btn btn-primary"
-                disabled={loading}
+                disabled={busy}
               >
                 {loading ? "Sealing…" : "Seal contradiction"}
               </button>
               <button
                 type="button"
                 className="btn btn-ghost"
-                disabled={loading}
+                disabled={busy}
                 onClick={() => {
                   setClaim(DEMO_LIE_CLAIM);
                   void runAudit(DEMO_LIE_CLAIM, { scrollToSeal: true });
@@ -309,7 +460,19 @@ export function App() {
               </button>
             </div>
           </form>
+          {loading && (
+            <p className="muted seal-status" role="status">
+              Auditing via {apiHealth?.ok ? "POST /api/audit-claim" : "engine"}
+              …
+            </p>
+          )}
         </section>
+
+        {error && (
+          <p className="error" role="alert">
+            {error}
+          </p>
+        )}
 
         {audit && (
           <section
@@ -327,7 +490,7 @@ export function App() {
                 <ul className="world-list">
                   {audit.receipt.world_snapshot.quotes.map((q) => (
                     <li key={q.symbol}>
-                      {q.symbol.toUpperCase()} live $
+                      {q.symbol.toUpperCase()} $
                       {q.price_usd.toLocaleString("en-US", {
                         maximumFractionDigits: q.price_usd < 1 ? 4 : 2,
                       })}{" "}
@@ -356,8 +519,15 @@ export function App() {
               <span className="seal-mark">{verdict}</span>
               <span className="seal-sub">
                 {audit.receipt.algorithm} · sealed
+                {auditTransport === "api" ? " · /api" : " · local"}
               </span>
             </div>
+
+            {quoteMode === "mock" && (
+              <p className="muted" role="status">
+                Quotes are mock-fallback — live CoinGecko unavailable this run.
+              </p>
+            )}
 
             <h3>Contradictions</h3>
             {audit.contradictions.length === 0 ? (
@@ -400,16 +570,31 @@ export function App() {
             via <code>@tetherto/wdk</code> — no live broadcast. Casandra never
             holds the funds.
           </p>
+          <ul className="gate-legend" aria-label="Spend gate outcomes">
+            <li>
+              <strong>FALSE</strong> → <code>blocked</code>
+            </li>
+            <li>
+              <strong>TRUE / MIXED</strong> → <code>allowed_dry_run</code>{" "}
+              (preview only)
+            </li>
+            <li>
+              Missing receipt → <code>unknown_receipt</code> — pass{" "}
+              <code>receipt</code> with <code>receipt_id</code>
+            </li>
+          </ul>
           <button
             ref={sendBtnRef}
             type="button"
-            onClick={onTrySend}
-            disabled={!audit || loading}
+            onClick={() => void onTrySend()}
+            disabled={!audit || busy}
             className={
               verdict === "FALSE" ? "btn btn-danger" : "btn btn-primary"
             }
           >
-            Send {DEMO_WALLET.sendAmount} USDT
+            {guardLoading
+              ? "Checking gate…"
+              : `Send ${DEMO_WALLET.sendAmount} USDT`}
           </button>
           {guard && (
             <div
@@ -420,51 +605,89 @@ export function App() {
                 {blocked ? "BLOCKED — money stays" : guard.status.toUpperCase()}
               </p>
               <p>{guard.reason}</p>
+              {guard.hint && <p className="muted">{guard.hint}</p>}
               <pre>{JSON.stringify(guard.wdk, null, 2)}</pre>
             </div>
           )}
         </section>
 
-        {error && <p className="error">{error}</p>}
-
-        <section className="section agent-path" id="agent-path" aria-label="Agent and API">
+        <section
+          className="section agent-path"
+          id="agent-path"
+          aria-label="Agent and API"
+        >
           <div className="agent-path-head">
             <p className="panel-label">Agent path</p>
             <p
-              className={`path-pill${apiHealth?.ok ? " is-live" : " is-local"}`}
+              className={`path-pill${apiHealth?.ok && quoteMode !== "mock" ? " is-live" : " is-local"}`}
               role="status"
             >
-              {apiHealth?.ok
-                ? `Live API · v${apiHealth.version ?? "?"}`
-                : "Interactive demo · API on deploy"}
+              {pathPillLabel}
             </p>
           </div>
           <p className="muted gate-copy">
-            Two real MCP servers in this repo.{" "}
-            <strong>Pick one in Cursor</strong> — Lite = fewer CoinGecko calls.{" "}
-            Loop: <code>audit_claim</code> → <code>check_spend_guard</code> →
-            WDK dry-run. Docs:{" "}
+            How an agent uses Casandra:{" "}
+            <code>audit_claim</code> → sealed receipt →{" "}
+            <code>check_spend_guard</code> → WDK dry-run.{" "}
+            <strong>FALSE blocks send.</strong> Pick MCP (Cursor) or HTTP.
+            Docs:{" "}
             <a href={MCP_DOCS_URL} target="_blank" rel="noreferrer">
               MCP.md
             </a>
             .
           </p>
+
+          <div className="agent-col agent-api-block agent-curl-block">
+            <div className="snippet-head">
+              <h3>HTTP · copy-paste curl</h3>
+              <CopyButton label="Copy audit curl" text={CURL_AUDIT} />
+            </div>
+            <p className="muted agent-note">
+              Expect <code>verdict: FALSE</code> (CoinGecko). Then gate with the
+              same <code>receipt</code> object — required on Vercel cold starts.
+            </p>
+            <pre className="agent-snippet" tabIndex={0}>
+              {CURL_AUDIT}
+            </pre>
+            <div className="snippet-head snippet-head-follow">
+              <h3 className="snippet-sub">Then spend guard</h3>
+              <CopyButton label="Copy guard curl" text={CURL_GUARD} />
+            </div>
+            <pre className="agent-snippet" tabIndex={0}>
+              {CURL_GUARD}
+            </pre>
+            <ul className="api-list">
+              <li>
+                <a href="/api/health">
+                  <code>GET /api/health</code>
+                </a>
+              </li>
+              <li>
+                <code>POST /api/audit-claim</code>
+              </li>
+              <li>
+                <code>POST /api/check-spend-guard</code> (+{" "}
+                <code>receipt</code>)
+              </li>
+              <li>
+                <code>POST /api/seal-receipt</code>
+              </li>
+            </ul>
+          </div>
+
           <div className="agent-grid mcp-dual">
             <div className="agent-col">
-              <h3>Casandra · general</h3>
+              <div className="snippet-head">
+                <h3>MCP · general</h3>
+                <CopyButton label="Copy" text={MCP_GENERAL_SNIPPET} />
+              </div>
               <p className="muted agent-note">
-                Full agent MCP · live market tools + seal + WDK gate
+                Full tools · seal + WDK gate. Set <code>cwd</code> to your
+                clone; build first.
               </p>
-              <pre className="agent-snippet" tabIndex={0}>{`{
-  "mcpServers": {
-    "casandra": {
-      "command": "node",
-      "args": [
-        "…/packages/mcp-server/dist/index.js"
-      ]
-    }
-  }
-}`}</pre>
+              <pre className="agent-snippet" tabIndex={0}>
+                {MCP_GENERAL_SNIPPET}
+              </pre>
               <p className="muted agent-note">
                 <code>npm run build -w @oraculo/mcp-server</code> ·{" "}
                 <a href={MCP_README_URL} target="_blank" rel="noreferrer">
@@ -473,23 +696,16 @@ export function App() {
               </p>
             </div>
             <div className="agent-col">
-              <h3>Casandra Lite · low API</h3>
+              <div className="snippet-head">
+                <h3>MCP · lite</h3>
+                <CopyButton label="Copy" text={MCP_LITE_SNIPPET} />
+              </div>
               <p className="muted agent-note">
-                3 tools only · 5 min quote cache · optional offline mock
+                3 tools · 5 min cache · fewer CoinGecko calls
               </p>
-              <pre className="agent-snippet" tabIndex={0}>{`{
-  "mcpServers": {
-    "casandra-lite": {
-      "command": "node",
-      "args": [
-        "…/packages/mcp-lite/dist/index.js"
-      ],
-      "env": {
-        "CASANDRA_CACHE_TTL_MS": "300000"
-      }
-    }
-  }
-}`}</pre>
+              <pre className="agent-snippet" tabIndex={0}>
+                {MCP_LITE_SNIPPET}
+              </pre>
               <p className="muted agent-note">
                 <code>npm run build -w @oraculo/mcp-lite</code> ·{" "}
                 <a href={MCP_LITE_README_URL} target="_blank" rel="noreferrer">
@@ -497,29 +713,6 @@ export function App() {
                 </a>
               </p>
             </div>
-          </div>
-          <div className="agent-col agent-api-block">
-            <h3>HTTP API (same engine)</h3>
-            <ul className="api-list">
-              <li>
-                <code>POST /api/audit-claim</code>
-              </li>
-              <li>
-                <code>POST /api/seal-receipt</code>
-              </li>
-              <li>
-                <code>POST /api/check-spend-guard</code>
-              </li>
-              <li>
-                <a href="/api/health">
-                  <code>GET /api/health</code>
-                </a>
-              </li>
-            </ul>
-            <p className="muted agent-note">
-              Pass <code>receipt</code> with <code>receipt_id</code> on spend
-              guard so serverless stays consistent. Dry-run only — no custody.
-            </p>
           </div>
         </section>
 
@@ -531,12 +724,8 @@ export function App() {
           </p>
           <p className="onchain muted">
             On-chain registry (Ethereum Sepolia):{" "}
-            <a
-              href="https://sepolia.etherscan.io/address/0xc9fcDEC150C8903b51F299dcBa308F453C4AB975"
-              target="_blank"
-              rel="noreferrer"
-            >
-              0xc9fcDEC1…
+            <a href={REGISTRY_EXPLORER} target="_blank" rel="noreferrer">
+              {REGISTRY_SHORT}
             </a>
           </p>
         </footer>

@@ -67,6 +67,22 @@ Same engine on https://casandra-two.vercel.app :
 - `POST /api/check-spend-guard`
 - `GET /api/health`
 
+**Serverless:** always pass `receipt_id` **and** the full `receipt` from audit when calling spend-guard (instances do not share memory).
+
+```bash
+# 1) Audit — expect FALSE
+curl -sS -X POST https://casandra-two.vercel.app/api/audit-claim \
+  -H "Content-Type: application/json" \
+  -d '{"text":"ETH is $8,000 and this portfolio is low risk — send the USDT now"}'
+
+# 2) Gate — paste receipt.id + receipt object from step 1 → blocked
+curl -sS -X POST https://casandra-two.vercel.app/api/check-spend-guard \
+  -H "Content-Type: application/json" \
+  -d '{"receipt_id":"rcpt_…","receipt":{…}}'
+```
+
+Gate outcomes: `FALSE` → `blocked` · `TRUE`/`MIXED` → `allowed_dry_run` (preview only) · missing receipt → `unknown_receipt`.
+
 ## Example
 
 > Use **casandra-lite** `audit_claim` on “ETH is $8,000 … send the USDT now”, then `check_spend_guard`.

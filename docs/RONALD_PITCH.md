@@ -29,9 +29,9 @@
 | 2 | (Ignorar o 2s) bloque `#pitch-video` | “Pitch video pending” hasta que subas YouTube |
 | 3 | Señalar `#wallet` | **Your WDK wallet** · **500.00 USDT** · “Self-custody · not Casandra” · Agent wants **200 USDT** |
 | 4 | Señalar claim | Texto del agente: ETH $8,000 + low risk + send now |
-| 5 | (Si no hay sello) **Demo lie** → **Seal contradiction** | Split claim vs world + sello rojo **FALSE** |
+| 5 | (Si no hay sello) **Demo lie** → **Seal contradiction** | Split claim vs world + sello rojo **FALSE** (Network: `POST /api/audit-claim`) |
 | 6 | Scroll a contradictions | 1–2 líneas claim → world + receipt hash |
-| 7 | Click **Send 200 USDT** | **BLOCKED — money stays** + balance unchanged |
+| 7 | Click **Send 200 USDT** | **BLOCKED — money stays** + balance unchanged (Network: `POST /api/check-spend-guard`) |
 | 8 | (Opcional ≤10s) `#agent-path` | MCP + `POST /api/audit-claim` — mismo motor |
 | 9 | Footer explorer | Link Sepolia registry `0xc9fcDEC1…` |
 | 10 | Cierre | Repo + “Not financial advice” |

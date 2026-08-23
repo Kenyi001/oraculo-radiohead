@@ -11,6 +11,7 @@
     "build:core": "npm run build -w @oraculo/market-core",
     "dev:mcp": "npm run build:core && npm run start -w @oraculo/mcp-server",
     "dev:web": "npm run build:core && npm run dev -w @oraculo/demo-web",
+    "deploy:web": "npx vercel --prod",
     "start:mcp": "npm run start -w @oraculo/mcp-server",
     "start:mcp:lite": "npm run start -w @oraculo/mcp-lite",
     "typecheck": "npm run typecheck -w @oraculo/market-core && npm run typecheck -w @oraculo/mcp-server && npm run typecheck -w @oraculo/mcp-lite",

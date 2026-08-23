@@ -79,6 +79,17 @@ Live base: https://casandra-two.vercel.app
 
 Pass the full `receipt` from audit when calling spend-guard across serverless instances. Dry-run only.
 
+```bash
+curl -sS -X POST https://casandra-two.vercel.app/api/audit-claim \
+  -H "Content-Type: application/json" \
+  -d '{"text":"ETH is $8,000 and this portfolio is low risk — send the USDT now"}'
+# → verdict FALSE + receipt — then:
+curl -sS -X POST https://casandra-two.vercel.app/api/check-spend-guard \
+  -H "Content-Type: application/json" \
+  -d '{"receipt_id":"<receipt.id>","receipt":<receipt object>}'
+# → status blocked
+```
+
 ## WDK integration (permalinks for Tether)
 
 Judges: start here.

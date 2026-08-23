@@ -65,6 +65,10 @@ Same JSON under `mcpServers` in Claude’s config file.
 
 Expect **FALSE** → **BLOCKED**.
 
+## HTTP twin
+
+Same engine: https://casandra-two.vercel.app — `POST /api/audit-claim` then `POST /api/check-spend-guard` with `{ receipt_id, receipt }`. See [docs/MCP.md](../../docs/MCP.md).
+
 ## When to use Lite vs full Casandra
 
 - **Lite** — pitch demos, repeated audits, rate-limit friendly, CI smoke.

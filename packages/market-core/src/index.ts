@@ -201,7 +201,7 @@ function offlineMode(): boolean {
   const v = (process.env.CASANDRA_OFFLINE || "").trim().toLowerCase();
   return v === "1" || v === "true" || v === "yes";
 }
-const VERSION = "0.3.0";
+const VERSION = "0.3.1";
 const DISCLAIMER =
   "Not financial advice. Casandra seals contradictions; it does not predict prices or execute trades.";
 const ALGORITHM_ID = "casandra-risk-v1";
@@ -271,6 +271,8 @@ export interface SpendGuardResult {
   receipt_id: string;
   verdict: ClaimVerdict | null;
   reason: string;
+  /** Present on unknown_receipt — how to rehydrate on serverless/HTTP. */
+  hint?: string;
   wdk: {
     package: string;
     mode: "dry_run";
@@ -1433,7 +1435,10 @@ export function checkSpendGuard(receiptId: string): SpendGuardResult {
       status: "unknown_receipt",
       receipt_id: receiptId,
       verdict: null,
-      reason: "No sealed receipt in this session. Call audit_claim / seal_receipt first.",
+      reason:
+        "No sealed receipt in this process memory. Call audit_claim / seal_receipt first, then check_spend_guard with the same receipt_id.",
+      hint:
+        "HTTP/serverless: pass receipt_id AND the full receipt object from the audit response (in-memory store is per-instance). Example body: { \"receipt_id\": \"rcpt_…\", \"receipt\": { … } }",
       wdk: {
         package: "@tetherto/wdk",
         mode: "dry_run",
