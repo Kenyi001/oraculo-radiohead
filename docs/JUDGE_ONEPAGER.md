@@ -39,9 +39,11 @@ Judges: we are the missing **truth gate** in front of WDK. Policy MCPs still mat
 | Item | Link |
 |---|---|
 | Live demo | https://casandra-two.vercel.app |
+| Logo | https://casandra-two.vercel.app/casandra-icon.jpg |
 | Repo | https://github.com/Kenyi001/oraculo-radiohead |
 | Spend gate | https://github.com/Kenyi001/oraculo-radiohead/blob/master/packages/mcp-server/src/wdkGuard.ts |
 | MCP tools | https://github.com/Kenyi001/oraculo-radiohead/blob/master/packages/mcp-server/src/index.ts |
+| HTTP loop | `POST /api/audit-claim` → `POST /api/check-spend-guard` (+ `receipt`) |
 | Registry (Sepolia) | `0xc9fcDEC150C8903b51F299dcBa308F453C4AB975` |
 | Explorer | https://sepolia.etherscan.io/address/0xc9fcDEC150C8903b51F299dcBa308F453C4AB975 |
 | Packages | `@tetherto/wdk@1.0.0-beta.16` · `@tetherto/wdk-cli@1.0.0-beta.3` |

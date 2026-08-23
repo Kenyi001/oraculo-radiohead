@@ -36,16 +36,18 @@ Agents invent prices and still call send tools (hallucinated txs, unauthorized M
 
 1. Agent states a money claim (demo lie: ETH is $8,000 — send USDT).
 2. Casandra audits vs live market evidence and seals a receipt (TRUE / MIXED / FALSE + hash).
-3. Before WDK send: check_spend_guard(receipt).
+3. Before WDK send: check_spend_guard(receipt) — on HTTP pass receipt_id + full receipt (serverless).
 4. If FALSE → USDT dry-run BLOCKED. Money never moves.
 
 ## Demo
 
 - Live: https://casandra-two.vercel.app
+- Logo: https://casandra-two.vercel.app/casandra-icon.jpg
 - Story: wallet 500 USDT → lie → FALSE → Send 200 USDT → BLOCKED
+- Network: POST /api/audit-claim → POST /api/check-spend-guard (pass receipt_id + full receipt)
 - MCP general: packages/mcp-server (casandra)
 - MCP lite (low API): packages/mcp-lite (casandra-lite)
-- API: GET /api/health · POST /api/audit-claim · POST /api/check-spend-guard
+- API: GET /api/health · POST /api/audit-claim · POST /api/check-spend-guard · POST /api/seal-receipt
 
 ## Vs WWall (WDK Track)
 

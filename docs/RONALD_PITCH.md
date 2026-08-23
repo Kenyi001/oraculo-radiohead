@@ -3,37 +3,39 @@
 **Vos:** @RonaldGaymer2002 · Issues [#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6) (video) + [#7](https://github.com/Kenyi001/oraculo-radiohead/issues/7) (Hacki)  
 **Deadline:** Dom 23 Ago ~**11:00 America/La_Paz**  
 **Live:** https://casandra-two.vercel.app  
+**Logo:** https://casandra-two.vercel.app/casandra-icon.jpg  
 **Captions EN (quemar):** [captions.en.srt](captions.en.srt) · beat sheet: [VIDEO.md](VIDEO.md)  
-**Hacki paste:** [HACKI_PASTE.md](HACKI_PASTE.md)
+**Hacki paste:** [HACKI_PASTE.md](HACKI_PASTE.md) · checklist: [RONALD.md](RONALD.md)
 
 > Este archivo reemplaza el guion viejo de Market Pulse / Evidence Pack.  
-> **No digas** “oracle”, “predictions”, “Casandra mueve plata”, ni “WDK es opcional”.
+> **No digas** “oracle”, “predictions”, “Casandra mueve plata”, ni “WDK es opcional”.  
+> **No inventes** URL de YouTube — grabá, subí Unlisted, pegá la URL real en #6.
 
 ---
 
 ## 5 minutos antes de grabar
 
-1. Zoom navegador **125%**. Cerrá notificaciones.
+1. Zoom navegador **125%**. Cerrá notificaciones. Abrí DevTools → **Network** (filtrá `audit` / `check`).
 2. Abrí **solo** https://casandra-two.vercel.app (recargá una vez).
-3. Esperá a que aparezca el sello **FALSE** solo (la demo se auto-sella).
+3. Esperá el auto-demo: sello **FALSE** + pill **Live API** (Agent path).
 4. Tené listo CapCut / YouTube Studio para quemar `captions.en.srt`.
 5. Habla **español** (o inglés). Los captions van en **inglés** sí o sí.
 
 ---
 
-## Click path exacto (demo)
+## Click path exacto (demo LIVE)
 
 | # | Acción | Qué debe verse |
 |---|--------|----------------|
-| 1 | Abrir live | Header **Casandra** + tagline custody |
-| 2 | (Ignorar o 2s) bloque `#pitch-video` | “Pitch video pending” hasta que subas YouTube |
+| 1 | Abrir live | Icon **CAS** + brand **Casandra** + tagline custody |
+| 2 | (Ignorar o 2s) `#pitch-video` | “Pitch video pending” hasta que subas YouTube (sin URL falsa) |
 | 3 | Señalar `#wallet` | **Your WDK wallet** · **500.00 USDT** · “Self-custody · not Casandra” · Agent wants **200 USDT** |
-| 4 | Señalar claim | Texto del agente: ETH $8,000 + low risk + send now |
-| 5 | (Si no hay sello) **Demo lie** → **Seal contradiction** | Split claim vs world + sello rojo **FALSE** (Network: `POST /api/audit-claim`) |
-| 6 | Scroll a contradictions | 1–2 líneas claim → world + receipt hash |
-| 7 | Click **Send 200 USDT** | **BLOCKED — money stays** + balance unchanged (Network: `POST /api/check-spend-guard`) |
-| 8 | (Opcional ≤10s) `#agent-path` | MCP + `POST /api/audit-claim` — mismo motor |
-| 9 | Footer explorer | Link Sepolia registry `0xc9fcDEC1…` |
+| 4 | Señalar claim | Texto: ETH $8,000 + low risk + send now |
+| 5 | (Si no hay sello) **Demo lie** → **Seal contradiction** | Split claim vs world + sello rojo **FALSE** · Network: `POST /api/audit-claim` · quotes `coingecko` (o aviso mock) |
+| 6 | Scroll contradictions + receipt | claim → world + `rcpt_…` / hash |
+| 7 | Click **Send 200 USDT** | **BLOCKED — money stays** · balance unchanged · Network: `POST /api/check-spend-guard` |
+| 8 | (Opcional ≤10s) `#agent-path` | Pill **Live API** · curl HTTP + MCP general/lite (cwd) |
+| 9 | Footer explorer | Sepolia registry `0xc9fcDEC1…` |
 | 10 | Cierre | Repo + “Not financial advice” |
 
 **No abras** Cursor ni MCP en el video a menos que te sobre tiempo (opcional 10s al final).
@@ -47,7 +49,7 @@
 **0:00–0:20 — Hook**  
 Hola — soy Augusto, equipo Casandra, Santa Cruz.  
 Los agentes de IA inventan precios… y todavía llaman herramientas de envío.  
-Casandra es un detector de mentiras para agentes que hablan de plata.  
+Casandra — **CAS** — es un detector de mentiras para agentes que hablan de plata.  
 **Tu USDT se queda en tu wallet WDK.** Nosotros nunca custodiamos.
 
 **0:20–0:50 — Wallet + mentira**  
@@ -55,11 +57,11 @@ Acá está tu wallet: quinientos USDT. Auto-custodia — no es de Casandra.
 El agente dice: Ethereum a ocho mil dólares, riesgo bajo… y quiere mandar doscientos USDT ya.
 
 **0:50–1:20 — Sello FALSE**  
-Casandra compara el claim con el mercado en vivo.  
+Casandra compara el claim con el mercado en vivo — misma API que ven los jueces.  
 Veredicto: **FALSE**. Las contradicciones quedan selladas — con hash.
 
 **1:20–1:45 — Evidencia**  
-Mismo motor que el MCP: `audit_claim`.  
+Mismo motor que el MCP: `audit_claim` → `POST /api/audit-claim`.  
 Timestamp. Hash. Los jueces abren la URL; los agentes llaman la tool.
 
 **1:45–2:20 — WDK gate (héroe Track 1)**  
@@ -83,7 +85,7 @@ Casandra: pueden hablar. No pueden sellar una mentira.
 
 > Hi — Augusto, Casandra, Santa Cruz. AI agents invent prices and still call send tools. Casandra is a lie detector for agents that talk about money. **Your USDT stays in your WDK wallet — we never custody.**  
 > Here's your wallet: five hundred USDT. The agent claims ETH is eight thousand, risk is low, and wants to send two hundred now.  
-> We compare claim vs live market. Verdict: **FALSE**. Sealed. Hashed. Same engine as the MCP.  
+> We compare claim vs live market via the same `/api` judges hit. Verdict: **FALSE**. Sealed. Hashed. Same engine as the MCP.  
 > Try send through WDK… **BLOCKED**. Money stays. Dry-run — no live broadcast.  
 > WWall gates spend *policy*. We gate on *claim truth*. General plus WDK Track 1. Not financial advice. They can speak. They cannot seal a lie.
 
@@ -106,11 +108,11 @@ Decí **una** de estas (no todas):
 
 | Tiempo | Shot | Audio |
 |--------|------|-------|
-| 0:00–0:12 | Cara o logo + URL | Hook |
+| 0:00–0:12 | Cara o CAS icon + URL | Hook |
 | 0:12–0:35 | Full wallet strip | Custody |
 | 0:35–0:55 | Textarea claim | Mentira |
 | 0:55–1:25 | Sello FALSE grande | Veredicto |
-| 1:25–1:45 | Receipt hash | Technicality |
+| 1:25–1:45 | Receipt hash (+ Network opcional) | Technicality |
 | 1:45–2:15 | Botón Send → BLOCKED | WDK hero |
 | 2:15–2:35 | Balance unchanged | Practicality |
 | 2:35–3:00 | Footer + repo tab | Cierre |
@@ -119,12 +121,12 @@ Decí **una** de estas (no todas):
 
 ## Después de grabar (orden)
 
-Seguí la checklist completa: **[RONALD.md](RONALD.md)** (checkboxes). Resumen:
+Seguí la checklist completa: **[RONALD.md](RONALD.md)** (P0 + checkboxes). Resumen:
 
 1. Quemá [captions.en.srt](captions.en.srt).
-2. YouTube **Unlisted**.
+2. YouTube **Unlisted** — URL real únicamente.
 3. Pegá URL en: [#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6) · README `**Video:**` · Hacki Demo link\* · avisá a Dax (`VITE_DEMO_VIDEO_URL`).
-4. Hacki: [HACKI_PASTE.md](HACKI_PASTE.md) — borrá Evidence Pack / `0x27544…`.
+4. Hacki: [HACKI_PASTE.md](HACKI_PASTE.md) + logo `casandra-icon.jpg` — borrá Evidence Pack / `0x27544…`.
 5. Comentá BUIDL en [#7](https://github.com/Kenyi001/oraculo-radiohead/issues/7).
 
 ---
@@ -137,4 +139,5 @@ Seguí la checklist completa: **[RONALD.md](RONALD.md)** (checkboxes). Resumen:
 | Explorer | https://sepolia.etherscan.io/address/0xc9fcDEC150C8903b51F299dcBa308F453C4AB975 |
 | WDK | `@tetherto/wdk@1.0.0-beta.16` · `@tetherto/wdk-cli@1.0.0-beta.3` |
 | Gate code | `packages/mcp-server/src/wdkGuard.ts` |
+| Live API | `POST /api/audit-claim` · `POST /api/check-spend-guard` (+ `receipt`) |
 | BUIDL | https://hacki.crecimiento.build/h/aleph-hackathon-2026/buidls/96a0e616-5b7e-4577-84a0-6deb3d0d0a28 |
