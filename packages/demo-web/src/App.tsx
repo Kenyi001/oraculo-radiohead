@@ -316,6 +316,12 @@ export function App() {
             <span className="tag-em">Your USDT stays in your WDK wallet</span>
             — we never hold funds. Seal a claim. On FALSE, send is blocked.
           </p>
+          <p
+            className={`hero-status path-pill${apiHealth?.ok && quoteMode !== "mock" ? " is-live" : " is-local"}`}
+            role="status"
+          >
+            {pathPillLabel}
+          </p>
         </header>
 
         <section
@@ -431,7 +437,7 @@ export function App() {
           <p className="panel-label" id={claimId}>
             What the agent said
           </p>
-          <form onSubmit={onAudit} className="claim-form">
+          <form onSubmit={onAudit} className="claim-form" aria-busy={busy}>
             <textarea
               value={claim}
               onChange={(e) => setClaim(e.target.value)}
@@ -462,8 +468,9 @@ export function App() {
           </form>
           {loading && (
             <p className="muted seal-status" role="status">
-              Auditing via {apiHealth?.ok ? "POST /api/audit-claim" : "engine"}
-              …
+              {apiHealth?.ok
+                ? "POST /api/audit-claim — sealing claim vs market…"
+                : "Auditing claim (local engine)…"}
             </p>
           )}
         </section>
@@ -557,12 +564,19 @@ export function App() {
                 Seal is FALSE. Next: try to send — the door should stay shut.
               </p>
             )}
+            {verdict && verdict !== "FALSE" && !guard && (
+              <p className="next-hint next-hint-ok" role="status">
+                Seal is {verdict}. Spend guard may allow a WDK dry-run preview
+                only — still no live broadcast.
+              </p>
+            )}
           </section>
         )}
 
         <section
           className={`section wdk-gate${blocked ? " is-blocked" : ""}`}
           id="wdk-gate"
+          aria-busy={guardLoading}
         >
           <h2>Spend through WDK</h2>
           <p className="muted gate-copy">
@@ -589,20 +603,35 @@ export function App() {
             onClick={() => void onTrySend()}
             disabled={!audit || busy}
             className={
-              verdict === "FALSE" ? "btn btn-danger" : "btn btn-primary"
+              blocked || verdict === "FALSE"
+                ? "btn btn-danger"
+                : "btn btn-primary"
             }
           >
             {guardLoading
               ? "Checking gate…"
-              : `Send ${DEMO_WALLET.sendAmount} USDT`}
+              : blocked
+                ? "BLOCKED — money stays"
+                : guard?.status === "allowed_dry_run"
+                  ? `Dry-run ${DEMO_WALLET.sendAmount} USDT`
+                  : `Send ${DEMO_WALLET.sendAmount} USDT`}
           </button>
+          {guardLoading && (
+            <p className="muted seal-status" role="status">
+              POST /api/check-spend-guard…
+            </p>
+          )}
           {guard && (
             <div
               className={`guard-result guard-${guard.status}`}
               role="status"
             >
               <p className="guard-status">
-                {blocked ? "BLOCKED — money stays" : guard.status.toUpperCase()}
+                {blocked
+                  ? "BLOCKED — money stays"
+                  : guard.status === "allowed_dry_run"
+                    ? "ALLOWED — dry-run only"
+                    : guard.status.toUpperCase()}
               </p>
               <p>{guard.reason}</p>
               {guard.hint && <p className="muted">{guard.hint}</p>}
@@ -643,8 +672,10 @@ export function App() {
               <CopyButton label="Copy audit curl" text={CURL_AUDIT} />
             </div>
             <p className="muted agent-note">
-              Expect <code>verdict: FALSE</code> (CoinGecko). Then gate with the
-              same <code>receipt</code> object — required on Vercel cold starts.
+              Expect <code>verdict: FALSE</code> with{" "}
+              <code>source: coingecko</code> (or mock-fallback if rate-limited).
+              Then gate with the same <code>receipt</code> object — required on
+              Vercel cold starts.
             </p>
             <pre className="agent-snippet" tabIndex={0}>
               {CURL_AUDIT}

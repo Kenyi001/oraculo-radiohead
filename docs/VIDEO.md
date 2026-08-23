@@ -6,9 +6,10 @@ Burn [`captions.en.srt`](captions.en.srt) in CapCut / YouTube Studio before subm
 
 ## Setup before record
 
-1. Open https://casandra-two.vercel.app (reload once — demo auto-seals the lie)
-2. Zoom 125%. Show wallet strip first (500 USDT · Self-custody)
+1. Open https://casandra-two.vercel.app (reload once — demo auto-seals the lie; badge **Live API**)
+2. Zoom 125%. Show **CAS** + wallet strip first (500 USDT · Self-custody)
 3. No old jargon (`Market Pulse`, `consume_only`, `pulse-v1`)
+4. Optional Network: `POST /api/audit-claim` then `POST /api/check-spend-guard`
 
 ## Beat sheet
 

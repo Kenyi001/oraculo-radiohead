@@ -531,8 +531,19 @@ h1.brand-logo {
   margin-top: 0.85rem;
 }
 
-.agent-curl-block {
-  margin-bottom: 0.25rem;
+.hero-status {
+  display: inline-block;
+  margin: 0.85rem 0 0;
+}
+
+.next-hint-ok {
+  border-left-color: var(--true);
+}
+
+.agent-curl-block.agent-api-block {
+  margin-top: 0.85rem;
+  padding-top: 0;
+  border-top: none;
 }
 
 .claim-form textarea {
