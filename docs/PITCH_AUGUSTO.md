@@ -1,7 +1,8 @@
 # Pitch + video — Augusto (@RonaldGaymer2002)
 
-> **OBSOLETO para grabar.** Usá el kit actualizado: **[RONALD_PITCH.md](RONALD_PITCH.md)**  
-> Historia nueva: wallet custody → lie → FALSE → Send USDT → BLOCKED (no Market Pulse).
+> **OBSOLETO para grabar.** Usá el kit actualizado: **[RONALD_PITCH.md](RONALD_PITCH.md)** + checklist **[RONALD.md](RONALD.md)**.  
+> Historia: wallet custody → lie → FALSE → Send USDT → BLOCKED (no Market Pulse).  
+> Contrato canónico: `0xc9fcDEC150C8903b51F299dcBa308F453C4AB975` (**no** `0x27544…`).
 
 **Tu rol:** exponer y grabar el demo ≤3 min.  
 **Tracks:** General + WDK Track 1 (WDK es core, no opcional).  
@@ -15,11 +16,11 @@
 
 | # | Qué | Quién | Check |
 |---|-----|-------|-------|
-| 1 | Live demo https://casandra-two.vercel.app | Dax (#5 done) | [ ] |
-| 2 | Panel **Market Pulse** (why / reasons / headlines) | Ya en master | [ ] |
-| 3 | Cursor dual MCP (Casandra + wdk-wallet) | Dax (#8) | [ ] |
-| 4 | Wallet test unlock | Dax | [ ] |
-| 5 | Address contrato Ethereum Sepolia | Victor (#10) — `0x27544Fe4…` | [x] |
+| 1 | Live demo https://casandra-two.vercel.app | Dax | [x] |
+| 2 | Loop wallet → FALSE → BLOCKED | Ya en master | [x] |
+| 3 | MCP + API agent path | Dax | [x] |
+| 4 | Guion + checklist | [RONALD.md](RONALD.md) | [ ] |
+| 5 | Address contrato Ethereum Sepolia | `0xc9fcDEC1…` | [x] |
 
 ---
 

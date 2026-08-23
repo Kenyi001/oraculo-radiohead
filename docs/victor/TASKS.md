@@ -12,8 +12,8 @@
 
 | | |
 |---|---|
-| Address | `0x27544Fe45b81C09fC91f99c0A7374970839eC4FF` |
-| Explorer | https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF |
+| Address | `0xc9fcDEC150C8903b51F299dcBa308F453C4AB975` |
+| Explorer | https://sepolia.etherscan.io/address/0xc9fcDEC150C8903b51F299dcBa308F453C4AB975 |
 | Artifact | `contracts/deployments/sepolia.json` |
 
 ## Checklist (aceptado)

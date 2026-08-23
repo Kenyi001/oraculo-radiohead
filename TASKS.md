@@ -29,9 +29,9 @@
 |---|---|---|---|
 | T1–T7 | Specs, core, MCP sources, UI v1 | Dax | **done** |
 | T8 | Vercel live URL | Partner/Dax | live · redeploy after pivot |
-| T9 | CasandraRegistry Sepolia | Dax | **done** `0x27544Fe4…` |
-| T10 | Video 3 min + EN captions | Partner+Dax | open · [docs/VIDEO.md](docs/VIDEO.md) |
-| T11 | Hacki submit General + WDK | Dax | open · [docs/SHIP.md](docs/SHIP.md) |
+| T9 | CasandraRegistry Sepolia | Dax | **done** `0xc9fcDEC150C8903b51F299dcBa308F453C4AB975` |
+| T10 | Video 3 min + EN captions | **Ronald** | open · [docs/RONALD.md](docs/RONALD.md) |
+| T11 | Hacki submit General + WDK | **Ronald** | open · [docs/HACKI_PASTE.md](docs/HACKI_PASTE.md) |
 | T14 | Lie detector pivot (audit + seal + WDK gate) | Dax | **done** |
 
 ## Definition of done (Sunday)

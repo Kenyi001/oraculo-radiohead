@@ -1,8 +1,11 @@
 # Agent policy — Casandra + WDK
 
-Casandra is an **Evidence Pack** for agents. The **agent decides**. Casandra does not order trades or sends.
+> **OBSOLETO para demo Aleph.** Flujo canónico: `audit_claim` → `seal_receipt` → `check_spend_guard` (BLOCKED on FALSE).  
+> Guion/pitch: [RONALD_PITCH.md](RONALD_PITCH.md). Este doc describe el orden viejo Evidence Pack / `get_market_pulse`.
 
-## Mandatory order
+Casandra is an **Evidence Pack** for agents (legacy path). The **agent decides**. Casandra does not order trades or sends.
+
+## Mandatory order (legacy Pulse)
 
 1. Call `get_market_pulse` (symbol, optional `side`). Read `why`, `reasons[]`, `meters`, `headlines`, `confidence`, and the context hint `verdict`.
 2. **You (the agent) decide** whether to act, wait, ask the human, or stop. Do not treat `verdict` as a trade order or a prediction.

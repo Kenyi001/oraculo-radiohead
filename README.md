@@ -39,10 +39,11 @@ Casandra attacks the link *“the agent lied about the market and still wants to
 
 **Live:** https://casandra-two.vercel.app  
 **Repo:** https://github.com/Kenyi001/oraculo-radiohead  
-**Video:** _paste YouTube/Loom URL here after upload_  
+**Video:** _Ronald: paste YouTube Unlisted URL here after upload_ (then tell Dax → `VITE_DEMO_VIDEO_URL` + redeploy for `#pitch-video`)  
 **BUIDL:** https://hacki.crecimiento.build/h/aleph-hackathon-2026/buidls/96a0e616-5b7e-4577-84a0-6deb3d0d0a28
 
-Open the demo → default claim is a lie (`ETH is $8,000…`) → seal shows **FALSE** → **Try send USDT** → **BLOCKED**.
+Open the demo → default claim is a lie (`ETH is $8,000…`) → seal shows **FALSE** → **Send 200 USDT** → **BLOCKED**.  
+Pitch checklist for Ronald: [docs/RONALD.md](docs/RONALD.md)
 
 ## MCP tools (hero)
 

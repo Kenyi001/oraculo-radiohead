@@ -40,29 +40,38 @@ Or: `npm run deploy:web` (runs `npx vercel --prod`).
    - Output: `packages/demo-web/dist`
 5. Deploy
 
-## Env vars (optional until Victor finishes #10)
+## Env vars (Production)
 
-In Vercel → Project → Settings → Environment Variables (Production):
+In Vercel → Project **casandra-two** → Settings → Environment Variables:
 
 | Name | Example |
 |---|---|
 | `VITE_CASANDRA_REGISTRY_ADDRESS` | `0xc9fcDEC150C8903b51F299dcBa308F453C4AB975` |
 | `VITE_CASANDRA_REGISTRY_EXPLORER` | `https://sepolia.etherscan.io/address/0xc9fcDEC150C8903b51F299dcBa308F453C4AB975` |
+| `VITE_DEMO_VIDEO_URL` | `https://www.youtube.com/watch?v=XXXXXXXXXXX` |
 
-Already baked in `packages/demo-web/.env.production` for Vercel builds.
+Registry values are also in `packages/demo-web/.env.production`.
 
+### After Ronald pastes YouTube Unlisted
 
-Redeploy after setting them so Vite bakes them into the bundle.
+1. Set **`VITE_DEMO_VIDEO_URL`** on Vercel (Production) to the watch URL (or `youtu.be/…`).
+2. From repo root: `npx vercel --prod` (project `casandra-two`).
+3. Alias if needed: `npx vercel alias set <deployment> casandra-two.vercel.app`
+4. Confirm embed at https://casandra-two.vercel.app/#pitch-video (iframe, not “Pitch video pending”).
+5. Target: **&lt;15 min** after Ronald comments the URL on [#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6).
+
+Redeploy after any `VITE_*` change so Vite bakes them into the bundle.
 
 ## After deploy
 
-1. Paste HTTPS URL into README (`**Live demo:**` line)
-2. Comment the URL on [#5](https://github.com/Kenyi001/oraculo-radiohead/issues/5)
-3. Use the same URL in the pitch video (#6) and Hacki submit (#7)
+1. Paste HTTPS URL into README (`**Live:**` line) if it changed
+2. Use live URL + video URL in Hacki (#7) and pitch (#6)
 
 ## Smoke check
 
 - [ ] HTTPS opens Casandra (wallet → seal FALSE → Send → BLOCKED)
-- [ ] `GET /api/health` returns JSON; `POST /api/audit-claim` seals FALSE on demo lie
+- [ ] `GET https://casandra-two.vercel.app/api/health` returns JSON with registry `0xc9fcDEC1…`
+- [ ] `POST /api/audit-claim` seals FALSE on demo lie
 - [ ] Footer shows Sepolia registry `0xc9fcDEC1…`
 - [ ] Agent path section shows Live API when functions are up
+- [ ] After video env: `#pitch-video` shows YouTube embed

@@ -25,15 +25,16 @@
 
 | # | Acción | Qué debe verse |
 |---|--------|----------------|
-| 1 | Abrir live | Header **Casandra** + “Your WDK wallet” con **500.00 USDT** |
-| 2 | Señalar wallet | “Self-custody · not Casandra” + “Agent wants to send **200 USDT**” |
-| 3 | Señalar claim | Texto del agente: ETH $8,000 + low risk + send now |
-| 4 | (Si no hay sello) **Demo lie** → **Seal contradiction** | Split claim vs world + sello rojo **FALSE** |
-| 5 | Scroll a contradictions | 1–2 líneas claim → world |
-| 6 | Señalar receipt id + hash | “Timestamped. Hashed.” |
+| 1 | Abrir live | Header **Casandra** + tagline custody |
+| 2 | (Ignorar o 2s) bloque `#pitch-video` | “Pitch video pending” hasta que subas YouTube |
+| 3 | Señalar `#wallet` | **Your WDK wallet** · **500.00 USDT** · “Self-custody · not Casandra” · Agent wants **200 USDT** |
+| 4 | Señalar claim | Texto del agente: ETH $8,000 + low risk + send now |
+| 5 | (Si no hay sello) **Demo lie** → **Seal contradiction** | Split claim vs world + sello rojo **FALSE** |
+| 6 | Scroll a contradictions | 1–2 líneas claim → world + receipt hash |
 | 7 | Click **Send 200 USDT** | **BLOCKED — money stays** + balance unchanged |
-| 8 | Footer explorer | Link Sepolia registry `0xc9fcDEC1…` |
-| 9 | Cierre | Repo + “Not financial advice” |
+| 8 | (Opcional ≤10s) `#agent-path` | MCP + `POST /api/audit-claim` — mismo motor |
+| 9 | Footer explorer | Link Sepolia registry `0xc9fcDEC1…` |
+| 10 | Cierre | Repo + “Not financial advice” |
 
 **No abras** Cursor ni MCP en el video a menos que te sobre tiempo (opcional 10s al final).
 
@@ -118,13 +119,12 @@ Decí **una** de estas (no todas):
 
 ## Después de grabar (orden)
 
-1. Quemá [captions.en.srt](captions.en.srt) (CapCut o YouTube Studio).
-2. Subí **Unlisted:** https://www.youtube.com/upload  
-3. Pegá `youtube.com/watch?v=...` en:
-   - Issue [#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6)
-   - README línea `Demo video:`
-   - Hacki **Demo link\***
-4. Hacki: pegá [HACKI_PASTE.md](HACKI_PASTE.md) → **Submit** General + WDK.
+Seguí la checklist completa: **[RONALD.md](RONALD.md)** (checkboxes). Resumen:
+
+1. Quemá [captions.en.srt](captions.en.srt).
+2. YouTube **Unlisted**.
+3. Pegá URL en: [#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6) · README `**Video:**` · Hacki Demo link\* · avisá a Dax (`VITE_DEMO_VIDEO_URL`).
+4. Hacki: [HACKI_PASTE.md](HACKI_PASTE.md) — borrá Evidence Pack / `0x27544…`.
 5. Comentá BUIDL en [#7](https://github.com/Kenyi001/oraculo-radiohead/issues/7).
 
 ---
