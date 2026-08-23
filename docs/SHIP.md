@@ -11,8 +11,10 @@ Tracks: **General (default) + WDK sponsor** — evidencia-first — [TRACK.md](T
 - [x] CasandraRegistry Solidity + local smoke
 - [x] Demo footer `VITE_CASANDRA_*`
 - [x] Reposicionamiento: agente decide; WDK opcional
+- [x] CasandraRegistry **Ethereum Sepolia** (#10 cerrado)
 
-**Live demo:** https://casandra-two.vercel.app (#5)
+**Live demo:** https://casandra-two.vercel.app (#5)  
+**Contract:** [`0x27544Fe45b81C09fC91f99c0A7374970839eC4FF`](https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF)
 
 ## You must do (login / faucet / mic)
 
@@ -25,29 +27,23 @@ Tracks: **General (default) + WDK sponsor** — evidencia-first — [TRACK.md](T
 
 ### 2) Ethereum Sepolia deploy (#10 — Victor)
 
-**Official network = Ethereum Sepolia** (team has SepoliaETH; Base faucet unavailable).
-
-Address: [`0x27544Fe45b81C09fC91f99c0A7374970839eC4FF`](https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF)
-
-Victor: confirm snapshot id=0 + checklist in #10. Docs/README already updated on master.
-
-```bash
-npm run contracts:deploy:sepolia   # chainId must be 11155111
-```
+**DONE** — official network = Ethereum Sepolia. No redeploy needed.
 
 ### 3) Vercel (#5)
 
 **DONE** — https://casandra-two.vercel.app
 
-### 4) Video (#6 — Augusto)
+### 4) Video (#6 — Ronald / Augusto)
 
 ≤3 min · **70% Pulse** · **20% WDK dry-run** · **10% tracks/disclaimer**  
 Guion: [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md) · [SUBMIT.md](SUBMIT.md)
 
-### 5) Hacki submit (#7 — Dax)
+### 5) Hacki submit (#7 — Ronald)
+
+Pack copy-paste: **[HACKI_SUBMIT_PACK.md](HACKI_SUBMIT_PACK.md)**
 
 1. BUIDL en Hacki/DoraHacks  
 2. Tracks: **General** + marcar **WDK** (no “AI only”)  
-3. Adjuntar: repo · video · https://casandra-two.vercel.app · contract Sepolia si #10 · packages WDK ([WDK.md](WDK.md))
+3. Adjuntar: repo · video · https://casandra-two.vercel.app · contract Sepolia · packages WDK ([WDK.md](WDK.md))
 
 Links: https://hacki.crecimiento.build/h/aleph-hackathon-2026 · https://hacki.crecimiento.build/h/aleph-hackathon-2026/tracks/wdk-track

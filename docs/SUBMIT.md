@@ -2,7 +2,7 @@
 
 **General (default) + sponsor WDK** · evidencia-first · [TRACK.md](TRACK.md) · [DIRECTION.md](DIRECTION.md) · [WDK.md](WDK.md)
 
-**Owner pitch + video:** **Augusto** (@RonaldGaymer2002) — [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md).
+**Owner pitch + video + Hacki submit:** **Ronald / Augusto** (@RonaldGaymer2002) — [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md) · **pack copy-paste:** [HACKI_SUBMIT_PACK.md](HACKI_SUBMIT_PACK.md).
 
 ## Pitch script (~2:30–3:00 EN) — Augusto presenta
 
@@ -18,10 +18,11 @@
 
 ## Steps
 
-1. **Augusto:** grabar ≤3 min con [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md) (Pulse-first).
+1. **Ronald:** grabar ≤3 min con [PITCH_AUGUSTO.md](PITCH_AUGUSTO.md) (Pulse-first) — #6.
 2. Pegar video URL en README + #6.
 3. Live demo ya en https://casandra-two.vercel.app (#5 done).
-4. Victor: CasandraRegistry **Ethereum Sepolia** — address en README (#10); confirmar checklist.
-5. Dax: submit Hacki — **General** + **WDK**; repo/video/deploy/contract (#7).
+4. Contract Ethereum Sepolia ya en README (#10 **cerrado**).
+5. **Ronald:** submit Hacki con [HACKI_SUBMIT_PACK.md](HACKI_SUBMIT_PACK.md) — **General** + **WDK**; repo/video/demo/contract (#7).
+6. **Dax:** unlock WDK wallet para el tramo WDK del video (#8).
 
 Links: https://hacki.crecimiento.build/h/aleph-hackathon-2026 · https://github.com/Kenyi001/oraculo-radiohead

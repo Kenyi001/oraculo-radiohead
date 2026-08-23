@@ -1,17 +1,14 @@
 # Tareas Victor — Casandra (Aleph Hackathon 2026)
 
-**Responsable:** Victor  
-**Proyecto:** Oráculo de Inversión Casandra ([oraculo-radiohead](https://github.com/Kenyi001/oraculo-radiohead))  
-**Tracks:** **General (default) + WDK sponsor**
+**Responsable:** Victor (@Vctor11180)  
+**Tracks:** General (default) + WDK sponsor  
+**Estado #10:** **DONE**
 
 ---
 
-## Decisión de red (oficial)
+## Red oficial
 
-**Ethereum Sepolia** (chainId `11155111`) es la red oficial del demo — el equipo tiene SepoliaETH; Base faucet no disponible.  
-Base Sepolia queda opcional para después.
-
-### Deploy oficial (#10)
+**Ethereum Sepolia** (chainId `11155111`) — el equipo tiene SepoliaETH.
 
 | | |
 |---|---|
@@ -19,21 +16,13 @@ Base Sepolia queda opcional para después.
 | Explorer | https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF |
 | Artifact | `contracts/deployments/sepolia.json` |
 
-## Tarea
+## Checklist (aceptado)
 
-- [x] Sincronizar `master`
-- [x] Verificar `CasandraRegistry.sol`
-- [x] Smoke local
-- [x] **Despliegue Ethereum Sepolia + address en README/demo** (#10)
-- [ ] Confirmar en #10: snapshot id=0 visible + checklist de pruebas (compile/smoke/explorer/README)
+- [x] Compile `CasandraRegistry.sol`
+- [x] Smoke local + snapshot demo
+- [x] Deploy Ethereum Sepolia (`chainId: 11155111`)
+- [x] `publishRiskSnapshot` demo on-chain
+- [x] Address en README + demo `.env.production`
+- [x] Issue [#10](https://github.com/Kenyi001/oraculo-radiohead/issues/10) cerrado
 
-## Checklist de pruebas (Hacki)
-
-1. `npx hardhat compile`
-2. `npm run contracts:deploy:local`
-3. Deploy Sepolia → `chainId: 11155111` (ya hecho)
-4. Snapshot `publishRiskSnapshot` id=0
-5. Link Etherscan vivo
-6. README + `VITE_CASANDRA_*` / `.env.production`
-
-Tracks: [docs/TRACK.md](../TRACK.md) · Contracts: [contracts/README.md](../../contracts/README.md)
+Base Sepolia queda opcional para después. No hace falta más redeploy.
