@@ -1,171 +1,206 @@
-# Casandra (repo: oraculo-radiohead)
+# Casandra 🔮 (oraculo-radiohead)
 
 **Decision substrate for AI agents — sourced, timestamped market evidence so the agent decides on its own.**  
-Not predictions. Not a money-mover. Not financial advice.
+*Not predictions. Not a money-mover. Not financial advice.*
 
-> Named after Cassandra, the prophetess. Built for [Aleph Hackathon 2026](https://hacki.crecimiento.build/h/aleph-hackathon-2026) — Santa Cruz (EMI / Ethereum Bolivia).  
-> **General (default)** + sponsor **[WDK](https://hacki.crecimiento.build/h/aleph-hackathon-2026/tracks/wdk-track)** (optional execution under evidence).  
-> Specs: [specs/constitution.md](specs/constitution.md) · Direction: [docs/DIRECTION.md](docs/DIRECTION.md)
+[![Hackathon](https://img.shields.io/badge/Aleph-Hackathon_2026-blueviolet?style=for-the-badge)](https://hacki.crecimiento.build/h/aleph-hackathon-2026)
+[![Network](https://img.shields.io/badge/Ethereum-Sepolia_Testnet-blue?style=for-the-badge&logo=ethereum)](https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF)
+[![Sponsor](https://img.shields.io/badge/Track-Tether_WDK-teal?style=for-the-badge)](https://hacki.crecimiento.build/h/aleph-hackathon-2026/tracks/wdk-track)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
-## Problem / Solution
+---
 
-AI agents invent prices and invent reasons. **Casandra** returns a consume-only **Evidence Pack** — live price, risk, Fear&Greed, news headlines, and a structured `why` / `reasons[]` — so the **agent can decide on its own**. Same engine powers the **web demo** for judges. **WDK** (`wdk-mcp`) is an optional second layer: only if the agent chooses to act, a guardrail can gate a USD₮ dry-run (sponsor track proof — not the product).
+## 1. Resumen General y Propuesta de Valor
 
-### What it simplifies
+En el ecosistema DeFi actual, los agentes de IA suelen tomar decisiones basadas en raspados de pantalla caóticos, opiniones de chats o heurísticas sesgadas. Esto los lleva a alucinar precios, inventar razones de mercado e iniciar transacciones arriesgadas.
 
-Without Casandra, the agent scrapes prices, invents “whys”, and may move a wallet on hallucinations.  
-**With Casandra:** one call (`get_market_pulse`) → ready Evidence Pack → the agent **reads and decides** (`consume_only: true`).
-
-### What others don’t offer
-
-| Typical hackathon agent | Casandra |
-|-------------------------|----------|
-| Chat opinion / black-box advice | Versioned, deterministic JSON |
-| Price-only **or** send-token demo | Price + risk + F&G + news + **why** in one pack |
-| Product = move USD₮ | Product = **inform**; execution optional |
-
-Full thesis: [docs/DIRECTION.md](docs/DIRECTION.md).
-
-## Team
-
-| Role | Owner |
-|---|---|
-| MCP + core + Pulse + submit | **Dax** ([Kenyi001](https://github.com/Kenyi001)) |
-| Market Pulse quality | **David** ([arnez69](https://github.com/arnez69)) |
-| Contrato + Web3 (Ethereum Sepolia) | **Vctor11180** ([Vctor11180](https://github.com/Vctor11180)) |
-| Vercel live demo | **Dax** — [docs/VERCEL.md](docs/VERCEL.md) |
-| Pitch + video | **Augusto** ([RonaldGaymer2002](https://github.com/RonaldGaymer2002)) — [docs/PITCH_AUGUSTO.md](docs/PITCH_AUGUSTO.md) |
-
-## Aleph 2026
-
-| | |
-|---|---|
-| **General (default)** | Evidence Pack / Decision Substrate — [docs/TRACK.md](docs/TRACK.md) |
-| **Sponsor** | **WDK** — optional execution under evidence — [docs/WDK.md](docs/WDK.md) |
-| **Direction** | [docs/DIRECTION.md](docs/DIRECTION.md) |
-| Chapter | [Santa Cruz EMI](https://aleph-hackathon-2026-santa-cruz.vercel.app/#lugar) |
-| Platform | [Hacki](https://hacki.crecimiento.build/h/aleph-hackathon-2026) |
-| Framework | [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) · [TASKS.md](TASKS.md) · [docs/BOARD.md](docs/BOARD.md) |
-
-## MCP tools (Casandra)
-
-| Tool | Purpose |
-|---|---|
-| **`get_market_pulse`** | **Primary:** consume-only Evidence Pack — favor + why + news + F&G + context hint |
-| `get_price` | USD price + 24h change |
-| `get_portfolio_state` | Value, PnL %, weights, USDT share |
-| `get_risk_level` | Score 0–100 + band + context hint `action` |
-| `get_market_context` | Fast bias bullets (not advice) |
-| `get_market_summary` | Multi-symbol bias |
-| `check_wdk_guardrail` | **Optional WDK:** allow/deny before `send_token` |
-| `health` | Version / last fetch |
-
-Agent policy: [docs/AGENT_WDK_POLICY.md](docs/AGENT_WDK_POLICY.md) — **agent decides**; Pulse first; WDK only after.
-
-## Market Pulse — consume-only Evidence Pack
-
-Agents **must not** reinvent the formula. Call `get_market_pulse` and read JSON:
-
-| Field | Use |
-|-------|-----|
-| `why` | Structured **por qué** (market, news, sentiment, alignment) |
-| `reasons[]` | ≥3 concrete reasons with numbers |
-| `meters` | price changes, Fear&Greed, news_score |
-| `headlines[]` | News titles (RSS or mock fallback) |
-| `verdict` | Context hint: `proceed` / `caution` / `avoid` (not a trade order) |
-| `market_favor` | `for` / `against` / `neutral` |
-| `confidence` | 0–1 |
-| `consume_only` | always `true` |
-| `algorithm` | `casandra-pulse-v1` |
-| `fetched_at` | ISO timestamp |
-
-Product requirements: [docs/david/REQUISITOS_PULSE.md](docs/david/REQUISITOS_PULSE.md).
-
-**Live demo:** https://casandra-two.vercel.app  
-**Demo video:** _pending — Ronald pega URL YouTube Unlisted de [#6](https://github.com/Kenyi001/oraculo-radiohead/issues/6)_ (upload: https://www.youtube.com/upload)  
-**Repo:** https://github.com/Kenyi001/oraculo-radiohead  
-**Hacki pack:** [docs/HACKI_SUBMIT_PACK.md](docs/HACKI_SUBMIT_PACK.md)
-
-### Sponsor track proof (WDK) — secondary
-
-- Guardrail: [`packages/market-core/src/index.ts`](packages/market-core/src/index.ts) (`checkWdkGuardrail`)
-- MCP: [`packages/mcp-server/src/index.ts`](packages/mcp-server/src/index.ts) (`check_wdk_guardrail`)
-- Dual MCP: [`docs/mcp-casandra-wdk.example.json`](docs/mcp-casandra-wdk.example.json)
-- Packages: `@tetherto/wdk@1.0.0-beta.16`, `@tetherto/wdk-cli@1.0.0-beta.3`
-- Full guide: [docs/WDK.md](docs/WDK.md)
-
-Ask: *“Run get_market_pulse for eth side=buy. Summarize why and reasons. Only if you would act, check_wdk_guardrail and dry-run — never invent numbers.”*
-
-## Risk algorithm v1 (`casandra-risk-v1`)
+**Casandra** resuelve esto proporcionando un **Evidence Pack (Paquete de Evidencia) determinista, versionado y estructurado en JSON**. 
 
 ```
-score = 0.45 * abs_change_component
-      + 0.35 * relative_vol_vs_btc
-      + 0.20 * (100 - usdt_share_pct)
+                               ┌──────────────────────────┐
+                               │   Fuentes en Tiempo Real │
+                               │  (RSS, Precios, F&G Index)│
+                               └─────────────┬────────────┘
+                                             ▼
+                               ┌──────────────────────────┐
+                               │     Algoritmo Casandra   │
+                               │   (Análisis de Riesgo)   │
+                               └─────────────┬────────────┘
+                                             ▼
+                               ┌──────────────────────────┐
+   ┌──────────────────────────►│      Evidence Pack       ├──────────────────────────┐
+   │                           │     (JSON Estructurado)  │                          │
+   │                           └─────────────┬────────────┘                          │
+   ▼                                         ▼                                       ▼
+┌──────────────────────────┐   ┌─────────────┴────────────┐   ┌──────────────────────────┐
+│   MCP Server (stdio)     │   │      Smart Contract      │   │     Frontend (React)     │
+│   (Agentes de IA)        │   │    (Ethereum Sepolia)    │   │      (Visualización)     │
+└──────────────────────────┘   └──────────────────────────┘   └──────────────────────────┘
 ```
 
-- Bands: **0–33 low** · **34–66 med** · **67–100 high**
-- Context hint: low → proceed · med → caution · high → avoid
-- Full factor breakdown returned in JSON
+### Características Clave:
+- **Toma de decisiones libre de alucinaciones:** En lugar de darle sugerencias directas de compra/venta, entrega a los agentes una estructura de datos `consume_only: true` con los fundamentos del mercado. El agente lee, procesa y asume la responsabilidad de la decisión.
+- **Evidencia Unificada:** Combina precio actual, cambios de 24h, métricas de sentimiento (Fear & Greed Index), titulares de noticias en vivo vía RSS (CoinTelegraph, CoinDesk) y un desglose detallado de por qué el mercado se encuentra en ese estado.
+- **Arquitectura de Guardarraíl (WDK):** Integra Tether WDK de forma segura. Si el agente decide actuar basándose en la evidencia de Casandra, el puente opcional WDK valida que no haya señales de alerta extrema antes de autorizar cualquier operación de prueba.
 
-## Quick start
+---
 
+## 2. Arquitectura Técnica y Componentes
+
+El proyecto está estructurado como un monorepo basado en **npm Workspaces**, diseñado para ser modular, altamente tipado (TypeScript) y fácil de extender:
+
+```
+oraculo-radiohead/
+├── contracts/             # Contratos inteligentes (Hardhat + Solidity)
+├── packages/
+│   ├── market-core/       # Algoritmos de riesgo, parsing de RSS, datos agregados
+│   ├── mcp-server/        # Servidor de Model Context Protocol (stdio)
+│   ├── wdk-bridge/        # Integración y manifiesto del Tether WDK
+│   └── demo-web/          # Interfaz web de usuario (React + Vite)
+├── scripts/               # Scripts de utilidad rápida
+└── docs/                  # Especificaciones, dirección de diseño y pitches
+```
+
+### Detalle de Componentes
+
+1. **`@oraculo/market-core` (Núcleo de Datos y Algoritmo de Riesgo)**
+   - Recupera precios de criptomonedas y variaciones en tiempo real.
+   - Consume y parsea XML de feeds RSS oficiales (`CoinTelegraph` y `CoinDesk`) segmentados por símbolo (`BTC`, `ETH`, `SOL`, `USDT`).
+   - Implementa **`casandra-risk-v1`**: Un algoritmo transparente que evalúa el nivel de riesgo en una escala de 0 a 100 ponderando la volatilidad, los cambios de precio y la proporción de stablecoins en el portafolio.
+   - Genera el **Evidence Pack** con campos como: `why`, `reasons[]`, `meters`, `headlines[]`, `market_favor`, `confidence`, y `verdict`.
+
+2. **`@oraculo/mcp-server` (Protocolo de Contexto de Modelos - MCP)**
+   - Implementa el estándar de Anthropic/MCP para comunicar herramientas directamente a LLMs.
+   - Expone herramientas críticas como `get_market_pulse` (Primaria), `get_price`, `get_risk_level`, `get_portfolio_state` y `check_wdk_guardrail`.
+   - Se ejecuta a través de `stdio`, ideal para integración directa en IDEs como Cursor o clientes de escritorio como Claude Desktop.
+
+3. **`@oraculo/wdk-bridge` (Puente Tether WDK)**
+   - Gestiona las dependencias de Tether WDK (`@tetherto/wdk` y `@tetherto/wdk-cli`).
+   - Define el flujo de guardarraíles para agentes: 1) Desbloqueo de cartera, 2) Validación de riesgo con Casandra (`check_wdk_guardrail`), 3) Ejecución/Simulación en WDK (dry-run).
+
+4. **`contracts/CasandraRegistry.sol` (Registro On-Chain)**
+   - Contrato inteligente minimalista escrito en Solidity y desplegado en **Ethereum Sepolia**.
+   - Permite anclar hashes de los análisis de riesgo y portafolio generados por Casandra a la blockchain para auditoría pública y verificación de consistencia en el tiempo.
+   - **Dirección Sepolia:** [`0x27544Fe45b81C09fC91f99c0A7374970839eC4FF`](https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF)
+
+5. **`@oraculo/demo-web` (Frontend de Demostración)**
+   - Aplicación web construida con React, Vite y CSS Vanilla para un diseño premium, fluido e interactivo.
+   - Permite a los jueces de la Hackathon interactuar visualmente con el Evidence Pack, simular carteras, ver las noticias analizadas y consultar registros en la blockchain.
+
+---
+
+## 3. Instalación, Variables de Entorno y Ejecución Local
+
+### Requisitos Previos
+- **Node.js** >= 20.x
+- **npm** >= 10.x
+
+### Paso 1: Clonar e Instalar Dependencias
 ```bash
+git clone https://github.com/Kenyi001/oraculo-radiohead.git
+cd oraculo-radiohead
 npm install
-npm run build
-npm run start:mcp    # MCP stdio
-npm run dev:web      # http://localhost:5173
 ```
 
-### Cursor MCP config (Casandra + optional WDK)
+### Paso 2: Configuración de Variables de Entorno
 
+#### 1. Configuración de Tether WDK (Raíz del proyecto)
+Crea un archivo `.env` en la raíz del proyecto basado en `.env.wdk.example`:
+```env
+WDK_WALLET_NAME=casandra-dev
+WDK_DEFAULT_NETWORK=sepolia
+# Opcional (si se requieren consultas extendidas):
+# MOONPAY_API_KEY=tu_api_key
+# WDK_INDEXER_URL=url_del_indexer
+```
+
+#### 2. Configuración de Contratos Inteligentes (`/contracts`)
+Crea un archivo `.env` en el directorio `contracts/` basándote en `contracts/.env.example`:
+```env
+PRIVATE_KEY=tu_clave_privada_de_sepolia (nunca compartir)
+SEPOLIA_RPC=https://ethereum-sepolia-rpc.publicnode.com
+```
+
+#### 3. Configuración del Frontend (`/packages/demo-web`)
+Crea un archivo `.env` en `packages/demo-web/` basado en `packages/demo-web/.env.example`:
+```env
+VITE_CASANDRA_REGISTRY_ADDRESS=0x27544Fe45b81C09fC91f99c0A7374970839eC4FF
+VITE_CASANDRA_REGISTRY_EXPLORER=https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF
+```
+
+### Paso 3: Compilación del Monorepo
+Para compilar todos los paquetes en el orden correcto de dependencias:
+```bash
+npm run build
+```
+
+### Paso 4: Ejecución Local
+
+- **Ejecutar Servidor MCP (stdio):**
+  ```bash
+  npm run start:mcp
+  ```
+  *(Alternativamente para desarrollo: `npm run dev:mcp`)*
+
+- **Ejecutar Frontend (Vite):**
+  ```bash
+  npm run dev:web
+  ```
+  Abre tu navegador en [http://localhost:5173](http://localhost:5173).
+
+- **Ejecutar Compilación y Despliegue Local de Contratos (Hardhat):**
+  ```bash
+  npm run contracts:compile
+  # Para desplegar en la red local de Hardhat
+  npm run contracts:deploy:local
+  # Para desplegar en Ethereum Sepolia
+  npm run contracts:deploy:sepolia
+  ```
+
+- **Ejecutar Script de Utilidad (Probar la obtención del Pulse en Node):**
+  ```bash
+  node scripts/capture-pulse-json.mjs
+  ```
+
+---
+
+## 4. Configuración MCP en Cursor o Claude Desktop
+
+Para integrar las herramientas de Casandra en tu agente o IDE:
+
+### Configuración en Cursor (settings -> Features -> MCP):
+- **Name:** `casandra`
+- **Type:** `command`
+- **Command:** `node <RUTA_ABSOLUTA_A_TU_PROYECTO>/packages/mcp-server/dist/index.js`
+
+### Configuración en Claude Desktop (`config.json`):
 ```json
 {
   "mcpServers": {
     "casandra": {
       "command": "node",
-      "args": ["D:/_Dev/Projects/oraculo-radiohead/packages/mcp-server/dist/index.js"]
-    },
-    "wdk-wallet": {
-      "command": "wdk-mcp"
+      "args": [
+        "<RUTA_ABSOLUTA_A_TU_PROYECTO>/packages/mcp-server/dist/index.js"
+      ]
     }
   }
 }
 ```
 
-## Monorepo
+---
 
-```
-packages/market-core   # prices, portfolio, risk, Pulse, optional WDK guardrail
-packages/mcp-server    # Casandra MCP (get_market_pulse primary)
-packages/wdk-bridge    # WDK package manifest (sponsor track)
-packages/demo-web      # judges UI — Pulse-first
-contracts/             # CasandraRegistry (Ethereum Sepolia)
-docs/                  # DIRECTION, TRACK, WDK, pitch
-```
+## 5. Equipo de Trabajo y Colaboradores
 
-## On-chain (CasandraRegistry)
+Un gran proyecto construido por mentes apasionadas en la **Aleph Hackathon 2026 (Santa Cruz, Bolivia)**:
 
-Minimal risk-snapshot registry for Aleph. **Official network: Ethereum Sepolia** (team SepoliaETH; Base optional later).
+| Integrante | Rol / Responsabilidad | GitHub |
+|---|---|---|
+| **Dax Kenji Tellez Duran** | **MCP + Core + Integración Pulse + Vercel Deployment** <br> Arquitectura del servidor MCP, lógica core de agregación y despliegue del demo web. | [@Kenyi001](https://github.com/Kenyi001) |
+| **David Arnez** | **Calidad del Market Pulse y Algorítmica** <br> Diseño, calibración y especificación del motor de análisis de riesgo y Evidence Pack. | [@arnez69](https://github.com/arnez69) |
+| **Victor Manuel** | **Contratos Inteligentes y Web3 Integración** <br> Desarrollo y despliegue de `CasandraRegistry` en Sepolia, integración de RPCs e interacción blockchain. | [@Vctor11180](https://github.com/Vctor11180) |
+| **Augusto Ronald** | **Dirección de Pitch, Video Demostrativo y Documentación** <br> Storytelling del proyecto, grabación del video de uso y redacción de dirección técnica. | [@RonaldGaymer2002](https://github.com/RonaldGaymer2002) |
 
-```bash
-npm run contracts:compile
-npm run contracts:deploy:sepolia
-```
+---
 
-See [contracts/README.md](contracts/README.md).
-
-**Contract address (Ethereum Sepolia):** [`0x27544Fe45b81C09fC91f99c0A7374970839eC4FF`](https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF)  
-**Explorer:** https://sepolia.etherscan.io/address/0x27544Fe45b81C09fC91f99c0A7374970839eC4FF
-
-## Code graph ([graphify](https://github.com/graphify-project))
-
-[graphify-out/GRAPH_REPORT.md](graphify-out/GRAPH_REPORT.md) · [graphify-out/graph.html](graphify-out/graph.html) · [graphify-out/oraculo-radiohead-callflow.html](graphify-out/oraculo-radiohead-callflow.html).
-
-## Disclaimer
-
-**Not financial advice.** Casandra does not execute trades or predict returns. The agent decides.
-
-## License
-
-MIT
+## Descargo de Responsabilidad / Disclaimer
+**No es asesoría financiera.** Casandra no toma posiciones comerciales, no ejecuta operaciones automatizadas por sí misma de manera autónoma en producción y no garantiza rendimientos. El propósito principal es enriquecer el contexto para que los agentes operen bajo un marco riguroso de evidencia empírica.
